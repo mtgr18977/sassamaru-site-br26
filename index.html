@@ -1,0 +1,769 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Bench Rodada — Poisson + Elo (odds-like)</title>
+
+  <!-- CSV parser (CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+  <style>
+    :root{
+      --bg:#0b1020;
+      --card:#111a33;
+      --muted:#9fb0e0;
+      --text:#e9efff;
+      --border:rgba(255,255,255,.10);
+      --accent:#7aa2ff;
+      --good:#2ee59d;
+      --warn:#ffd37a;
+      --bad:#ff7a7a;
+      --shadow:0 12px 30px rgba(0,0,0,.35);
+      --radius:16px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      background:radial-gradient(1200px 600px at 15% 10%, rgba(122,162,255,.25), transparent 60%),
+                 radial-gradient(1200px 600px at 85% 20%, rgba(46,229,157,.18), transparent 60%),
+                 var(--bg);
+      color:var(--text);
+    }
+    .wrap{
+      max-width:1100px;
+      margin:0 auto;
+      padding:28px 16px 56px;
+    }
+    header{
+      display:flex;
+      gap:16px;
+      align-items:flex-start;
+      justify-content:space-between;
+      margin-bottom:18px;
+    }
+    h1{
+      margin:0;
+      font-size:20px;
+      letter-spacing:.2px;
+    }
+    .sub{
+      margin:6px 0 0;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.35;
+    }
+    .card{
+      background:linear-gradient(180deg, rgba(17,26,51,.92), rgba(17,26,51,.70));
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:16px;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:14px;
+    }
+    @media (max-width: 880px){
+      .grid{grid-template-columns:1fr}
+    }
+    label{
+      display:block;
+      font-size:12px;
+      color:var(--muted);
+      margin:0 0 8px;
+    }
+    textarea, input[type="text"]{
+      width:100%;
+      border:1px solid var(--border);
+      background:rgba(0,0,0,.20);
+      color:var(--text);
+      border-radius:12px;
+      padding:12px 12px;
+      font-family:var(--mono);
+      font-size:13px;
+      outline:none;
+    }
+    textarea{
+      min-height:160px;
+      resize:vertical;
+      line-height:1.4;
+    }
+    .row{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    button{
+      border:1px solid rgba(122,162,255,.35);
+      background:linear-gradient(180deg, rgba(122,162,255,.25), rgba(122,162,255,.12));
+      color:var(--text);
+      padding:10px 14px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:600;
+      letter-spacing:.2px;
+      transition:transform .05s ease, border-color .15s ease;
+    }
+    button:active{transform:translateY(1px)}
+    button:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+    }
+    .pill{
+      font-family:var(--mono);
+      font-size:12px;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      color:var(--muted);
+      background:rgba(0,0,0,.18);
+      white-space:nowrap;
+    }
+    .status{
+      margin-top:10px;
+      font-size:12px;
+      color:var(--muted);
+    }
+    .status b{color:var(--text)}
+    .status .ok{color:var(--good)}
+    .status .warn{color:var(--warn)}
+    .status .bad{color:var(--bad)}
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      overflow:hidden;
+      border-radius:14px;
+      border:1px solid var(--border);
+      margin-top:14px;
+      background:rgba(0,0,0,.18);
+    }
+    thead th{
+      text-align:left;
+      font-size:12px;
+      color:var(--muted);
+      background:rgba(0,0,0,.25);
+      padding:10px 10px;
+      border-bottom:1px solid var(--border);
+      position:sticky;
+      top:0;
+    }
+    tbody td{
+      padding:10px 10px;
+      border-bottom:1px solid rgba(255,255,255,.06);
+      font-size:13px;
+    }
+    tbody tr:last-child td{border-bottom:none}
+    .num{font-family:var(--mono); text-align:right}
+    .mono{font-family:var(--mono)}
+    .tag{
+      display:inline-block;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(0,0,0,.20);
+      font-size:12px;
+      font-weight:700;
+    }
+    .tag.home{border-color:rgba(46,229,157,.35)}
+    .tag.draw{border-color:rgba(255,211,122,.35)}
+    .tag.away{border-color:rgba(255,122,122,.35)}
+    .footer-note{
+      margin-top:10px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.35;
+    }
+    .small{font-size:12px;color:var(--muted)}
+    .danger{
+      border-color:rgba(255,122,122,.35)!important;
+      background:rgba(255,122,122,.08)!important;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Bench Rodada — Poisson + Elo (odds-like)</h1>
+        <p class="sub">
+          Entrada: uma partida por linha no formato <span class="mono">Mandante x Visitante</span>.<br/>
+          Saída: probabilidades 1X2 + odds com overround (margem) + gols esperados.
+        </p>
+      </div>
+      <div class="pill" id="configPill"></div>
+    </header>
+
+    <div class="grid">
+      <div class="card">
+        <label for="fixtures">Rodada (uma por linha)</label>
+        <textarea id="fixtures" spellcheck="false">flamengo x internacional
+gremio x botafogo
+bragantino x atletico mineiro
+bahia x fluminense
+santos x sao paulo
+vasco x chapecoense
+remo x mirassol
+cruzeiro x coritiba
+palmeiras x vitoria
+athletico paranaense x corinthians</textarea>
+
+        <div class="row" style="margin-top:12px;">
+          <button id="runBtn" disabled>Rodar simulação</button>
+          <span class="pill" id="modelState">Carregando dataset…</span>
+        </div>
+
+        <div class="status" id="status"></div>
+        <div class="footer-note">
+          <b>Como hospedar:</b> coloque este arquivo no seu servidor e deixe o CSV no mesmo diretório com o nome configurado abaixo.
+          Se der erro de CORS/404, ajuste <span class="mono">CSV_PATH</span>.
+        </div>
+      </div>
+
+      <div class="card">
+        <label>Config do Modelo</label>
+        <div class="small mono" id="cfg"></div>
+        <div class="footer-note">
+          <b>Notas:</b>
+          <ul style="margin:8px 0 0 18px; padding:0; color:var(--muted);">
+            <li>Mando fica somente no Poisson (evita dupla contagem).</li>
+            <li>Elo ajusta o λ via <span class="mono">exp(±adj)</span> com clamp.</li>
+            <li>Dixon–Coles simplificado ajusta empates baixos (0–0, 1–1, 1–0, 0–1).</li>
+            <li>Odds aplicam overround simples: <span class="mono">p_market = p * (1+m)</span>.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+      <div class="row" style="justify-content:space-between;">
+        <div class="mono" style="font-weight:700;">Resultados</div>
+        <div class="small" id="meta"></div>
+      </div>
+
+      <div style="overflow:auto; margin-top:8px;">
+        <table id="outTable" aria-label="Resultados">
+          <thead>
+            <tr>
+              <th>Mandante</th>
+              <th>Visitante</th>
+              <th class="num">Gols M</th>
+              <th class="num">Gols V</th>
+              <th class="num">P(M)%</th>
+              <th class="num">P(E)%</th>
+              <th class="num">P(V)%</th>
+              <th class="num">Odd M</th>
+              <th class="num">Odd E</th>
+              <th class="num">Odd V</th>
+              <th>Palpite</th>
+            </tr>
+          </thead>
+          <tbody id="outBody">
+            <tr><td colspan="11" class="small">Carregue o modelo e clique em “Rodar simulação”.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+<script>
+/** =========================
+ *  Config (ajuste aqui)
+ *  ========================= */
+const CSV_PATH = "./campeonato-brasileiro-full_ate_2025.csv"; // coloque este CSV ao lado do HTML
+const DATE_COL = "data";
+const HOME_TEAM_COL = "mandante";
+const AWAY_TEAM_COL = "visitante";
+// No seu CSV “full”, gols podem estar assim (como você usou no Python):
+const HOME_GOALS_COL = "mandante_Placar";
+const AWAY_GOALS_COL = "visitante_Placar";
+
+// Half-life (dias)
+const HALF_LIFE_ELO_DAYS = 365 * 2;
+const HALF_LIFE_POISSON_DAYS = 365 * 4;
+
+// Elo
+const ELO_INITIAL = 1500;
+const ELO_K_BASE = 30;
+const SEASON_RESET_ALPHA = 0.20; // reset parcial por ano
+
+// Elo -> lambda (odds-like)
+const ELO_GAMMA = 0.08;
+const ELO_LAMBDA_CLAMP = 0.18;
+
+// Poisson
+const POISSON_MAX_GOALS = 8;
+
+// Dixon–Coles simplificado
+const DC_RHO = -0.10;
+
+// Overround (margem) para odds
+const OVERROUND = 0.06;
+
+// Peso mínimo (estabilidade)
+const MIN_W_ELO = 0.15;
+const MIN_W_POI = 0.30;
+
+/** =========================
+ *  Helpers
+ *  ========================= */
+function normalizeTeam(name){
+  if (name === null || name === undefined) return "";
+  let s = String(name).trim().toLowerCase();
+  s = s.normalize("NFKD").replace(/[\u0300-\u036f]/g, "");
+  s = s.replace(/-/g, " ");
+  s = s.replace(/\s+/g, " ").trim();
+
+  const aliases = new Map([
+    ["atletico mg", "atletico mineiro"],
+    ["atletico mineiro mg", "atletico mineiro"],
+    ["botafogo rj", "botafogo"],
+    ["vasco da gama", "vasco"],
+    ["athetico parananese", "athletico paranaense"],
+  ]);
+  return aliases.get(s) || s;
+}
+
+function parseDateBR(s){
+  // tenta dd/mm/yyyy e variações
+  if (!s) return null;
+  const str = String(s).trim();
+  // PapaParse já entrega string; parse manual
+  const m = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+  if (m){
+    const dd = Number(m[1]), mm = Number(m[2]), yy = Number(m[3].length === 2 ? ("20"+m[3]) : m[3]);
+    const d = new Date(Date.UTC(yy, mm-1, dd));
+    return isNaN(d.getTime()) ? null : d;
+  }
+  // fallback: Date() nativo (pode funcionar se ISO)
+  const d2 = new Date(str);
+  return isNaN(d2.getTime()) ? null : d2;
+}
+
+function daysBetween(a, b){
+  // b - a (dias)
+  const ms = (b.getTime() - a.getTime());
+  return Math.floor(ms / (1000 * 60 * 60 * 24));
+}
+
+function temporalWeight(matchDate, refDate, halfLifeDays, minW){
+  if (!matchDate || !refDate) return 1.0;
+  const age = daysBetween(matchDate, refDate);
+  if (age <= 0) return 1.0;
+  const w = Math.pow(0.5, age / halfLifeDays);
+  return Math.max(minW, w);
+}
+
+function poissonProb(lambda, k){
+  if (lambda <= 0) return (k === 0 ? 1 : 0);
+  // exp(-λ) * λ^k / k!
+  let fact = 1;
+  for (let i=2;i<=k;i++) fact *= i;
+  return Math.exp(-lambda) * Math.pow(lambda, k) / fact;
+}
+
+function oddsFromProbsOverround(ph, pd, pa, overround){
+  const eps = 1e-12;
+  ph = Math.max(eps, ph);
+  pd = Math.max(eps, pd);
+  pa = Math.max(eps, pa);
+  const scale = 1 + overround;
+  return {
+    oh: 1 / (ph * scale),
+    od: 1 / (pd * scale),
+    oa: 1 / (pa * scale),
+  };
+}
+
+/** Dixon–Coles simplificado (aplica multiplicadores e renormaliza) */
+function applyDixonColes(scoreProbs, rho){
+  // scoreProbs: Map key "gH,gA" -> p
+  const adj = new Map(scoreProbs);
+
+  function mult(gH, gA, m){
+    const key = `${gH},${gA}`;
+    adj.set(key, (adj.get(key) || 0) * m);
+  }
+
+  mult(0,0, 1 - rho);
+  mult(1,1, 1 - rho);
+  mult(1,0, 1 + rho);
+  mult(0,1, 1 + rho);
+
+  let sum = 0;
+  for (const p of adj.values()) sum += p;
+  if (sum <= 0) return scoreProbs;
+
+  for (const [k,p] of adj.entries()){
+    adj.set(k, p / sum);
+  }
+  return adj;
+}
+
+/** =========================
+ *  Build Model
+ *  ========================= */
+let MODEL = null;
+
+function buildModel(rows){
+  // Normaliza e filtra
+  const parsed = [];
+  for (const r of rows){
+    const home = normalizeTeam(r[HOME_TEAM_COL]);
+    const away = normalizeTeam(r[AWAY_TEAM_COL]);
+    const hg = Number(r[HOME_GOALS_COL]);
+    const ag = Number(r[AWAY_GOALS_COL]);
+    const dt = parseDateBR(r[DATE_COL]);
+
+    if (!home || !away) continue;
+    if (!Number.isFinite(hg) || !Number.isFinite(ag)) continue;
+    if (!dt) continue;
+
+    parsed.push({home, away, hg: hg|0, ag: ag|0, dt});
+  }
+
+  if (parsed.length < 50) {
+    throw new Error("Dataset insuficiente após limpeza. Verifique nomes das colunas e formato de data.");
+  }
+
+  // Data ref = mais recente
+  let ref = parsed[0].dt;
+  for (const p of parsed) if (p.dt > ref) ref = p.dt;
+
+  // Pesos
+  for (const p of parsed){
+    p.wElo = temporalWeight(p.dt, ref, HALF_LIFE_ELO_DAYS, MIN_W_ELO);
+    p.wPoi = temporalWeight(p.dt, ref, HALF_LIFE_POISSON_DAYS, MIN_W_POI);
+  }
+
+  // Poisson forces: agregações
+  let leagueHomeGoalsW = 0, leagueAwayGoalsW = 0, leagueW = 0;
+  const team = new Map(); // time -> stats
+
+  function getTeam(t){
+    if (!team.has(t)){
+      team.set(t, {
+        homeGFw:0, homeGAw:0, homeW:0,
+        awayGFw:0, awayGAw:0, awayW:0,
+      });
+    }
+    return team.get(t);
+  }
+
+  for (const p of parsed){
+    const w = p.wPoi;
+    leagueHomeGoalsW += p.hg * w;
+    leagueAwayGoalsW += p.ag * w;
+    leagueW += w;
+
+    const th = getTeam(p.home);
+    th.homeGFw += p.hg * w;
+    th.homeGAw += p.ag * w;
+    th.homeW += w;
+
+    const ta = getTeam(p.away);
+    ta.awayGFw += p.ag * w;
+    ta.awayGAw += p.hg * w;
+    ta.awayW += w;
+  }
+
+  const leagueHomeAvg = leagueW > 0 ? (leagueHomeGoalsW / leagueW) : 1.0;
+  const leagueAwayAvg = leagueW > 0 ? (leagueAwayGoalsW / leagueW) : 1.0;
+
+  const forces = new Map();
+  for (const [t, st] of team.entries()){
+    const homeGF = st.homeW > 0 ? (st.homeGFw / st.homeW) : NaN;
+    const homeGA = st.homeW > 0 ? (st.homeGAw / st.homeW) : NaN;
+    const awayGF = st.awayW > 0 ? (st.awayGFw / st.awayW) : NaN;
+    const awayGA = st.awayW > 0 ? (st.awayGAw / st.awayW) : NaN;
+
+    const atkH = (Number.isFinite(homeGF) && leagueHomeAvg > 0) ? (homeGF / leagueHomeAvg) : 1.0;
+    const defH = (Number.isFinite(homeGA) && leagueAwayAvg > 0) ? (homeGA / leagueAwayAvg) : 1.0;
+    const atkA = (Number.isFinite(awayGF) && leagueAwayAvg > 0) ? (awayGF / leagueAwayAvg) : 1.0;
+    const defA = (Number.isFinite(awayGA) && leagueHomeAvg > 0) ? (awayGA / leagueHomeAvg) : 1.0;
+
+    forces.set(t, {atkH, defH, atkA, defA});
+  }
+
+  // Elo: ordenar por data e atualizar (reset por ano)
+  parsed.sort((a,b) => a.dt - b.dt);
+
+  const elo = new Map();
+  let currentYear = null;
+
+  function seasonReset(){
+    for (const [t, r] of elo.entries()){
+      elo.set(t, r * (1 - SEASON_RESET_ALPHA) + ELO_INITIAL * SEASON_RESET_ALPHA);
+    }
+  }
+
+  function getElo(t){
+    if (!elo.has(t)) elo.set(t, ELO_INITIAL);
+    return elo.get(t);
+  }
+
+  for (const p of parsed){
+    const y = p.dt.getUTCFullYear();
+    if (currentYear === null) currentYear = y;
+    else if (y !== currentYear){
+      seasonReset();
+      currentYear = y;
+    }
+
+    const rc = getElo(p.home);
+    const rv = getElo(p.away);
+
+    let result = 0.5;
+    if (p.hg > p.ag) result = 1.0;
+    else if (p.hg < p.ag) result = 0.0;
+
+    const expC = 1 / (1 + Math.pow(10, (rv - rc) / 400));
+    const diff = Math.abs(p.hg - p.ag);
+    const kBase = ELO_K_BASE * (1 + 0.5 * Math.max(0, diff - 1));
+    const k = kBase * p.wElo;
+
+    const newC = rc + k * (result - expC);
+    const newV = rv + k * ((1 - result) - (1 - expC));
+
+    elo.set(p.home, newC);
+    elo.set(p.away, newV);
+  }
+
+  return {
+    refDate: ref,
+    leagueHomeAvg,
+    leagueAwayAvg,
+    forces,
+    elo,
+    parsedCount: parsed.length,
+    teamCount: forces.size,
+  };
+}
+
+/** =========================
+ *  Predict
+ *  ========================= */
+function predictMatch(homeRaw, awayRaw, model){
+  const home = normalizeTeam(homeRaw);
+  const away = normalizeTeam(awayRaw);
+
+  const fH = model.forces.get(home) || {atkH:1, defH:1, atkA:1, defA:1};
+  const fA = model.forces.get(away) || {atkH:1, defH:1, atkA:1, defA:1};
+
+  // Base Poisson (mando aqui)
+  const lambdaH = fH.atkH * fA.defA * model.leagueHomeAvg;
+  const lambdaA = fA.atkA * fH.defH * model.leagueAwayAvg;
+
+  // Elo adjustment on log(lambda)
+  const rH = model.elo.get(home) ?? ELO_INITIAL;
+  const rA = model.elo.get(away) ?? ELO_INITIAL;
+  const eloDiff = rH - rA;
+
+  let adj = (eloDiff / 400) * ELO_GAMMA;
+  adj = Math.max(-ELO_LAMBDA_CLAMP, Math.min(ELO_LAMBDA_CLAMP, adj));
+
+  const lamH = lambdaH * Math.exp(+adj);
+  const lamA = lambdaA * Math.exp(-adj);
+
+  // Score matrix
+  const score = new Map();
+  for (let gh=0; gh<=POISSON_MAX_GOALS; gh++){
+    for (let ga=0; ga<=POISSON_MAX_GOALS; ga++){
+      const p = poissonProb(lamH, gh) * poissonProb(lamA, ga);
+      score.set(`${gh},${ga}`, p);
+    }
+  }
+
+  const scoreAdj = applyDixonColes(score, DC_RHO);
+
+  // Aggregate 1X2
+  let pH=0, pD=0, pA=0;
+  for (const [k,p] of scoreAdj.entries()){
+    const [gh, ga] = k.split(",").map(Number);
+    if (gh > ga) pH += p;
+    else if (gh === ga) pD += p;
+    else pA += p;
+  }
+  const tot = pH + pD + pA || 1;
+  pH /= tot; pD /= tot; pA /= tot;
+
+  const odds = oddsFromProbsOverround(pH, pD, pA, OVERROUND);
+
+  // Palpite por argmax (como você vinha usando)
+  let pick = "Empate";
+  const max = Math.max(pH,pD,pA);
+  if (max === pH) pick = "Mandante";
+  else if (max === pA) pick = "Visitante";
+
+  return {
+    home, away,
+    lamH: lamH, lamA: lamA,
+    pH, pD, pA,
+    oh: odds.oh, od: odds.od, oa: odds.oa,
+    pick
+  };
+}
+
+/** =========================
+ *  UI
+ *  ========================= */
+const $ = (id) => document.getElementById(id);
+const runBtn = $("runBtn");
+const modelState = $("modelState");
+const statusEl = $("status");
+const outBody = $("outBody");
+const metaEl = $("meta");
+const cfgEl = $("cfg");
+const configPill = $("configPill");
+
+function setStatus(html){
+  statusEl.innerHTML = html;
+}
+
+function setModelPill(text, cls){
+  modelState.textContent = text;
+  modelState.classList.remove("danger");
+  if (cls === "danger") modelState.classList.add("danger");
+}
+
+function formatPct(x){
+  return (x*100).toFixed(1);
+}
+function formatNum(x, d=2){
+  return Number(x).toFixed(d);
+}
+function formatOdd(x){
+  return Number(x).toFixed(2);
+}
+
+function renderRows(rows){
+  outBody.innerHTML = "";
+  for (const r of rows){
+    const tagClass = r.pick === "Mandante" ? "home" : (r.pick === "Empate" ? "draw" : "away");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="mono">${r.home.replace(/\b\w/g, c => c.toUpperCase())}</td>
+      <td class="mono">${r.away.replace(/\b\w/g, c => c.toUpperCase())}</td>
+      <td class="num">${formatNum(r.lamH, 2)}</td>
+      <td class="num">${formatNum(r.lamA, 2)}</td>
+      <td class="num">${formatPct(r.pH)}</td>
+      <td class="num">${formatPct(r.pD)}</td>
+      <td class="num">${formatPct(r.pA)}</td>
+      <td class="num">${formatOdd(r.oh)}</td>
+      <td class="num">${formatOdd(r.od)}</td>
+      <td class="num">${formatOdd(r.oa)}</td>
+      <td><span class="tag ${tagClass}">${r.pick}</span></td>
+    `;
+    outBody.appendChild(tr);
+  }
+}
+
+function parseFixtures(text){
+  const lines = text.split("\n").map(s => s.trim()).filter(Boolean);
+  const fixtures = [];
+  for (const line of lines){
+    // aceita "a x b", "a vs b", "a - b"
+    const m = line.match(/^(.+?)\s*(?:x|vs|v|—|-)\s*(.+)$/i);
+    if (!m) continue;
+    fixtures.push([m[1].trim(), m[2].trim()]);
+  }
+  return fixtures;
+}
+
+runBtn.addEventListener("click", () => {
+  if (!MODEL) return;
+
+  const fixtures = parseFixtures($("fixtures").value);
+  if (!fixtures.length){
+    setStatus(`<span class="bad">Nenhuma partida válida.</span> Use “mandante x visitante” (uma por linha).`);
+    return;
+  }
+
+  const t0 = performance.now();
+  const results = fixtures.map(([h,a]) => predictMatch(h,a, MODEL));
+  const t1 = performance.now();
+
+  renderRows(results);
+
+  metaEl.textContent = `${results.length} jogos • ${(t1 - t0).toFixed(0)} ms`;
+  setStatus(`<span class="ok">OK</span> — simulação concluída.`);
+});
+
+/** =========================
+ *  Load CSV & init
+ *  ========================= */
+function renderConfig(){
+  configPill.textContent = `ρ=${DC_RHO} • γ=${ELO_GAMMA} • clamp=±${ELO_LAMBDA_CLAMP} • overround=${(OVERROUND*100).toFixed(1)}%`;
+  cfgEl.textContent =
+`CSV_PATH: ${CSV_PATH}
+colunas: data=${DATE_COL} | mandante=${HOME_TEAM_COL} | visitante=${AWAY_TEAM_COL} | gols_m=${HOME_GOALS_COL} | gols_v=${AWAY_GOALS_COL}
+
+Half-life: Elo=${HALF_LIFE_ELO_DAYS}d | Poisson=${HALF_LIFE_POISSON_DAYS}d
+min pesos: Elo=${MIN_W_ELO} | Poi=${MIN_W_POI}
+
+Elo: inicial=${ELO_INITIAL} | Kbase=${ELO_K_BASE} | reset/ano α=${SEASON_RESET_ALPHA}
+Elo→λ: γ=${ELO_GAMMA} | clamp=±${ELO_LAMBDA_CLAMP}
+
+Dixon–Coles: ρ=${DC_RHO}
+Odds: overround=${(OVERROUND*100).toFixed(1)}%`;
+}
+
+async function loadCSV(){
+  renderConfig();
+  setModelPill("Carregando dataset…");
+  setStatus(`Carregando <b>${CSV_PATH}</b>…`);
+
+  const res = await fetch(CSV_PATH, {cache:"no-store"});
+  if (!res.ok){
+    throw new Error(`Falha ao carregar CSV (${res.status}). Verifique CSV_PATH e se o arquivo está acessível.`);
+  }
+  const text = await res.text();
+
+  const parsed = await new Promise((resolve, reject) => {
+    Papa.parse(text, {
+      header: true,
+      skipEmptyLines: true,
+      dynamicTyping: false,
+      complete: (r) => resolve(r.data),
+      error: (e) => reject(e)
+    });
+  });
+
+  // valida colunas
+  const sample = parsed[0] || {};
+  const required = [DATE_COL, HOME_TEAM_COL, AWAY_TEAM_COL, HOME_GOALS_COL, AWAY_GOALS_COL];
+  const missing = required.filter(c => !(c in sample));
+  if (missing.length){
+    throw new Error(`CSV não contém colunas necessárias: ${missing.join(", ")}.`);
+  }
+
+  setStatus(`Construindo modelo a partir de <b>${parsed.length}</b> linhas…`);
+  const t0 = performance.now();
+  MODEL = buildModel(parsed);
+  const t1 = performance.now();
+
+  runBtn.disabled = false;
+  setModelPill(`Modelo pronto • ${MODEL.teamCount} times`, "");
+  metaEl.textContent = `dataset: ${MODEL.parsedCount} jogos • build: ${(t1 - t0).toFixed(0)} ms`;
+  setStatus(
+    `<span class="ok">OK</span> — modelo construído.
+     Ref: <b>${MODEL.refDate.toISOString().slice(0,10)}</b> • médias liga: casa=${MODEL.leagueHomeAvg.toFixed(2)} fora=${MODEL.leagueAwayAvg.toFixed(2)}`
+  );
+}
+
+loadCSV().catch(err => {
+  console.error(err);
+  runBtn.disabled = true;
+  setModelPill("Erro ao carregar", "danger");
+  setStatus(`<span class="bad">Erro:</span> ${String(err.message || err)}`);
+});
+</script>
+</body>
+</html>
