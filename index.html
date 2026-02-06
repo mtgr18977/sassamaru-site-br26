@@ -235,6 +235,7 @@ athletico paranaense x corinthians</textarea>
           <ul style="margin:8px 0 0 18px; padding:0; color:var(--muted);">
             <li>Mando fica somente no Poisson (evita dupla contagem).</li>
             <li>Elo ajusta o λ via <span class="mono">exp(±adj)</span> com clamp.</li>
+            <li>Forma recente ajusta λ com base nos últimos jogos (ataque/defesa).</li>
             <li>Dixon–Coles simplificado ajusta empates baixos (0–0, 1–1, 1–0, 0–1).</li>
             <li>Odds aplicam overround simples: <span class="mono">p_market = p * (1+m)</span>.</li>
           </ul>
@@ -304,6 +305,13 @@ const POISSON_MAX_GOALS = 8;
 // Dixon–Coles simplificado
 const DC_RHO = -0.10;
 
+// Forma recente
+const FORM_MATCHES = 5;
+const HALF_LIFE_FORM_DAYS = 120;
+const MIN_W_FORM = 0.40;
+const FORM_FACTOR_MIN = 0.75;
+const FORM_FACTOR_MAX = 1.25;
+
 // Overround (margem) para odds
 const OVERROUND = 0.06;
 
@@ -359,6 +367,10 @@ function temporalWeight(matchDate, refDate, halfLifeDays, minW){
   if (age <= 0) return 1.0;
   const w = Math.pow(0.5, age / halfLifeDays);
   return Math.max(minW, w);
+}
+
+function clamp(val, min, max){
+  return Math.max(min, Math.min(max, val));
 }
 
 function poissonProb(lambda, k){
@@ -476,6 +488,7 @@ function buildModel(rows){
 
   const leagueHomeAvg = leagueW > 0 ? (leagueHomeGoalsW / leagueW) : 1.0;
   const leagueAwayAvg = leagueW > 0 ? (leagueAwayGoalsW / leagueW) : 1.0;
+  const leagueGoalsPerTeam = (leagueHomeAvg + leagueAwayAvg) / 2;
 
   const forces = new Map();
   for (const [t, st] of team.entries()){
@@ -494,6 +507,32 @@ function buildModel(rows){
 
   // Elo: ordenar por data e atualizar (reset por ano)
   parsed.sort((a,b) => a.dt - b.dt);
+
+  // Forma recente (últimos jogos)
+  const recentMatches = new Map(); // time -> [{dt,gf,ga}]
+  function pushMatch(t, gf, ga, dt){
+    if (!recentMatches.has(t)) recentMatches.set(t, []);
+    recentMatches.get(t).push({dt, gf, ga});
+  }
+  for (const p of parsed){
+    pushMatch(p.home, p.hg, p.ag, p.dt);
+    pushMatch(p.away, p.ag, p.hg, p.dt);
+  }
+  const form = new Map();
+  for (const [t, list] of recentMatches.entries()){
+    list.sort((a,b) => a.dt - b.dt);
+    const recent = list.slice(-FORM_MATCHES);
+    let gf = 0, ga = 0, wsum = 0;
+    for (const m of recent){
+      const w = temporalWeight(m.dt, ref, HALF_LIFE_FORM_DAYS, MIN_W_FORM);
+      gf += m.gf * w;
+      ga += m.ga * w;
+      wsum += w;
+    }
+    if (wsum > 0){
+      form.set(t, {gf: gf / wsum, ga: ga / wsum});
+    }
+  }
 
   const elo = new Map();
   let currentYear = null;
@@ -540,8 +579,10 @@ function buildModel(rows){
     refDate: ref,
     leagueHomeAvg,
     leagueAwayAvg,
+    leagueGoalsPerTeam,
     forces,
     elo,
+    form,
     parsedCount: parsed.length,
     teamCount: forces.size,
   };
@@ -561,6 +602,19 @@ function predictMatch(homeRaw, awayRaw, model){
   const lambdaH = fH.atkH * fA.defA * model.leagueHomeAvg;
   const lambdaA = fA.atkA * fH.defH * model.leagueAwayAvg;
 
+  // Ajuste de forma recente (últimos jogos)
+  const avgGoals = model.leagueGoalsPerTeam || 1;
+  const formH = model.form.get(home) || {gf: avgGoals, ga: avgGoals};
+  const formA = model.form.get(away) || {gf: avgGoals, ga: avgGoals};
+
+  const atkHForm = clamp(formH.gf / avgGoals, FORM_FACTOR_MIN, FORM_FACTOR_MAX);
+  const defHForm = clamp(formH.ga / avgGoals, FORM_FACTOR_MIN, FORM_FACTOR_MAX);
+  const atkAForm = clamp(formA.gf / avgGoals, FORM_FACTOR_MIN, FORM_FACTOR_MAX);
+  const defAForm = clamp(formA.ga / avgGoals, FORM_FACTOR_MIN, FORM_FACTOR_MAX);
+
+  let lamH = lambdaH * atkHForm * defAForm;
+  let lamA = lambdaA * atkAForm * defHForm;
+
   // Elo adjustment on log(lambda)
   const rH = model.elo.get(home) ?? ELO_INITIAL;
   const rA = model.elo.get(away) ?? ELO_INITIAL;
@@ -569,8 +623,8 @@ function predictMatch(homeRaw, awayRaw, model){
   let adj = (eloDiff / 400) * ELO_GAMMA;
   adj = Math.max(-ELO_LAMBDA_CLAMP, Math.min(ELO_LAMBDA_CLAMP, adj));
 
-  const lamH = lambdaH * Math.exp(+adj);
-  const lamA = lambdaA * Math.exp(-adj);
+  lamH *= Math.exp(+adj);
+  lamA *= Math.exp(-adj);
 
   // Score matrix
   const score = new Map();
@@ -700,7 +754,7 @@ runBtn.addEventListener("click", () => {
  *  Load CSV & init
  *  ========================= */
 function renderConfig(){
-  configPill.textContent = `ρ=${DC_RHO} • γ=${ELO_GAMMA} • clamp=±${ELO_LAMBDA_CLAMP} • overround=${(OVERROUND*100).toFixed(1)}%`;
+  configPill.textContent = `ρ=${DC_RHO} • γ=${ELO_GAMMA} • forma=${FORM_MATCHES}j • overround=${(OVERROUND*100).toFixed(1)}%`;
   cfgEl.textContent =
 `CSV_PATH: ${CSV_PATH}
 colunas: data=${DATE_COL} | mandante=${HOME_TEAM_COL} | visitante=${AWAY_TEAM_COL} | gols_m=${HOME_GOALS_COL} | gols_v=${AWAY_GOALS_COL}
@@ -710,6 +764,9 @@ min pesos: Elo=${MIN_W_ELO} | Poi=${MIN_W_POI}
 
 Elo: inicial=${ELO_INITIAL} | Kbase=${ELO_K_BASE} | reset/ano α=${SEASON_RESET_ALPHA}
 Elo→λ: γ=${ELO_GAMMA} | clamp=±${ELO_LAMBDA_CLAMP}
+
+Forma recente: jogos=${FORM_MATCHES} | half-life=${HALF_LIFE_FORM_DAYS}d | min_w=${MIN_W_FORM}
+Forma λ clamp: ${FORM_FACTOR_MIN}–${FORM_FACTOR_MAX}
 
 Dixon–Coles: ρ=${DC_RHO}
 Odds: overround=${(OVERROUND*100).toFixed(1)}%`;
