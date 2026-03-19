@@ -19,9 +19,6 @@ Simulador de **seleções (Copa do Mundo)** e de **clubes (Campeonato Brasileiro
 - `simulacoes/`  
   Artefatos e organização das simulações.
 
-- `tests/`  
-  Testes e/ou validações relacionadas (quando aplicável).
-
 ## Como executar (local)
 
 Este projeto **não roda em Node** — são **arquivos HTML estáticos**.
@@ -42,25 +39,24 @@ python -m http.server 8000
 Acesse:
 - http://localhost:8000/
 
-## Apps disponíveis
+## Webapps disponíveis
 
-- **Index (principal)**: `apps/index.html`
-- **Bench/Seleções**: `apps/bench-selecoes.html`
+- **Index (principal)**: `apps/index.html`.
+- **Bench/Seleções**: `apps/bench-selecoes.html`.
 
-## Objetivo
+## Componentes
 
-Centralizar:
-- páginas web de simulação/visualização (`apps/`)
-- datasets (`datasets/`)
-- modelos (`modelos/`)
-- execuções e variações de simulações (`simulacoes/`)
+- páginas web de simulação/visualização (`apps/`).
+- datasets (`datasets/`).
+- modelos (`modelos/`).
+- execuções e variações de simulações (`simulacoes/`).
 
 ## Contribuição
 
-Sugestões e melhorias são bem-vindas:
-1. Faça um fork
-2. Crie uma branch (`feature/minha-melhoria`)
-3. Abra um Pull Request descrevendo a mudança
+Sugestões e melhorias são bem-vindas, para isso faça o seguinte:
+1. Faça um fork desse projeto.
+2. Crie uma branch (`feature/minha-melhoria`).
+3. Abra um Pull Request (PR) descrevendo a mudança.
 
 ## Licença
 
