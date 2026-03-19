@@ -64,4 +64,4 @@ Sugestões e melhorias são bem-vindas:
 
 ## Licença
 
-Defina a licença do projeto (ex.: MIT).
+MIT
