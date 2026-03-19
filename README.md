@@ -58,6 +58,9 @@ Sugestões e melhorias são bem-vindas, para isso faça o seguinte:
 2. Crie uma branch (`feature/minha-melhoria`).
 3. Abra um Pull Request (PR) descrevendo a mudança.
 
+> [!IMPORTANT] ToDo
+> Você pode acessar a lista de melhorias através do documento [ToDo.md](https://github.com/mtgr18977/sassamaru-site-br26/blob/main/ToDo.md).
+
 ## Licença
 
 MIT
