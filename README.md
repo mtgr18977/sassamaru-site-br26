@@ -1,4 +1,4 @@
-# sassamaru-site-br26
+# Sassamaru BR 26 | Sassamaru WC 26
 
 Simulador de **seleções (Copa do Mundo)** e de **clubes (Campeonato Brasileiro)**, com páginas HTML estáticas e materiais de apoio (datasets, modelos e simulações).
 
