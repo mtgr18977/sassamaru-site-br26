@@ -10856,7 +10856,13 @@ athletico-pr x botafogo</textarea>
     <div class="card" style="margin-top:14px;">
       <div class="row" style="justify-content:space-between;">
         <div class="mono" style="font-weight:700;">Resultados</div>
-        <div class="small" id="meta"></div>
+        <div class="row" style="gap:10px;align-items:center;">
+          <button id="exportPredBtn" style="display:none;padding:5px 12px;font-size:11px;
+            background:rgba(46,229,157,.1);border-color:rgba(46,229,157,.35);color:#2ee59d;">
+            ↓ Exportar CSV
+          </button>
+          <div class="small" id="meta"></div>
+        </div>
       </div>
 
       <div style="overflow:auto; margin-top:8px;">
@@ -10897,6 +10903,9 @@ const statusEl  = $("status");
 const outBody   = $("outBody");
 const metaEl    = $("meta");
 const configPill = $("configPill");
+const exportPredBtn = $("exportPredBtn");
+let _lastPredResults = null;
+let _lastPredRound   = null;
 document.getElementById("fixtures").addEventListener("input", scheduleValidation);
 
 function setStatus(html){ statusEl.innerHTML = html; }
@@ -11143,6 +11152,9 @@ runBtn.addEventListener("click", () => {
   const results = fixtures.map(([h,a]) => predictMatch(h,a, MODEL, opts));
   const t1 = performance.now();
   const allWarnings = results.flatMap(r => r.warnings || []);
+  _lastPredResults = results;
+  _lastPredRound   = upcomingRound;
+  exportPredBtn.style.display = "";
   renderRows(results);
   renderSummary(results);
   metaEl.textContent = `${results.length} jogos • rodada ${upcomingRound} • ${(t1-t0).toFixed(0)} ms`;
@@ -11213,6 +11225,36 @@ btExportBtn.addEventListener("click", () => {
   const a    = document.createElement("a");
   a.href     = url;
   a.download = `backtest_bench_rodada_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+});
+
+exportPredBtn.addEventListener("click", () => {
+  if (!_lastPredResults || !_lastPredResults.length) return;
+  const header = "rodada,mandante,visitante,lambda_M,lambda_V,prob_M,prob_D,prob_A,odd_M,odd_D,odd_V,placar,palpite";
+  const lines = _lastPredResults.map(r =>
+    [
+      _lastPredRound,
+      r.home,
+      r.away,
+      r.lamH.toFixed(4),
+      r.lamA.toFixed(4),
+      r.pH.toFixed(4),
+      r.pD.toFixed(4),
+      r.pA.toFixed(4),
+      r.oh.toFixed(2),
+      r.od.toFixed(2),
+      r.oa.toFixed(2),
+      r.bestScore || "",
+      r.pick
+    ].join(",")
+  );
+  const csv = [header, ...lines].join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  a.href     = url;
+  a.download = `previsoes_rodada_${_lastPredRound}_${new Date().toISOString().slice(0,10)}.csv`;
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 });
