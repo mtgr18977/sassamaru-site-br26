@@ -45,26 +45,27 @@
   // ═══════════════════════════════════════════════
   //  Team name normalisation
   // ═══════════════════════════════════════════════
+  const ALIASES = new Map([
+    ['brasil',       'brazil'],
+    ['usa',          'united states'],
+    ['us',           'united states'],
+    ['uae',          'united arab emirates'],
+    ['ir iran',      'iran'],
+    ['korea republic', 'south korea'],
+    ['republic of korea', 'south korea'],
+    ['dpr korea',    'north korea'],
+    ['czech republic', 'czechia'],
+    ['bosnia',       'bosnia and herzegovina'],
+    ['trinidad',     'trinidad and tobago'],
+  ]);
+
   function norm(s) {
     if (!s) return '';
     let t = String(s).trim().toLowerCase()
       .normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
       .replace(/[-_]/g, ' ')
       .replace(/\s+/g, ' ').trim();
-    const aliases = new Map([
-      ['brasil',       'brazil'],
-      ['usa',          'united states'],
-      ['us',           'united states'],
-      ['uae',          'united arab emirates'],
-      ['ir iran',      'iran'],
-      ['korea republic', 'south korea'],
-      ['republic of korea', 'south korea'],
-      ['dpr korea',    'north korea'],
-      ['czech republic', 'czechia'],
-      ['bosnia',       'bosnia and herzegovina'],
-      ['trinidad',     'trinidad and tobago'],
-    ]);
-    return aliases.get(t) || t;
+    return ALIASES.get(t) || t;
   }
 
   // ═══════════════════════════════════════════════
