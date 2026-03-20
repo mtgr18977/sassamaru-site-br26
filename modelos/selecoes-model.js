@@ -128,13 +128,19 @@
         const lamH = fH.atkH * fA.defA * (g.neutral ? (leagueHomeAvg+leagueAwayAvg)/2 : leagueHomeAvg);
         const lamA = fA.atkA * fH.defH * (g.neutral ? (leagueHomeAvg+leagueAwayAvg)/2 : leagueAwayAvg);
         const p = poissonP(lamH, g.hg) * poissonP(lamA, g.ag);
-        if (p <= 0) continue;
+        if (p <= 0) {
+          // Invalid probability for this rho: penalize rho by returning -Infinity
+          return Number.NEGATIVE_INFINITY;
+        }
         let tau = 1;
         if      (g.hg===0 && g.ag===0) tau = 1 - lamH*lamA*rho;
         else if (g.hg===1 && g.ag===0) tau = 1 + lamA*rho;
         else if (g.hg===0 && g.ag===1) tau = 1 + lamH*rho;
         else if (g.hg===1 && g.ag===1) tau = 1 - rho;
-        if (tau <= 0) continue;
+        if (tau <= 0) {
+          // Invalid tau for this rho: penalize rho by returning -Infinity
+          return Number.NEGATIVE_INFINITY;
+        }
         ll += Math.log(p) + Math.log(tau);
       }
       return ll;
