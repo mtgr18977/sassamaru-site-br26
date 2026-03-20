@@ -109,27 +109,40 @@ header{display:flex;align-items:center;justify-content:space-between;
 .qualify-bar{height:100%;border-radius:2px}
 .qualify-pct{font-family:var(--mono);font-size:10px;color:var(--muted);min-width:30px;text-align:right}
 
-/* Knockout bracket */
+/* Visual Bracket — ESPN-style chaveamento */
 .bracket-section{margin-bottom:32px}
-.round-label{font-size:10px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;
-  color:var(--muted);margin-bottom:8px}
-.rounds-scroll{overflow-x:auto;padding-bottom:8px}
-.rounds-wrap{display:flex;gap:0;align-items:stretch;min-width:700px}
-.round-col{flex:1;display:flex;flex-direction:column;justify-content:space-around;gap:4px;
-  padding:0 4px}
-.round-col:first-child{padding-left:0}
-.round-col:last-child{padding-right:0}
-.round-col-title{font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);
-  font-weight:500;text-align:center;padding:6px 0 10px;flex-shrink:0}
-.match-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-  padding:6px 8px;font-size:11.5px;text-align:center;position:relative}
-.match-team{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  padding:1px 0;font-weight:500}
-.match-team.dim{color:var(--muted);font-weight:400}
-.match-divider{border:none;border-top:1px solid var(--border);margin:3px 0}
-.match-pct{font-family:var(--mono);font-size:9.5px;color:var(--muted);margin-top:2px}
-.match-box.champion{border-color:#D4AF37;background:#FFFBEB}
-.match-box.champion .match-team{color:var(--accent)}
+.vbracket-wrap{overflow-x:auto;padding:4px 0 20px;-webkit-overflow-scrolling:touch}
+.vbracket{display:flex;align-items:stretch;min-width:1080px;height:768px}
+.vb-round{display:flex;flex-direction:column;flex:0 0 150px}
+.vb-round-hd{font-size:9px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muted);font-weight:600;text-align:center;padding-bottom:6px;flex-shrink:0}
+.vb-slots{flex:1;display:flex;flex-direction:column}
+.vb-slot{flex:1;display:flex;align-items:center;position:relative;padding:3px 14px 3px 0}
+.vb-slot::after{content:'';position:absolute;right:0;top:50%;
+  width:14px;height:1px;background:var(--border)}
+.vb-slot.upper::before{content:'';position:absolute;right:0;top:50%;
+  width:1px;height:calc(50% + 1px);background:var(--border)}
+.vb-slot.lower::before{content:'';position:absolute;right:0;bottom:50%;
+  width:1px;height:calc(50% + 1px);background:var(--border)}
+.vb-slot.solo::after,.vb-slot.solo::before{display:none}
+.vb-gap{flex:0 0 14px}
+.vb-match{flex:1;background:var(--surface);border:1px solid var(--border);
+  border-radius:5px;overflow:hidden;min-width:0}
+.vb-team{display:flex;align-items:center;gap:4px;padding:4px 7px;font-size:10.5px;
+  border-bottom:1px solid var(--border);min-width:0}
+.vb-team:last-child{border-bottom:none}
+.vb-team.fav{background:#f0fdf4}
+.vb-flag{font-size:12px;flex-shrink:0;line-height:1}
+.vb-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500}
+.vb-pct{font-family:var(--mono);font-size:9px;color:var(--muted);flex-shrink:0;padding-left:3px}
+.vb-champ-wrap{flex:0 0 140px;display:flex;align-items:center;justify-content:center;padding:0 6px}
+.vb-champ-card{background:#FFFBEB;border:2px solid #D4AF37;border-radius:6px;
+  padding:12px 8px;text-align:center;width:100%}
+.vb-champ-lbl{font-size:8px;letter-spacing:.1em;text-transform:uppercase;
+  color:#92400E;font-weight:700;margin-bottom:6px}
+.vb-champ-flag{font-size:24px;line-height:1;margin-bottom:4px}
+.vb-champ-name{font-size:12px;font-weight:700;color:var(--accent);margin-bottom:3px}
+.vb-champ-pct{font-family:var(--mono);font-size:10px;color:var(--muted)}
 
 /* Finalist cards */
 .finalists{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:32px}
@@ -208,11 +221,11 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
     <div class="section-title" style="margin-top:8px">Fase de grupos — P(classificar)</div>
     <div class="groups-grid" id="groups-grid"></div>
 
-    <!-- Knockout rounds -->
-    <div class="section-title">Fases eliminatórias — P(avançar por fase)</div>
+    <!-- Knockout bracket -->
+    <div class="section-title">Chaveamento eliminatório — P(avançar por fase)</div>
     <div class="bracket-section">
-      <div class="rounds-scroll">
-        <div class="rounds-wrap" id="rounds-wrap"></div>
+      <div class="vbracket-wrap">
+        <div class="vbracket" id="bracket-container"></div>
       </div>
     </div>
 
@@ -49725,6 +49738,7 @@ function simulateOnce(model){
   return {
     groupStandings,
     qualified: qualified.map(q=>q.team),
+    r32Pairs:   r32,
     r32winners: advR32,
     r16winners: advR16,
     qfWinners:  advQF,
@@ -49754,6 +49768,13 @@ async function runMonteCarlo(model, N, onProgress){
   const thirdCounts = new Map();
   for(const t of ALL_TEAMS) thirdCounts.set(t,0);
 
+  // Per-slot bracket tracking (for visual bracket)
+  const r32Entrants = Array.from({length:16},()=>new Map());
+  const r32WinSlots = Array.from({length:16},()=>new Map());
+  const r16WinSlots = Array.from({length:8},()=>new Map());
+  const qfWinSlots  = Array.from({length:4},()=>new Map());
+  const sfWinSlots  = Array.from({length:2},()=>new Map());
+
   const BATCH=100;
   for(let i=0;i<N;i++){
     const res=simulateOnce(model);
@@ -49770,13 +49791,24 @@ async function runMonteCarlo(model, N, onProgress){
     finalCounts.set(res.sfWinners[0],(finalCounts.get(res.sfWinners[0])||0)+1);
     finalCounts.set(res.sfWinners[1],(finalCounts.get(res.sfWinners[1])||0)+1);
 
+    // Per-slot tracking for visual bracket
+    res.r32Pairs.forEach(([a,b],i)=>{
+      r32Entrants[i].set(a,(r32Entrants[i].get(a)||0)+1);
+      r32Entrants[i].set(b,(r32Entrants[i].get(b)||0)+1);
+    });
+    res.r32winners.forEach((t,i)=>r32WinSlots[i].set(t,(r32WinSlots[i].get(t)||0)+1));
+    res.r16winners.forEach((t,i)=>r16WinSlots[i].set(t,(r16WinSlots[i].get(t)||0)+1));
+    res.qfWinners.forEach((t,i)=>qfWinSlots[i].set(t,(qfWinSlots[i].get(t)||0)+1));
+    res.sfWinners.forEach((t,i)=>sfWinSlots[i].set(t,(sfWinSlots[i].get(t)||0)+1));
+
     if(i%BATCH===BATCH-1){
       onProgress(i+1,N);
       await new Promise(r=>setTimeout(r,0));
     }
   }
   onProgress(N,N);
-  return{winCounts,qualCounts,r32Counts,r16Counts,qfCounts,sfCounts,finalCounts,N};
+  return{winCounts,qualCounts,r32Counts,r16Counts,qfCounts,sfCounts,finalCounts,N,
+         r32Entrants,r32WinSlots,r16WinSlots,qfWinSlots,sfWinSlots};
 }
 
 // ════════════════════════════════════════════════
@@ -49867,35 +49899,92 @@ function renderGroups(stats){
 
 function renderBracket(stats){
   const N=stats.N;
-  const rounds=[
-    {label:'Oitavas (R32)',   data:stats.r32Counts},
-    {label:'16 avos (R16)',   data:stats.r16Counts},
-    {label:'Quartas',         data:stats.qfCounts},
-    {label:'Semifinal',       data:stats.sfCounts},
-    {label:'Final',           data:stats.finalCounts},
-    {label:'Campeão',         data:stats.winCounts},
-  ];
 
-  // Show top 8 teams per round
-  const wrap=document.getElementById('rounds-wrap');
-  wrap.innerHTML=rounds.map(r=>{
-    const sorted=[...ALL_TEAMS]
-      .map(t=>({t,p:pct(r.data.get(t)||0,N)}))
-      .filter(x=>x.p>0.005)
-      .sort((a,b)=>b.p-a.p).slice(0,8);
+  function topOf(map){
+    if(!map||map.size===0)return{t:'?',p:0};
+    let best=null,bestC=0;
+    for(const[t,c]of map.entries())if(c>bestC){bestC=c;best=t;}
+    return{t:best,p:bestC/N};
+  }
 
-    const isChamp=r.label==='Campeão';
-    const cards=sorted.map(x=>`
-      <div class="match-box ${isChamp&&x===sorted[0]?'champion':''}">
-        <div class="match-team">${flag(x.t)} ${dn(x.t)}</div>
-        <div class="match-pct">${(x.p*100).toFixed(1)}%</div>
-      </div>`).join('');
-
-    return `<div class="round-col">
-      <div class="round-col-title">${r.label}</div>
-      ${cards}
+  function matchCard(t1,t2,winSlot){
+    const w1=(winSlot?.get(t1)||0)/N;
+    const w2=(winSlot?.get(t2)||0)/N;
+    const f1=w1>=w2;
+    return `<div class="vb-match">
+      <div class="vb-team${f1?' fav':''}">
+        <span class="vb-flag">${flag(t1)}</span>
+        <span class="vb-name" title="${dn(t1)}">${dn(t1)}</span>
+        <span class="vb-pct">${(w1*100).toFixed(0)}%</span>
+      </div>
+      <div class="vb-team${!f1?' fav':''}">
+        <span class="vb-flag">${flag(t2)}</span>
+        <span class="vb-name" title="${dn(t2)}">${dn(t2)}</span>
+        <span class="vb-pct">${(w2*100).toFixed(0)}%</span>
+      </div>
     </div>`;
-  }).join('');
+  }
+
+  function roundHtml(label,matches,lastRound){
+    const slots=matches.map((m,i)=>{
+      const cls=lastRound?'solo':(i%2===0?'upper':'lower');
+      return `<div class="vb-slot ${cls}">${matchCard(m.t1,m.t2,m.win)}</div>`;
+    }).join('');
+    return `<div class="vb-round">
+      <div class="vb-round-hd">${label}</div>
+      <div class="vb-slots">${slots}</div>
+    </div>`;
+  }
+
+  const gap='<div class="vb-gap"></div>';
+
+  // R32: 16 matches — top 2 entrants per slot
+  const r32Html=roundHtml('Oitavas',stats.r32Entrants.map((ents,i)=>{
+    const sorted=[...ents.entries()].sort((a,b)=>b[1]-a[1]);
+    return{t1:sorted[0]?.[0]||'?',t2:sorted[1]?.[0]||'?',win:stats.r32WinSlots[i]};
+  }));
+
+  // R16: 8 matches — most likely R32 winners per pair
+  const r16Html=roundHtml('R16',stats.r16WinSlots.map((win,i)=>({
+    t1:topOf(stats.r32WinSlots[2*i]).t,
+    t2:topOf(stats.r32WinSlots[2*i+1]).t,
+    win
+  })));
+
+  // QF: 4 matches
+  const qfHtml=roundHtml('Quartas',stats.qfWinSlots.map((win,i)=>({
+    t1:topOf(stats.r16WinSlots[2*i]).t,
+    t2:topOf(stats.r16WinSlots[2*i+1]).t,
+    win
+  })));
+
+  // SF: 2 matches
+  const sfHtml=roundHtml('Semi',stats.sfWinSlots.map((win,i)=>({
+    t1:topOf(stats.qfWinSlots[2*i]).t,
+    t2:topOf(stats.qfWinSlots[2*i+1]).t,
+    win
+  })));
+
+  // Final: 1 match
+  const finalHtml=roundHtml('Final',[{
+    t1:topOf(stats.sfWinSlots[0]).t,
+    t2:topOf(stats.sfWinSlots[1]).t,
+    win:stats.winCounts
+  }],true);
+
+  // Champion
+  const champ=topOf(stats.winCounts);
+  const champHtml=`<div class="vb-champ-wrap">
+    <div class="vb-champ-card">
+      <div class="vb-champ-lbl">Campeão</div>
+      <div class="vb-champ-flag">${flag(champ.t)}</div>
+      <div class="vb-champ-name">${dn(champ.t)}</div>
+      <div class="vb-champ-pct">${(champ.p*100).toFixed(1)}%</div>
+    </div>
+  </div>`;
+
+  document.getElementById('bracket-container').innerHTML=
+    r32Html+gap+r16Html+gap+qfHtml+gap+sfHtml+gap+finalHtml+champHtml;
 }
 
 // ════════════════════════════════════════════════
