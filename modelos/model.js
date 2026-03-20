@@ -118,6 +118,173 @@
     return adj;
   }
 
+  // ---------------------------------------------------------------------------
+  // Dixon-Coles full MLE via analytical gradients + Adam optimiser
+  //
+  // Parameter vector x (length 2n + 3):
+  //   x[i]      = log(α_i)   attack strength,  i ∈ [0, n)
+  //   x[n+i]    = log(β_i)   defense weakness, i ∈ [0, n)
+  //   x[2n]     = log(γ)     home-advantage factor
+  //   x[2n+1]   = log(μ)     league base goal rate  (μ ≈ leagueAwayAvg)
+  //   x[2n+2]   = ρ          low-score correlation  (raw, clipped during opt)
+  //
+  // Expected goals:
+  //   λ_H = exp( x[hi] + x[n+aj] + x[2n] + x[2n+1] )
+  //   λ_A = exp( x[aj] + x[n+hi]           + x[2n+1] )
+  //
+  // Identifiability: penalise (Σ log α_i)² and (Σ log β_i)²
+  // ---------------------------------------------------------------------------
+  function fitDixonColes(parsed, leagueHomeAvg, leagueAwayAvg) {
+    const PENALTY   = 500;
+    const LR        = 0.05;
+    const MAX_ITER  = 400;
+    const MAX_GOALS = CONFIG.POISSON_MAX_GOALS;
+
+    // Build team index and match records in a single pass over parsed
+    const teamIdx = new Map();
+    const teams   = [];
+    const matches = [];
+    for (const p of parsed) {
+      if (!teamIdx.has(p.home)) { teamIdx.set(p.home, teams.length); teams.push(p.home); }
+      if (!teamIdx.has(p.away)) { teamIdx.set(p.away, teams.length); teams.push(p.away); }
+      matches.push({
+        hi: teamIdx.get(p.home),
+        ai: teamIdx.get(p.away),
+        hg: Math.min(p.hg, MAX_GOALS),
+        ag: Math.min(p.ag, MAX_GOALS),
+        w:  p.wPoi,
+      });
+    }
+    const n = teams.length;
+
+    // Pre-compute log-factorials up to MAX_GOALS
+    const logFact = [0];
+    for (let k = 1; k <= MAX_GOALS + 1; k++) logFact.push(logFact[k - 1] + Math.log(k));
+
+    // Parameter vector: 2n + 3
+    const DIM = 2 * n + 3;
+    const x   = new Float64Array(DIM);
+
+    // Initialise: neutral α=1, β=1; γ from data; μ = leagueAwayAvg; ρ = -0.10
+    const safeHome = leagueHomeAvg > 0 ? leagueHomeAvg : 1;
+    const safeAway = leagueAwayAvg > 0 ? leagueAwayAvg : 1;
+    x[2 * n]     = Math.log(safeHome / safeAway); // log(γ)
+    x[2 * n + 1] = Math.log(safeAway);            // log(μ)
+    x[2 * n + 2] = CONFIG.DC_RHO;                 // ρ seed
+
+    // Adam state
+    const m1 = new Float64Array(DIM);
+    const m2 = new Float64Array(DIM);
+    const B1 = 0.9, B2 = 0.999, EPS_ADAM = 1e-8;
+
+    let bestX   = Float64Array.from(x);
+    let bestNll = Infinity;
+
+    // Pre-allocate gradient buffer — zeroed via fill() each iteration
+    const g = new Float64Array(DIM);
+    // Incremental Adam bias-correction accumulators (avoids Math.pow each step)
+    let b1t = 1.0;
+    let b2t = 1.0;
+
+    for (let iter = 0; iter < MAX_ITER; iter++) {
+      g.fill(0);
+      let nll = 0;
+      const logHome = x[2 * n];
+      const logBase = x[2 * n + 1];
+      const rho     = x[2 * n + 2];
+
+      for (const m of matches) {
+        const logLH = x[m.hi] + x[n + m.ai] + logHome + logBase;
+        const logLA = x[m.ai] + x[n + m.hi]            + logBase;
+        const lH    = Math.exp(logLH);
+        const lA    = Math.exp(logLA);
+        const hg    = m.hg;
+        const ag    = m.ag;
+
+        // Dixon-Coles τ and its partial derivatives w.r.t. lH, lA, ρ
+        let tau, dtH, dtA, dtR;
+        if      (hg === 0 && ag === 0) { tau = 1 - lH * lA * rho; dtH = -lA * rho; dtA = -lH * rho; dtR = -lH * lA; }
+        else if (hg === 1 && ag === 0) { tau = 1 + lA * rho;       dtH = 0;         dtA = rho;        dtR =  lA;     }
+        else if (hg === 0 && ag === 1) { tau = 1 + lH * rho;       dtH = rho;       dtA = 0;          dtR =  lH;     }
+        else if (hg === 1 && ag === 1) { tau = 1 - rho;            dtH = 0;         dtA = 0;          dtR = -1;      }
+        else                           { tau = 1;                   dtH = 0;         dtA = 0;          dtR =  0;      }
+
+        if (tau <= 1e-10) { nll += 1e10; continue; }
+
+        nll -= m.w * (
+          Math.log(tau) +
+          hg * logLH - lH - logFact[hg] +
+          ag * logLA - lA - logFact[ag]
+        );
+
+        // ∂log(τ)/∂logLH = (∂τ/∂lH)·lH / τ  (chain rule: ∂lH/∂logLH = lH)
+        const dLogTau_lH = (dtH * lH) / tau;
+        const dLogTau_lA = (dtA * lA) / tau;
+
+        // ∂L_m/∂logLH = dLogTau_lH + hg - lH
+        const dL_LH = m.w * (dLogTau_lH + hg - lH);
+        const dL_LA = m.w * (dLogTau_lA + ag - lA);
+
+        // logLH depends on: x[hi], x[n+ai], x[2n], x[2n+1]
+        g[m.hi]      -= dL_LH;
+        g[n + m.ai]  -= dL_LH;
+        g[2 * n]     -= dL_LH;
+        g[2 * n + 1] -= dL_LH;
+
+        // logLA depends on: x[ai], x[n+hi], x[2n+1]
+        g[m.ai]      -= dL_LA;
+        g[n + m.hi]  -= dL_LA;
+        g[2 * n + 1] -= dL_LA;
+
+        // ρ gradient
+        g[2 * n + 2] -= m.w * (dtR / tau);
+      }
+
+      // Identifiability penalties
+      let sumA = 0, sumD = 0;
+      for (let i = 0; i < n; i++) { sumA += x[i]; sumD += x[n + i]; }
+      nll += PENALTY * (sumA * sumA + sumD * sumD);
+      for (let i = 0; i < n; i++) {
+        g[i]     += 2 * PENALTY * sumA;
+        g[n + i] += 2 * PENALTY * sumD;
+      }
+
+      if (nll < bestNll) { bestNll = nll; bestX = Float64Array.from(x); }
+
+      // Adam parameter update (incremental bias correction avoids Math.pow)
+      b1t *= B1;
+      b2t *= B2;
+      const inv1mb1t = 1 / (1 - b1t);
+      const inv1mb2t = 1 / (1 - b2t);
+      for (let j = 0; j < DIM; j++) {
+        m1[j] = B1 * m1[j] + (1 - B1) * g[j];
+        m2[j] = B2 * m2[j] + (1 - B2) * g[j] * g[j];
+        const mh = m1[j] * inv1mb1t;
+        const vh = m2[j] * inv1mb2t;
+        x[j] -= LR * mh / (Math.sqrt(vh) + EPS_ADAM);
+      }
+
+      // Keep ρ in a valid range so τ > 0 for all low scores
+      x[2 * n + 2] = clamp(x[2 * n + 2], -0.45, 0.45);
+    }
+
+    // Extract final parameters into Maps
+    const dcAtk = new Map();
+    const dcDef = new Map();
+    for (let i = 0; i < n; i++) {
+      dcAtk.set(teams[i], Math.exp(bestX[i]));
+      dcDef.set(teams[i], Math.exp(bestX[n + i]));
+    }
+
+    return {
+      atk:     dcAtk,
+      def:     dcDef,
+      homeAdv: Math.exp(bestX[2 * n]),
+      base:    Math.exp(bestX[2 * n + 1]),
+      rho:     bestX[2 * n + 2],
+    };
+  }
+
   function buildModel(rows) {
     const parsed = [];
     for (const r of rows) {
@@ -306,6 +473,9 @@
       elo.set(p.away, newV);
     }
 
+    // Joint MLE: estimate attack, defense, home advantage and ρ simultaneously
+    const dc = fitDixonColes(parsed, leagueHomeAvg, leagueAwayAvg);
+
     return {
       refDate: ref,
       leagueHomeAvg,
@@ -314,6 +484,7 @@
       forces,
       elo,
       form,
+      dc,
       parsedCount: parsed.length,
       teamCount: forces.size,
     };
@@ -323,11 +494,17 @@
     const home = normalizeTeam(homeRaw);
     const away = normalizeTeam(awayRaw);
 
-    const fH = model.forces.get(home) || { atkH: 1, defH: 1, atkA: 1, defA: 1 };
-    const fA = model.forces.get(away) || { atkH: 1, defH: 1, atkA: 1, defA: 1 };
+    // Use MLE-estimated DC parameters (atk, def, home advantage, base rate)
+    const dc = model.dc;
+    const atkHome = dc.atk.get(home) ?? 1;
+    const defHome = dc.def.get(home) ?? 1;
+    const atkAway = dc.atk.get(away) ?? 1;
+    const defAway = dc.def.get(away) ?? 1;
 
-    const lambdaH = fH.atkH * fA.defA * model.leagueHomeAvg;
-    const lambdaA = fA.atkA * fH.defH * model.leagueAwayAvg;
+    // λ_H = α_home · β_away · γ · μ   (γ = homeAdv, μ = base)
+    // λ_A = α_away · β_home · μ
+    const lambdaH = atkHome * defAway * dc.homeAdv * dc.base;
+    const lambdaA = atkAway * defHome             * dc.base;
 
     const avgGoals = model.leagueGoalsPerTeam || 1;
     const formH = model.form.get(home) || { gf: avgGoals, ga: avgGoals };
@@ -375,7 +552,7 @@
       }
     }
 
-    const scoreAdj = applyDixonColes(score, CONFIG.DC_RHO);
+    const scoreAdj = applyDixonColes(score, dc.rho);
 
     let pH = 0;
     let pD = 0;
