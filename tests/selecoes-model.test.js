@@ -212,7 +212,7 @@ test("poissonP(2, 2) ≈ 2e^-2", () => {
 });
 
 test("poissonP mode is at floor(lambda) for integer lambda", () => {
-  // For lambda=3, mode should be at k=3 (and also 2 for Poisson with integer lambda)
+  // For lambda=4, mode should be at k=4 (and also 3 for Poisson with integer lambda)
   const lam = 4;
   const pMode = poissonP(lam, lam);
   assert.ok(pMode > poissonP(lam, lam - 2));
