@@ -89,12 +89,70 @@
   }
 
   function applyDC(scoreMap, rho) {
+    // Apply Dixon–Coles correlation adjustment to a joint score distribution.
+    // We infer lamH and lamA from the baseline distribution so that the same
+    // rho parameter used in the likelihood (which depends on lambdas) is
+    // applied consistently here.
     const adj = new Map(scoreMap);
-    const mult = (gh, ga, m) => { const k=`${gh},${ga}`; adj.set(k,(adj.get(k)||0)*m); };
-    mult(0,0,1-rho); mult(1,1,1-rho); mult(1,0,1+rho); mult(0,1,1+rho);
-    let sum = 0; for (const v of adj.values()) sum += v;
-    if (sum <= 0) return scoreMap;
-    for (const [k,v] of adj.entries()) adj.set(k, v/sum);
+
+    // If rho is zero or falsy, return a shallow copy with no adjustments.
+    if (!rho) {
+      return adj;
+    }
+
+    // Compute implied lambdas from the (possibly unnormalised) scoreMap.
+    let lamH = 0;
+    let lamA = 0;
+    let totalProb = 0;
+    for (const [k, v] of adj.entries()) {
+      const parts = String(k).split(',');
+      if (parts.length !== 2) continue;
+      const gh = Number(parts[0]);
+      const ga = Number(parts[1]);
+      if (!isFinite(gh) || !isFinite(ga)) continue;
+      const p = Number(v);
+      if (!isFinite(p) || p <= 0) continue;
+      lamH += gh * p;
+      lamA += ga * p;
+      totalProb += p;
+    }
+
+    if (totalProb <= 0) {
+      // Degenerate distribution; fall back to the original map.
+      return scoreMap;
+    }
+
+    // Convert to expectations if scoreMap is not normalised.
+    lamH /= totalProb;
+    lamA /= totalProb;
+
+    // Dixon–Coles tau adjustments:
+    //   τ(0,0) = 1 - lamH*lamA*rho
+    //   τ(0,1) = 1 + lamH*rho
+    //   τ(1,0) = 1 + lamA*rho
+    //   τ(1,1) = 1 - rho
+    const applyTau = (gh, ga, tau) => {
+      const key = `${gh},${ga}`;
+      const cur = adj.get(key);
+      if (cur == null) return;
+      adj.set(key, cur * tau);
+    };
+
+    applyTau(0, 0, 1 - lamH * lamA * rho);
+    applyTau(0, 1, 1 + lamH * rho);
+    applyTau(1, 0, 1 + lamA * rho);
+    applyTau(1, 1, 1 - rho);
+
+    // Renormalise to ensure probabilities sum to 1.
+    let sum = 0;
+    for (const v of adj.values()) sum += v;
+    if (sum <= 0 || !isFinite(sum)) {
+      // If adjustment leads to an invalid distribution, fall back.
+      return scoreMap;
+    }
+    for (const [k, v] of adj.entries()) {
+      adj.set(k, v / sum);
+    }
     return adj;
   }
 
