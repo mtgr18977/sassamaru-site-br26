@@ -39,4 +39,47 @@ assert.ok(
   "Away team with strong recent form should not be underdog."
 );
 
+// ── homeAdv: boost applied when above threshold ──────────────────────────────
+// "forte" scores 3 at home and 0 away; "medio" is a neutral reference.
+// Both sides of the fixture need ≥ 10 weighted games for homeAdv to be set.
+const rows2 = [];
+for (let i = 0; i < 40; i++) rows2.push(makeRow(isoDay(i),      "forte", "medio", 3, 0));
+for (let i = 40; i < 80; i++) rows2.push(makeRow(isoDay(i + 80), "medio", "forte", 1, 0));
+const model2 = buildModel(rows2);
+
+assert.ok(
+  model2.homeAdv.has("forte"),
+  "forte should have a homeAdv entry (well above 10 weighted games)"
+);
+assert.ok(
+  model2.homeAdv.get("forte") > 1.0,
+  "forte homeAdv should exceed 1.0 given dominant home scoring"
+);
+
+const pred2WithAdv    = predictMatch("forte", "medio", model2);
+const pred2WithoutAdv = predictMatch("forte", "medio", { ...model2, homeAdv: new Map() });
+assert.ok(
+  pred2WithAdv.lamH > pred2WithoutAdv.lamH,
+  "lamH for forte should be boosted by homeAdv factor"
+);
+
+// ── homeAdv: fallback to 1.0 when below threshold ────────────────────────────
+// "novo" plays only 4 home games → homeW < 10 → should NOT appear in homeAdv.
+const rows3 = [];
+for (let i = 0; i < 50; i++) rows3.push(makeRow(isoDay(i), "alpha", "beta", 1, 1));
+for (let i = 50; i < 54; i++) rows3.push(makeRow(isoDay(i), "novo",  "alpha", 2, 0));
+const model3 = buildModel(rows3);
+
+assert.ok(
+  !model3.homeAdv.has("novo"),
+  "novo should NOT have a homeAdv entry (below 10 weighted home games)"
+);
+const pred3WithAdv    = predictMatch("novo", "alpha", model3);
+const pred3WithoutAdv = predictMatch("novo", "alpha", { ...model3, homeAdv: new Map() });
+assert.strictEqual(
+  pred3WithAdv.lamH,
+  pred3WithoutAdv.lamH,
+  "lamH for novo should be identical with or without homeAdv map (fallback to 1.0)"
+);
+
 console.log("model.test.js: all checks passed");

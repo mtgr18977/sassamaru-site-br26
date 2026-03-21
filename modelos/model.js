@@ -399,10 +399,10 @@
     }
 
     // Per-team home advantage: ratio of home scoring rate vs away scoring rate,
-    // both normalised to the league average. Requires ≥10 weighted games each.
+    // both normalised to the league average. Requires ≥10 weighted games each side.
     const homeAdv = new Map();
     for (const [t, st] of team.entries()) {
-      if (st.homeW > 10 && st.awayW > 10) {
+      if (st.homeW >= 10 && st.awayW >= 10) {
         const hRate = (st.homeGFw / st.homeW) / Math.max(0.01, leagueHomeAvg);
         const aRate = (st.awayGFw / st.awayW) / Math.max(0.01, leagueAwayAvg);
         homeAdv.set(t, clamp(hRate / Math.max(0.1, aRate), 0.85, 1.15));
