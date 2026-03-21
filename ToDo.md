@@ -5,8 +5,8 @@
 
 ## Modelo
 
-- [ ] **Dixon-Coles completo com iteração MLE**  
-  A implementação atual usa grid search de ρ isolado. A estimação rigorosa do Dixon-Coles envolve maximizar todos os parâmetros simultaneamente (ataque, defesa, home advantage, ρ) via gradiente ou BFGS. Isso melhoraria a calibração geral do modelo.
+- [x] **Dixon-Coles completo com iteração MLE**
+  Implementado em `modelos/model.js`: gradiente analítico da log-verossimilhança DC (com correção τ e chain rule em log-espaço), penalidades de identificabilidade, 400 iterações Adam. Todos os parâmetros (α ataque, β defesa, γ home advantage, μ base, ρ) estimados conjuntamente com pesos temporais.
 
 - [ ] **Modelo de correlação de gols (bivariate Poisson ou Weibull-gamma)**  
   Substitui a independência entre λ_H e λ_A por uma distribuição bivariada que captura correlações negativas (quando um time marca mais, o outro tende a recuar). O modelo de Dixon & Robinson (1998) é uma extensão natural.
@@ -41,20 +41,20 @@
 - [ ] **Modo "o que mudou" — comparação de rodadas**  
   Permitir ao usuário rodar o modelo em duas rodadas diferentes e ver como as probabilidades mudaram para cada confronto, com setas de variação e destaques automáticos.
 
-- [ ] **Exportação de resultados como CSV / JSON**  
-  Um botão para exportar todas as previsões da rodada ou da simulação Monte Carlo como CSV, para quem quiser analisar os dados externamente.
+- [x] **Exportação de resultados como CSV / JSON**
+  Implementado em `apps/index.html`: botão de exportação que gera CSV com todas as previsões da rodada.
 
 - [ ] **Modo mobile otimizado para o bench-rodada**  
   A tabela de resultados com 11 colunas não é legível em tela pequena. Uma visualização alternativa em cards verticais para mobile melhoraria a usabilidade.
 
-- [ ] **Bracket visual interativo para a Copa 2026**  
-  O simulador da Copa exibe probabilidades em tabelas, mas um chaveamento visual (tipo ESPN bracket) seria muito mais legível para a fase eliminatória.
+- [x] **Bracket visual interativo para a Copa 2026**
+  Implementado em `simulacoes/bench-copa2026.html`: layout estilo ESPN com chaveamento visual completo da fase eliminatória.
 
 
 ## Infraestrutura
 
-- [ ] **Testes automatizados para o modelo de seleções**  
-  O bench-rodada tem 89 testes unitários em model.test.js. O modelo de seleções não tem cobertura de testes, o que torna refatorações arriscadas.
+- [x] **Testes automatizados para o modelo de seleções**
+  Implementado em `tests/selecoes-model.test.js`: 110 testes cobrindo helpers matemáticos, pesos temporais, buildModel e predict. Roda via `npm test`.
 
 - [ ] **Web Worker para o Monte Carlo**  
   Mover o loop de simulação para um Web Worker eliminaria completamente o risco de travar a UI, mesmo com 50 000 simulações, e permitiria cancelar uma simulação em andamento.

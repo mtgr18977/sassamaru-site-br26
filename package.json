@@ -1,0 +1,8 @@
+{
+  "name": "sassamaru-site-br26",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "node tests/model.test.js && node tests/selecoes-model.test.js"
+  }
+}

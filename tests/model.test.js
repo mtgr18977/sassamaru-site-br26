@@ -1,5 +1,5 @@
 const assert = require("assert");
-const { CONFIG, buildModel, predictMatch } = require("../model.js");
+const { CONFIG, buildModel, predictMatch } = require("../modelos/model.js");
 
 function makeRow(date, home, away, hg, ag) {
   return {

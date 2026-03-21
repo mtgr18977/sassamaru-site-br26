@@ -398,6 +398,17 @@
       forces.set(t, { atkH, defH, atkA, defA });
     }
 
+    // Per-team home advantage: ratio of home scoring rate vs away scoring rate,
+    // both normalised to the league average. Requires ≥10 weighted games each.
+    const homeAdv = new Map();
+    for (const [t, st] of team.entries()) {
+      if (st.homeW > 10 && st.awayW > 10) {
+        const hRate = (st.homeGFw / st.homeW) / Math.max(0.01, leagueHomeAvg);
+        const aRate = (st.awayGFw / st.awayW) / Math.max(0.01, leagueAwayAvg);
+        homeAdv.set(t, clamp(hRate / Math.max(0.1, aRate), 0.85, 1.15));
+      }
+    }
+
     parsed.sort((a, b) => a.dt - b.dt);
 
     const recentMatches = new Map();
@@ -482,6 +493,7 @@
       leagueAwayAvg,
       leagueGoalsPerTeam,
       forces,
+      homeAdv,
       elo,
       form,
       dc,
@@ -501,9 +513,10 @@
     const atkAway = dc.atk.get(away) ?? 1;
     const defAway = dc.def.get(away) ?? 1;
 
-    // λ_H = α_home · β_away · γ · μ   (γ = homeAdv, μ = base)
+    // λ_H = α_home · β_away · γ_league · γ_team · μ   (γ = homeAdv, μ = base)
     // λ_A = α_away · β_home · μ
-    const lambdaH = atkHome * defAway * dc.homeAdv * dc.base;
+    const teamHomeAdv = model.homeAdv.get(home) ?? 1;
+    const lambdaH = atkHome * defAway * dc.homeAdv * dc.base * teamHomeAdv;
     const lambdaA = atkAway * defHome             * dc.base;
 
     const avgGoals = model.leagueGoalsPerTeam || 1;
