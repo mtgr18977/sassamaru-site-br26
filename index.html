@@ -7,6 +7,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" content="#1A4731"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+  <meta name="apple-mobile-web-app-title" content="BR26"/>
+  <link rel="apple-touch-icon" href="icons/icon-192.png"/>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -463,5 +470,10 @@ footer {
   </footer>
 
 </div>
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./service-worker.js');
+  }
+</script>
 </body>
 </html>

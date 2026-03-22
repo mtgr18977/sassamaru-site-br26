@@ -6,6 +6,7 @@ const CACHE_NAME = `br26-${CACHE_VERSION}`;
 
 // Assets to pre-cache on install
 const PRECACHE_ASSETS = [
+  './index.html',
   './apps/index.html',
   './apps/bench-selecoes.html',
   './simulacoes/bench-copa2026.html',
