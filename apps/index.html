@@ -5,6 +5,15 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Bench Rodada — Poisson + Elo (odds-like)</title>
 
+  <!-- PWA -->
+  <link rel="manifest" href="../manifest.json" />
+  <meta name="theme-color" content="#1A4731" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="BR26" />
+  <link rel="apple-touch-icon" href="../icons/icon-192.png" />
+
   <!-- CSV parser (CDN) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -11630,6 +11639,14 @@ loadCSV().catch(err => {
   setModelPill("Erro ao carregar", "danger");
   setStatus(`<span class="bad">Erro:</span> ${String(err.message || err)}`);
 });
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('../service-worker.js', { scope: '../' })
+      .catch(() => {});
+  });
+}
 </script>
 </body>
 </html>

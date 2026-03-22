@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background circle with safe zone for maskable -->
+  <circle cx="256" cy="256" r="256" fill="#1A4731"/>
+  <!-- Inner circle -->
+  <circle cx="256" cy="256" r="200" fill="#2d6e4e"/>
+  <!-- Football/soccer field lines (simplified) -->
+  <rect x="130" y="150" width="252" height="212" rx="8" fill="none" stroke="#ffffff" stroke-width="12"/>
+  <!-- Center circle -->
+  <circle cx="256" cy="256" r="42" fill="none" stroke="#ffffff" stroke-width="10"/>
+  <!-- Center dot -->
+  <circle cx="256" cy="256" r="8" fill="#ffffff"/>
+  <!-- Center line -->
+  <line x1="256" y1="150" x2="256" y2="362" stroke="#ffffff" stroke-width="10"/>
+  <!-- Left penalty area -->
+  <rect x="130" y="196" width="60" height="120" rx="4" fill="none" stroke="#ffffff" stroke-width="8"/>
+  <!-- Right penalty area -->
+  <rect x="322" y="196" width="60" height="120" rx="4" fill="none" stroke="#ffffff" stroke-width="8"/>
+  <!-- Corner arcs -->
+  <path d="M130 168 A18 18 0 0 1 148 150" fill="none" stroke="#ffffff" stroke-width="7"/>
+  <path d="M364 150 A18 18 0 0 1 382 168" fill="none" stroke="#ffffff" stroke-width="7"/>
+  <path d="M130 344 A18 18 0 0 0 148 362" fill="none" stroke="#ffffff" stroke-width="7"/>
+  <path d="M364 362 A18 18 0 0 0 382 344" fill="none" stroke="#ffffff" stroke-width="7"/>
+</svg>
