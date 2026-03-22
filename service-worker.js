@@ -97,10 +97,21 @@ async function staleWhileRevalidate(request) {
   const cache = await caches.open(CACHE_NAME);
   const cached = await cache.match(request);
 
-  const networkFetch = fetch(request).then((response) => {
-    if (response.ok) cache.put(request, response.clone());
-    return response;
-  }).catch(() => null);
+  const networkFetch = fetch(request)
+    .then((response) => {
+      if (response.ok) cache.put(request, response.clone());
+      return response;
+    })
+    .catch(() => null);
 
-  return cached || networkFetch;
+  // If we have a cached response, return it immediately (stale),
+  // while the network fetch continues in the background.
+  if (cached) {
+    return cached;
+  }
+
+  // No cached response: wait for network, and fall back to Response.error()
+  // if the network request fails and resolves to null.
+  const networkResponse = await networkFetch;
+  return networkResponse || Response.error();
 }
