@@ -483,6 +483,16 @@
       forces.set(t, { atkH, defH, atkA, defA });
     }
 
+    // ── Step 7b: Per-team home advantage ──
+    const homeAdv = new Map();
+    for (const [t, st] of team.entries()) {
+      if (st.homeW > 10 && st.awayW > 10) {
+        const hRate = (st.homeGFw / st.homeW) / Math.max(0.01, leagueHomeAvg);
+        const aRate = (st.awayGFw / st.awayW) / Math.max(0.01, leagueAwayAvg);
+        homeAdv.set(t, clamp(hRate / Math.max(0.1, aRate), 0.85, 1.15));
+      }
+    }
+
     // ── Step 8: Recent form (weighted by round age) ──
     const recentMatches = new Map();
     function pushMatch(t, gf, ga, season, round) {
@@ -582,6 +592,7 @@
       leagueAwayAvg,
       leagueGoalsPerTeam,
       forces,
+      homeAdv,
       elo,
       form,
       lastRound,
@@ -608,7 +619,8 @@
     const fH = model.forces.get(home) || { atkH: 1, defH: 1, atkA: 1, defA: 1 };
     const fA = model.forces.get(away) || { atkH: 1, defH: 1, atkA: 1, defA: 1 };
 
-    const lambdaH = fH.atkH * fA.defA * model.leagueHomeAvg;
+    const teamHomeAdv = model.homeAdv.get(home) ?? 1;
+    const lambdaH = fH.atkH * fA.defA * model.leagueHomeAvg * teamHomeAdv;
     const lambdaA = fA.atkA * fH.defH * model.leagueAwayAvg;
 
     const avgGoals = model.leagueGoalsPerTeam || 1;
