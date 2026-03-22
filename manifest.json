@@ -2,7 +2,7 @@
   "name": "Sassamaru BR26",
   "short_name": "BR26",
   "description": "Previsões e simulações para o Brasileirão e Copa do Mundo 2026",
-  "start_url": "./apps/index.html",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
