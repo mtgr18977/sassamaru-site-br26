@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Bench — Modelos de Previsão</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:        #F7F6F2;
+  --surface:   #FFFFFF;
+  --border:    #E2E0D9;
+  --text:      #141412;
+  --muted:     #7A786F;
+  --accent:    #1A4731;
+  --accent-lt: #EBF3EE;
+  --radius:    6px;
+  --mono:      'IBM Plex Mono', ui-monospace, monospace;
+  --sans:      'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+}
+html { font-size: 15px; }
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+/* ── Header ── */
+header {
+  padding: 40px 0 32px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 48px;
+}
+
+.header-inner {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.brand-mark {
+  width: 44px;
+  height: 44px;
+  background: var(--accent);
+  border-radius: var(--radius);
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 500;
+  flex-shrink: 0;
+  letter-spacing: -0.5px;
+}
+
+.brand-text h1 {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -.5px;
+  line-height: 1.1;
+}
+
+.brand-text p {
+  font-size: 12px;
+  color: var(--muted);
+  font-family: var(--mono);
+  margin-top: 2px;
+}
+
+.header-tag {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  padding: 4px 10px;
+  border-radius: 99px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* ── Intro text ── */
+.intro {
+  margin-bottom: 40px;
+}
+
+.intro p {
+  font-size: 14.5px;
+  color: var(--muted);
+  max-width: 860px;
+  line-height: 1.7;
+}
+
+/* ── App grid ── */
+.apps {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 48px;
+}
+
+@media (max-width: 580px) {
+  .apps { grid-template-columns: 1fr; }
+}
+
+/* ── App card ── */
+.app-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px 22px 18px;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color .15s, box-shadow .15s, transform .1s;
+}
+
+.app-card:hover {
+  border-color: #a7c7b5;
+  box-shadow: 0 4px 16px rgba(26,71,49,.08);
+  transform: translateY(-1px);
+}
+
+.app-card:active {
+  transform: translateY(0);
+}
+
+.app-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--card-color, var(--accent));
+  opacity: 0;
+  transition: opacity .15s;
+}
+
+.app-card:hover::after { opacity: 1; }
+
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.card-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius);
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  flex-shrink: 0;
+  background: var(--icon-bg, var(--accent-lt));
+}
+
+.card-badge {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 99px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  white-space: nowrap;
+  align-self: flex-start;
+}
+
+.app-title {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -.2px;
+  line-height: 1.2;
+}
+
+.app-sub {
+  font-size: 12px;
+  color: var(--muted);
+  font-family: var(--mono);
+  margin-top: 2px;
+}
+
+.app-desc {
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.6;
+  flex: 1;
+}
+
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+
+.card-tags {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 3px;
+  background: #F0EEE8;
+  color: var(--muted);
+}
+
+.card-arrow {
+  color: var(--muted);
+  font-size: 14px;
+  transition: color .15s, transform .15s;
+}
+
+.app-card:hover .card-arrow {
+  color: var(--accent);
+  transform: translateX(3px);
+}
+
+/* ── Model info section ── */
+.model-section {
+  border-top: 1px solid var(--border);
+  padding-top: 32px;
+  margin-bottom: 40px;
+}
+
+.section-label {
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+
+.model-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.model-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.model-block-title {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.model-block-title::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+
+.model-block p {
+  font-size: 11.5px;
+  color: var(--muted);
+  line-height: 1.55;
+  padding-left: 12px;
+}
+
+/* ── Footer ── */
+footer {
+  border-top: 1px solid var(--border);
+  padding-top: 18px;
+  font-size: 11px;
+  color: var(--muted);
+  font-family: var(--mono);
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-mark">B∑</div>
+        <div class="brand-text">
+          <h1>Sassamaru BR 26 | Sassamaru WC 26</h1>
+          <p>Modelos probabilísticos de futebol</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="intro">
+    <p>Quatro aplicações self-contained para previsão e simulação de partidas e competições, usando dados históricos e Monte Carlo. Nenhum servidor necessário — tudo roda no navegador.</p>
+  </div>
+
+  <!-- ── App cards ── -->
+  <div class="apps">
+
+    <a class="app-card" href="sassamaru-br/index.html" style="--card-color:#1A4731;--icon-bg:#EBF3EE">
+      <div class="card-top">
+        <div class="card-icon">🗓️</div>
+        <span class="card-badge">Brasileirão</span>
+      </div>
+      <div>
+        <div class="app-title">Bench Rodada</div>
+        <div class="app-sub">Previsão de partidas</div>
+      </div>
+      <p class="app-desc">Cole os jogos de uma rodada e obtenha probabilidades 1X2, odds, placar mais provável e matriz de placares por partida.</p>
+      <div class="card-footer">
+        <div class="card-tags">
+          <span class="tag">λ Poisson</span>
+          <span class="tag">Elo</span>
+          <span class="tag">Dixon-Coles</span>
+        </div>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a class="app-card" href="simulacoes/simula-br.html" style="--card-color:#D4AF37;--icon-bg:#FFFBEB">
+      <div class="card-top">
+        <div class="card-icon">🏆</div>
+        <span class="card-badge">Brasileirão 2026</span>
+      </div>
+      <div>
+        <div class="app-title">Bench Brasileirão</div>
+        <div class="app-sub">Simulação de temporada</div>
+      </div>
+      <p class="app-desc">Simula as 380 partidas da Série A 2026 via Monte Carlo e projeta campeão, classificação final, Libertadores, Sul-Americana e rebaixamento.</p>
+      <div class="card-footer">
+        <div class="card-tags">
+          <span class="tag">20 clubes</span>
+          <span class="tag">380 jogos</span>
+          <span class="tag">Monte Carlo</span>
+        </div>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a class="app-card" href="sassamaru-wc/index.html" style="--card-color:#1E40AF;--icon-bg:#EFF6FF">
+      <div class="card-top">
+        <div class="card-icon">🌍</div>
+        <span class="card-badge">Internacional</span>
+      </div>
+      <div>
+        <div class="app-title">Bench Seleções</div>
+        <div class="app-sub">Previsão de partidas</div>
+      </div>
+      <p class="app-desc">Modelo para partidas entre seleções com suporte a campo neutro. Dataset com 49 000+ jogos internacionais desde 1872.</p>
+      <div class="card-footer">
+        <div class="card-tags">
+          <span class="tag">49k jogos</span>
+          <span class="tag">Campo neutro</span>
+          <span class="tag">MLE ρ</span>
+        </div>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a class="app-card" href="simulacoes/simula-copa.html" style="--card-color:#B45309;--icon-bg:#FEF3C7">
+      <div class="card-top">
+        <div class="card-icon">🌐</div>
+        <span class="card-badge">Copa do Mundo 2026</span>
+      </div>
+      <div>
+        <div class="app-title">Bench Copa 2026</div>
+        <div class="app-sub">Simulação do torneio</div>
+      </div>
+      <p class="app-desc">Simula a Copa do Mundo completa: fase de grupos, R32, oitavas, quartas, semis e final. 48 seleções, grupos reais do sorteio de dezembro de 2025.</p>
+      <div class="card-footer">
+        <div class="card-tags">
+          <span class="tag">48 seleções</span>
+          <span class="tag">12 grupos</span>
+          <span class="tag">Monte Carlo</span>
+        </div>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- ── Docs link ── -->
+  <a class="app-card" href="bench-docs.html" style="--card-color:#7A786F;--icon-bg:#F0EEE8">
+    <div class="card-top">
+      <div class="card-icon">📄</div>
+      <span class="card-badge">Documentação</span>
+    </div>
+    <div>
+      <div class="app-title">Referência técnica</div>
+      <div class="app-sub">Como o modelo funciona?</div>
+    </div>
+    <p class="app-desc">Poisson bivariado, Elo, Dixon-Coles, decay temporal, Monte Carlo — arquitetura completa, fórmulas, parâmetros, limitações e próximos passos.</p>
+    <div class="card-footer">
+      <div class="card-tags">
+        <span class="tag">Fórmulas</span>
+        <span class="tag">Parâmetros</span>
+        <span class="tag">ToDo</span>
+      </div>
+      <span class="card-arrow">→</span>
+    </div>
+  </a>
+
+  <!-- ── Model components ── -->
+  <div class="model-section">
+    <div class="section-label">Componentes do modelo</div>
+    <div class="model-grid">
+      <div class="model-block">
+        <div class="model-block-title">Regressão de Poisson</div>
+        <p>Estimativa de λ (gols esperados) por time e contexto — mandante, visitante ou campo neutro. Pesos temporais via half-life decay.</p>
+      </div>
+      <div class="model-block">
+        <div class="model-block-title">Ratings Elo</div>
+        <p>Força relativa atualizada jogo a jogo com fator K dinâmico e resets sazonais. Ajusta λ via fator exponencial.</p>
+      </div>
+      <div class="model-block">
+        <div class="model-block-title">Correção Dixon-Coles</div>
+        <p>Parâmetro ρ estimado via MLE que corrige a sub-representação dos placares baixos (0-0, 1-0, 0-1, 1-1).</p>
+      </div>
+      <div class="model-block">
+        <div class="model-block-title">Forma recente</div>
+        <p>Ajuste multiplicativo em λ com base nos últimos jogos, ponderados por proximidade temporal e clamped para evitar over-fitting.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span>Bench v1.0 · Anthropic Claude</span>
+    <span>Datasets: campeonatobrasileirolimpo.csv · Mart Jürisoo (1872–2026)</span>
+  </footer>
+
+</div>
+</body>
+</html>

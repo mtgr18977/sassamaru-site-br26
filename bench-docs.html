@@ -1,0 +1,968 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Sassamaru — Documentação do Modelo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:        #F7F6F2;
+  --surface:   #FFFFFF;
+  --border:    #E2E0D9;
+  --text:      #141412;
+  --muted:     #7A786F;
+  --accent:    #1A4731;
+  --accent-lt: #EBF3EE;
+  --radius:    6px;
+  --mono:      'IBM Plex Mono', ui-monospace, monospace;
+  --sans:      'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+}
+html { font-size: 15px; scroll-behavior: smooth; }
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+}
+
+/* ── Layout ── */
+.page {
+  max-width: 740px;
+  margin: 0 auto;
+  padding: 0 24px 100px;
+}
+
+/* ── Header ── */
+header {
+  padding: 40px 0 28px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 48px;
+}
+.header-inner {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.brand { display: flex; align-items: center; gap: 13px; }
+.brand-mark {
+  width: 42px; height: 42px;
+  background: var(--accent); border-radius: var(--radius);
+  display: grid; place-items: center;
+  color: #fff; font-family: var(--mono); font-size: 13px; font-weight: 500;
+  flex-shrink: 0;
+}
+.brand-text h1 { font-size: 18px; font-weight: 600; letter-spacing: -.3px; line-height: 1.2; }
+.brand-text p  { font-size: 11px; color: var(--muted); font-family: var(--mono); margin-top: 2px; }
+.back-link {
+  font-family: var(--mono); font-size: 11px; color: var(--muted);
+  text-decoration: none; padding: 4px 10px; border: 1px solid var(--border);
+  border-radius: 99px; transition: color .15s, border-color .15s;
+}
+.back-link:hover { color: var(--text); border-color: var(--text); }
+
+/* ── Paper meta ── */
+.paper-meta {
+  margin-bottom: 44px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--border);
+}
+.paper-title {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -.6px;
+  line-height: 1.2;
+  margin-bottom: 10px;
+}
+.paper-subtitle {
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+.paper-tags {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.paper-tag {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  padding: 3px 9px;
+  border-radius: 99px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+.paper-date {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* ── Table of contents ── */
+.toc {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  margin-bottom: 44px;
+}
+.toc-title {
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+.toc-list {
+  list-style: none;
+  counter-reset: toc;
+}
+.toc-list li {
+  counter-increment: toc;
+  font-size: 13px;
+  margin-bottom: 4px;
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+}
+.toc-list li::before {
+  content: counter(toc);
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  min-width: 14px;
+}
+.toc-list a {
+  color: var(--text);
+  text-decoration: none;
+  transition: color .15s;
+}
+.toc-list a:hover { color: var(--accent); }
+.toc-sub { padding-left: 22px; }
+.toc-sub li { font-size: 12px; color: var(--muted); }
+.toc-sub li::before { content: '·'; }
+
+/* ── Prose ── */
+.section {
+  margin-bottom: 52px;
+  scroll-margin-top: 24px;
+}
+.section-num {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 4px;
+  font-weight: 400;
+}
+h2 {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -.3px;
+  margin-bottom: 16px;
+  line-height: 1.25;
+}
+h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-top: 28px;
+  margin-bottom: 10px;
+  letter-spacing: -.2px;
+}
+p {
+  font-size: 14px;
+  color: #2A2A26;
+  margin-bottom: 14px;
+  line-height: 1.75;
+}
+p:last-child { margin-bottom: 0; }
+
+/* ── Math / formula blocks ── */
+.formula-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin: 20px 0;
+  overflow: hidden;
+}
+.formula-eq {
+  padding: 18px 22px 16px;
+  border-left: 3px solid var(--accent);
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.9;
+  overflow-x: auto;
+  background: #FAFAF8;
+}
+.formula-eq .eq-line {
+  display: block;
+  white-space: pre;
+}
+.formula-eq .eq-main {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--accent);
+}
+.formula-eq .eq-sub  { color: #3A3A36; }
+.formula-vars {
+  display: grid;
+  grid-template-columns: auto 1fr;
+}
+.formula-var { display: contents; }
+.formula-var-name {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--accent);
+  padding: 6px 12px 6px 16px;
+  border-top: 1px solid var(--border);
+  white-space: nowrap;
+  background: var(--surface);
+}
+.formula-var-desc {
+  font-size: 12px;
+  color: var(--muted);
+  padding: 6px 16px 6px 8px;
+  border-top: 1px solid var(--border);
+  line-height: 1.5;
+  background: var(--surface);
+}
+.formula-note {
+  padding: 8px 16px;
+  font-size: 11.5px;
+  color: var(--muted);
+  font-family: var(--mono);
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  line-height: 1.6;
+}
+/* Legacy one-liner formulas */
+.formula {
+  background: #FAFAF8;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  margin: 20px 0;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.8;
+  overflow-x: auto;
+}
+.formula .comment { color: var(--muted); font-size: 11.5px; }
+
+/* ── Param table ── */
+.param-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  margin: 20px 0;
+}
+.param-table th {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: #F9F8F5;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+.param-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  line-height: 1.5;
+}
+.param-table tr:last-child td { border-bottom: none; }
+.param-table td:first-child {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--accent);
+  white-space: nowrap;
+}
+.param-table td:nth-child(2) {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* ── Callout boxes ── */
+.callout {
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin: 20px 0;
+  font-size: 13px;
+  line-height: 1.65;
+}
+.callout.note    { background: var(--accent-lt); border: 1px solid #a7c7b5; color: #1A3D2B; }
+.callout.warn    { background: #FEF3C7; border: 1px solid #fcd34d; color: #78350F; }
+.callout.insight { background: #EFF6FF; border: 1px solid #BFDBFE; color: #1E3A5F; }
+.callout strong  { font-weight: 600; }
+
+/* ── Figure / diagram ── */
+.fig {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin: 22px 0;
+}
+.fig-caption {
+  font-size: 11.5px;
+  color: var(--muted);
+  font-family: var(--mono);
+  margin-top: 12px;
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
+.pipeline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 8px 0;
+}
+.pipe-step {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.pipe-arrow {
+  color: var(--muted);
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+/* ── Metric card row ── */
+.metric-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  margin: 20px 0;
+}
+.metric-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+}
+.metric-card .mc-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.metric-card .mc-val {
+  font-family: var(--mono);
+  font-size: 20px;
+  font-weight: 300;
+  color: var(--text);
+}
+.metric-card .mc-sub {
+  font-size: 10.5px;
+  color: var(--muted);
+  font-family: var(--mono);
+  margin-top: 2px;
+}
+
+/* ── ToDo section ── */
+.todo-list {
+  list-style: none;
+  margin: 12px 0;
+}
+.todo-list li {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 13.5px;
+  line-height: 1.6;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.todo-list li:last-child { border-bottom: none; }
+.todo-tag {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  font-weight: 500;
+  padding: 2px 7px;
+  border-radius: 3px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.todo-tag.model   { background: var(--accent-lt); color: var(--accent); }
+.todo-tag.dados   { background: #EFF6FF; color: #1E40AF; }
+.todo-tag.ui      { background: #F0EEE8; color: var(--muted); }
+.todo-tag.infra   { background: #FEF3C7; color: #92400E; }
+.todo-text strong { font-weight: 600; }
+.todo-text small  { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+/* ── Footer ── */
+footer {
+  border-top: 1px solid var(--border);
+  padding-top: 18px;
+  font-size: 11px;
+  color: var(--muted);
+  font-family: var(--mono);
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- ── Header ── -->
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-mark">B∑</div>
+      <div class="brand-text">
+        <h1>Sassamaru Docs</h1>
+        <p>Documentação técnica do modelo</p>
+      </div>
+    </div>
+    <a class="back-link" href="index.html">← Voltar ao índice</a>
+  </div>
+</header>
+
+<!-- ── Paper title block ── -->
+<div class="paper-meta">
+  <div class="paper-title">Sassamaru: Um modelo probabilístico de previsão de partidas de futebol</div>
+  <div class="paper-subtitle">Arquitectura, parâmetros e decisões de design para previsão de partidas e simulação de competições usando regressão de Poisson bivariada, ratings Elo e correção Dixon-Coles.</div>
+  <div class="paper-tags">
+    <span class="paper-tag">Poisson bivariado</span>
+    <span class="paper-tag">Ratings Elo</span>
+    <span class="paper-tag">Dixon-Coles</span>
+    <span class="paper-tag">Temporal decay</span>
+    <span class="paper-tag">Monte Carlo</span>
+    <span class="paper-tag">Brasileirão 2003–2026</span>
+    <span class="paper-tag">International 1872–2026</span>
+  </div>
+  <div class="paper-date">Março 2026 · Versão 1.0</div>
+</div>
+
+<!-- ── Table of contents ── -->
+<div class="toc">
+  <div class="toc-title">Índice</div>
+  <ol class="toc-list">
+    <li><a href="#s1">Motivação e escopo</a></li>
+    <li><a href="#s2">Dados</a></li>
+    <li><a href="#s3">Arquitetura do modelo</a>
+      <ul class="toc-sub">
+        <li><a href="#s3-1">Pesos temporais</a></li>
+        <li><a href="#s3-2">Regressão de Poisson</a></li>
+        <li><a href="#s3-3">Ratings Elo</a></li>
+        <li><a href="#s3-4">Forma recente</a></li>
+        <li><a href="#s3-5">Correção Dixon-Coles</a></li>
+        <li><a href="#s3-6">Fator de descanso</a></li>
+        <li><a href="#s3-7">Campo neutro</a></li>
+      </ul>
+    </li>
+    <li><a href="#s4">Da λ às probabilidades e odds</a></li>
+    <li><a href="#s5">Validação e backtesting</a></li>
+    <li><a href="#s6">Simulação Monte Carlo</a></li>
+    <li><a href="#s7">Diferenças entre os apps</a></li>
+    <li><a href="#s8">Limitações conhecidas</a></li>
+    <li><a href="#s9">ToDo e próximos passos</a></li>
+  </ol>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<div class="section" id="s1">
+  <div class="section-num">§ 1</div>
+  <h2>Motivação e escopo</h2>
+
+  <p>O Sassamaru nasceu de uma pergunta simples: é possível construir um modelo de previsão de futebol robusto que rode inteiramente no navegador, sem servidor, sem API externa, usando apenas dados históricos públicos?</p>
+
+  <p>A resposta é sim — com ressalvas. Modelos probabilísticos de futebol têm longa tradição acadêmica, começando com Maher (1982) e Dixon &amp; Coles (1997). O Sassamaru reimplementa essa tradição em JavaScript client-side, priorizando transparência, reprodutibilidade e facilidade de uso.</p>
+
+  <p>O escopo é deliberadamente limitado: previsão de resultados 1X2 (mandante vence / empate / visitante vence) com probabilidades calibradas e odds derivadas. Não há previsão de escanteios, cartões, marcadores individuais ou mercados asiáticos.</p>
+
+  <div class="callout note">
+    <strong>O que o modelo não é:</strong> Uma ferramenta de apostas. As odds geradas são <em>odds justas</em> derivadas das probabilidades do próprio modelo, com overround fixo. Elas não refletem o mercado real e não incorporam informação de escalações, lesões ou condição de campo.
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<div class="section" id="s2">
+  <div class="section-num">§ 2</div>
+  <h2>Dados</h2>
+
+  <h3>Brasileirão</h3>
+  <p>Dataset customizado <code style="font-family:var(--mono);font-size:12.5px">campeonatobrasileirolimpo.csv</code> com 9 200+ partidas do Campeonato Brasileiro Série A entre 2003 e 2026 (rodadas 1–6 da edição atual). As colunas usadas são: rodada (<code style="font-family:var(--mono);font-size:12px">rodata</code>), mandante, visitante e placar.</p>
+
+  <div class="callout warn">
+    <strong>Atenção — estrutura temporal:</strong> O dataset não contém datas — apenas o número da rodada. O modelo usa a rodada como unidade de tempo, o que exige detecção automática de temporadas via clustering de "rodada 1" (mínimo de 5 ocorrências consecutivas). Isso torna o decay temporal independente de calendário, mas também significa que jogos fora de rodada (amistosos, copas) não estão presentes.
+  </div>
+
+  <h3>Internacional</h3>
+  <p>Dataset público de Mart Jürisoo disponível no Kaggle (<em>international football results</em>), com 49 000+ partidas entre seleções desde 1872. Colunas: <code style="font-family:var(--mono);font-size:12px">date, home_team, away_team, home_score, away_score, neutral</code>. O campo <code style="font-family:var(--mono);font-size:12px">neutral</code> é booleano e indica se o jogo foi disputado em campo neutro.</p>
+
+  <p>Para o modelo de seleções, o decay é date-based (dias desde cada partida), não round-based. O treinamento usa dados a partir de 1990 por padrão, já que o futebol pré-Copa do Mundo moderna tem distribuições estatísticas bastante distintas das atuais.</p>
+
+  <div class="metric-row">
+    <div class="metric-card">
+      <div class="mc-label">Jogos (Brasileirão)</div>
+      <div class="mc-val">9 200+</div>
+      <div class="mc-sub">2003 – 2026</div>
+    </div>
+    <div class="metric-card">
+      <div class="mc-label">Clubes ativos</div>
+      <div class="mc-val">~50</div>
+      <div class="mc-sub">ao longo dos anos</div>
+    </div>
+    <div class="metric-card">
+      <div class="mc-label">Jogos (internacional)</div>
+      <div class="mc-val">49 000+</div>
+      <div class="mc-sub">1872 – 2026</div>
+    </div>
+    <div class="metric-card">
+      <div class="mc-label">Seleções</div>
+      <div class="mc-val">~270</div>
+      <div class="mc-sub">com dados históricos</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<div class="section" id="s3">
+  <div class="section-num">§ 3</div>
+  <h2>Arquitetura do modelo</h2>
+
+  <p>O pipeline de previsão segue cinco etapas principais:</p>
+
+  <div class="fig">
+    <div class="pipeline">
+      <span class="pipe-step">1. Pesos temporais</span>
+      <span class="pipe-arrow">→</span>
+      <span class="pipe-step">2. Poisson (λ)</span>
+      <span class="pipe-arrow">→</span>
+      <span class="pipe-step">3. Elo (ajuste λ)</span>
+      <span class="pipe-arrow">→</span>
+      <span class="pipe-step">4. Forma (ajuste λ)</span>
+      <span class="pipe-arrow">→</span>
+      <span class="pipe-step">5. Dixon-Coles</span>
+      <span class="pipe-arrow">→</span>
+      <span class="pipe-step">P(H/D/A)</span>
+    </div>
+    <div class="fig-caption">Figura 1 — Pipeline de previsão. Cada etapa refina a estimativa de gols esperados (λ) ou a distribuição de placares resultante.</div>
+  </div>
+
+  <!-- 3.1 -->
+  <h3 id="s3-1">3.1 Pesos temporais (temporal decay)</h3>
+
+  <p>Partidas mais antigas são menos informativas do que partidas recentes. Para capturar isso, cada jogo histórico recebe um peso calculado com uma função de half-life exponencial:</p>
+
+<div class="formula-block"><div class="formula-eq"><span class="eq-line eq-main">w(age) = max(w_min,  0.5 ^ (age / half_life))</span></div><div class="formula-vars"><div class="formula-var"><span class="formula-var-name">age</span><span class="formula-var-desc">Idade do jogo em rodadas (Brasileirão) ou dias (seleções)</span></div><div class="formula-var"><span class="formula-var-name">half_life</span><span class="formula-var-desc">Meia-vida — quando age = half_life, o peso cai para 0.5</span></div><div class="formula-var"><span class="formula-var-name">w_min</span><span class="formula-var-desc">Peso mínimo — evita que jogos muito antigos sejam zerados</span></div></div></div>
+
+  <p>Três pesos independentes são calculados, com half-lives diferentes, para os três componentes que os usam:</p>
+
+  <table class="param-table">
+    <thead><tr><th>Componente</th><th>Half-life (Brasileirão)</th><th>Half-life (Seleções)</th><th>Peso mínimo</th></tr></thead>
+    <tbody>
+      <tr><td>Elo</td><td>76 rodadas (~2 temporadas)</td><td>730 dias (~2 anos)</td><td>0.10</td></tr>
+      <tr><td>Poisson (λ)</td><td>152 rodadas (~4 temporadas)</td><td>1 460 dias (~4 anos)</td><td>0.25</td></tr>
+      <tr><td>Forma recente</td><td>19 rodadas (~½ temporada)</td><td>120 dias (~4 meses)</td><td>0.35</td></tr>
+    </tbody>
+  </table>
+
+  <p>A intuição por trás dos diferentes half-lives: a <strong>força de ataque e defesa</strong> (Poisson) muda devagar — um time bom geralmente permanece bom por anos. A <strong>força relativa</strong> (Elo) muda um pouco mais rápido. A <strong>forma</strong> é por definição transitória — o que importa são os últimos meses, não os últimos anos.</p>
+
+  <!-- 3.2 -->
+  <h3 id="s3-2">3.2 Regressão de Poisson</h3>
+
+  <p>O modelo central assume que o número de gols marcados por cada time em uma partida segue distribuições de Poisson independentes com parâmetros λ<sub>H</sub> (gols esperados do mandante) e λ<sub>A</sub> (gols esperados do visitante).</p>
+
+<div class="formula-block"><div class="formula-eq"><span class="eq-line eq-main">λ_H = atk_H × def_A × league_home_avg</span><span class="eq-line eq-sub">λ_A = atk_A × def_H × league_away_avg</span></div><div class="formula-vars"><div class="formula-var"><span class="formula-var-name">atk_H</span><span class="formula-var-desc">Força de ataque do mandante jogando em casa (razão sobre a média da liga)</span></div><div class="formula-var"><span class="formula-var-name">def_A</span><span class="formula-var-desc">Vulnerabilidade defensiva do visitante fora de casa</span></div><div class="formula-var"><span class="formula-var-name">league_home_avg</span><span class="formula-var-desc">Média ponderada de gols por jogo em casa na liga</span></div></div></div>
+
+  <p>As quatro forças por time (ataque em casa, defesa em casa, ataque fora, defesa fora) são calculadas como razões em relação à média da liga, usando médias ponderadas pelos pesos temporais de Poisson:</p>
+
+<div class="formula-block"><div class="formula-eq"><span class="eq-line eq-main">atk_H(t) = Σ(gols_marcados_em_casa × w_poi) / Σ(w_poi)  ÷  league_home_avg</span><span class="eq-line eq-sub">def_H(t) = Σ(gols_sofridos_em_casa  × w_poi) / Σ(w_poi)  ÷  league_away_avg</span></div><div class="formula-note">Valores &gt; 1 indicam força acima da média da liga · valores &lt; 1 indicam abaixo. w_poi = peso temporal de Poisson de cada partida.</div></div>
+
+  <p>Essa estrutura é a base do modelo de Dixon &amp; Coles (1997) e equivale a uma regressão log-linear de Poisson com efeitos fixos por time e por lado (casa/fora).</p>
+
+  <!-- 3.3 -->
+  <h3 id="s3-3">3.3 Ratings Elo</h3>
+
+  <p>O sistema Elo, desenvolvido originalmente para xadrez por Arpad Elo, foi adaptado para futebol pela FIFA e por pesquisadores como Hvattum &amp; Arntzen (2010). A ideia central é que cada time tem um rating que sobe quando vence e cai quando perde, proporcionalmente à surpresa do resultado.</p>
+
+<div class="formula-block"><div class="formula-eq"><span class="eq-line eq-main">R_novo = R_antigo + K × (resultado − E[resultado])</span><span class="eq-line"></span><span class="eq-line eq-sub">E[resultado] = 1 / (1 + 10 ^ ((R_adversário − R_time) / 400))</span></div><div class="formula-vars"><div class="formula-var"><span class="formula-var-name">resultado</span><span class="formula-var-desc">1 se vitória · 0.5 se empate · 0 se derrota</span></div><div class="formula-var"><span class="formula-var-name">E[resultado]</span><span class="formula-var-desc">Probabilidade esperada de vitória via escala logística</span></div><div class="formula-var"><span class="formula-var-name">K</span><span class="formula-var-desc">K_base × (1 + 0.5 × max(0, diff_gols − 1)) × w_elo</span></div><div class="formula-var"><span class="formula-var-name">w_elo</span><span class="formula-var-desc">Peso temporal — reduz o impacto de jogos antigos no rating</span></div></div></div>
+
+  <p>O fator K é dinâmico: vitórias por maior placar geram atualização mais forte. O peso temporal <code style="font-family:var(--mono);font-size:12px">w_elo</code> reduz o impacto de jogos antigos no rating atual.</p>
+
+  <p>No início de cada temporada do Brasileirão, os ratings sofrem um <strong>reset parcial</strong> em direção ao valor inicial (1500), controlado pelo parâmetro <code style="font-family:var(--mono);font-size:12px">SEASON_RESET_ALPHA = 0.20</code>. Isso captura o fato de que, com mudanças de elenco, um time forte tende a regredir um pouco à média.</p>
+
+<div class="formula-block"><div class="formula-eq"><span class="eq-line eq-main">R_resetado = R_anterior × (1 − α) + R_inicial × α</span></div><div class="formula-vars"><div class="formula-var"><span class="formula-var-name">α</span><span class="formula-var-desc">SEASON_RESET_ALPHA = 0.20 — fração de regressão à média a cada temporada</span></div></div></div>
+
+  <p>O Elo entra no modelo como um ajuste multiplicativo em λ, usando o parâmetro γ (gamma):</p>
+
+<div class="formula-block"><div class="formula-eq"><span class="eq-line eq-main">λ_H_ajustado = λ_H × exp( +γ × ΔElo / 400 )</span><span class="eq-line eq-sub">λ_A_ajustado = λ_A × exp( −γ × ΔElo / 400 )</span></div><div class="formula-vars"><div class="formula-var"><span class="formula-var-name">ΔElo</span><span class="formula-var-desc">R_mandante − R_visitante</span></div><div class="formula-var"><span class="formula-var-name">γ</span><span class="formula-var-desc">0.06 — controla o quanto o Elo pesa sobre λ</span></div><div class="formula-var"><span class="formula-var-name">clamp</span><span class="formula-var-desc">O ajuste é limitado a [−0.18, +0.18] para evitar distorções extremas</span></div></div></div>
+
+  <div class="callout insight">
+    <strong>Por que não usar Elo diretamente?</strong> Seria possível derivar probabilidades direto do Elo via fórmula logística, mas isso perderia a informação de gols esperados — fundamental para calcular distribuição de placares. A abordagem híbrida (Poisson + Elo como ajuste) captura tanto a intensidade ofensiva/defensiva quanto a força relativa histórica.
+  </div>
+
+  <!-- 3.4 -->
+  <h3 id="s3-4">3.4 Forma recente</h3>
+
+  <p>A forma recente captura a tendência de curto prazo de um time — um time que está em crise tende a continuar sofrendo gols, independentemente da sua força histórica.</p>
+
+  <p>Para cada time, os últimos <code style="font-family:var(--mono);font-size:12px">FORM_N</code> jogos são usados para calcular médias ponderadas de gols marcados (GF) e sofridos (GA), com o peso temporal de forma (half-life curto):</p>
+
+<div class="formula-block"><div class="formula-eq"><span class="eq-line eq-main">form_GF(t) = Σ(gols_marcados_i × w_form_i) / Σ(w_form_i)</span><span class="eq-line eq-sub">form_GA(t) = Σ(gols_sofridos_i  × w_form_i) / Σ(w_form_i)</span></div><div class="formula-vars"><div class="formula-var"><span class="formula-var-name">i</span><span class="formula-var-desc">Índice dos últimos FORM_N jogos do time</span></div><div class="formula-var"><span class="formula-var-name">w_form_i</span><span class="formula-var-desc">Peso temporal de forma: 0.5 ^ (age_i / HL_FORM), mínimo MIN_W_FORM</span></div></div></div>
+
+  <p>Esses valores são convertidos em fatores relativos à média da liga e aplicados a λ:</p>
+
+<div class="formula-block"><div class="formula-eq"><span class="eq-line eq-sub">fator_atk_H = clamp( form_GF(mandante) / média_liga,  0.75,  1.25 )</span><span class="eq-line eq-sub">fator_def_A = clamp( form_GA(visitante) / média_liga,  0.75,  1.25 )</span><span class="eq-line"></span><span class="eq-line eq-main">λ_H = λ_H_base × fator_atk_H × fator_def_A</span><span class="eq-line eq-sub">λ_A = λ_A_base × fator_atk_A × fator_def_H</span></div><div class="formula-note">FORM_MIN = 0.75 · FORM_MAX = 1.25 — clamp evita over-fitting a sequências curtas de resultados.</div></div>
+
+  <!-- 3.5 -->
+  <h3 id="s3-5">3.5 Correção Dixon-Coles</h3>
+
+  <p>Dixon &amp; Coles (1997) identificaram que o modelo de Poisson puro superestima a probabilidade de placares altos e subestima os placares baixos, particularmente 0-0, 1-0, 0-1 e 1-1. A correção introduz um parâmetro ρ (rho) que ajusta essas quatro células da matriz de placares:</p>
+
+<div class="formula-block"><div class="formula-eq"><span class="eq-line eq-main">P(g_H, g_A) ∝ Poisson(λ_H, g_H) × Poisson(λ_A, g_A) × τ(g_H, g_A)</span><span class="eq-line"></span><span class="eq-line eq-sub">         ⎧ 1 − λ_H·λ_A·ρ    se g_H=0, g_A=0</span><span class="eq-line eq-sub">         ⎪ 1 + λ_A·ρ         se g_H=1, g_A=0</span><span class="eq-line eq-sub">τ(g,g) = ⎨ 1 + λ_H·ρ         se g_H=0, g_A=1</span><span class="eq-line eq-sub">         ⎪ 1 − ρ             se g_H=1, g_A=1</span><span class="eq-line eq-sub">         ⎩ 1                 caso contrário</span></div><div class="formula-vars"><div class="formula-var"><span class="formula-var-name">ρ</span><span class="formula-var-desc">Estimado via MLE — tipicamente entre −0.05 e −0.15 para o Brasileirão</span></div><div class="formula-var"><span class="formula-var-name">ρ &lt; 0</span><span class="formula-var-desc">Aumenta P(0-0) e P(1-1) · reduz P(1-0) e P(0-1)</span></div></div></div>
+
+  <p>O valor de ρ é estimado por <strong>máxima verossimilhança (MLE)</strong> via busca em grade de -0.50 a +0.50 em passos de 0.01, maximizando a log-verossimilhança do conjunto de treinamento. O valor empírico encontrado para o Brasileirão é aproximadamente <strong>ρ ≈ −0.01</strong> — significativamente menos negativo do que o −0.10 assumido inicialmente, o que demonstra a importância de estimar o parâmetro em vez de fixá-lo por hipótese.</p>
+
+  <div class="callout warn">
+    <strong>Normalização:</strong> Após aplicar a correção, a matriz de placares é renormalizada para que a soma de todas as probabilidades seja 1.0. Isso é necessário porque τ pode distorcer ligeiramente a soma total.
+  </div>
+
+  <!-- 3.6 -->
+  <h3 id="s3-6">3.6 Fator de descanso (Brasileirão)</h3>
+
+  <p>No Brasileirão, times com mais rodadas de descanso desde o último jogo jogam melhor. O modelo aplica um ajuste em λ baseado no gap (em rodadas) desde a última partida disputada:</p>
+
+<div class="formula-block"><div class="formula-eq"><span class="eq-line eq-main">rest_factor = clamp( 1 + REST_COEF × (gap − REST_BASELINE),  REST_MIN,  REST_MAX )</span></div><div class="formula-vars"><div class="formula-var"><span class="formula-var-name">gap</span><span class="formula-var-desc">Número de rodadas desde o último jogo do time</span></div><div class="formula-var"><span class="formula-var-name">REST_BASELINE</span><span class="formula-var-desc">1 rodada — gap neutro, sem ajuste</span></div><div class="formula-var"><span class="formula-var-name">REST_COEF</span><span class="formula-var-desc">0.03 → +3% de λ por rodada extra de descanso</span></div><div class="formula-var"><span class="formula-var-name">REST_MIN</span><span class="formula-var-desc">0.92 → penalidade máxima de 8%</span></div><div class="formula-var"><span class="formula-var-name">REST_MAX</span><span class="formula-var-desc">1.06 → bônus máximo de 6%</span></div></div></div>
+
+  <!-- 3.7 -->
+  <h3 id="s3-7">3.7 Campo neutro (seleções)</h3>
+
+  <p>Aproximadamente 30% das partidas internacionais são disputadas em campo neutro (Copas do Mundo, torneios continentais, amistosos em terceiro país). Nesses casos, a vantagem de jogar em casa não existe, então λ é calculado usando a média entre <code style="font-family:var(--mono);font-size:12px">league_home_avg</code> e <code style="font-family:var(--mono);font-size:12px">league_away_avg</code> para ambos os lados:</p>
+
+<div class="formula-block"><div class="formula-eq"><span class="eq-line eq-sub">base = (league_home_avg + league_away_avg) / 2</span><span class="eq-line"></span><span class="eq-line eq-main">λ_H = atk_H × def_A × base</span><span class="eq-line eq-sub">λ_A = atk_A × def_H × base</span></div><div class="formula-note">Com vantagem de casa: λ_H usa league_home_avg (maior) e λ_A usa league_away_avg. No campo neutro, ambos usam a mesma base — eliminando o benefício do mandante.</div></div>
+
+  <p>Ao construir o modelo, jogos em campo neutro são tratados como "jogos fora" para ambos os times nos cálculos de força de ataque e defesa, evitando inflar o parâmetro de vantagem de casa com dados de jogos que não têm tal vantagem.</p>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<div class="section" id="s4">
+  <div class="section-num">§ 4</div>
+  <h2>Da λ às probabilidades e odds</h2>
+
+  <p>Com λ<sub>H</sub> e λ<sub>A</sub> determinados, a probabilidade de cada placar possível (g<sub>H</sub>, g<sub>A</sub>) é calculada como produto das probabilidades de Poisson, corrigida por Dixon-Coles:</p>
+
+<div class="formula-block"><div class="formula-eq"><span class="eq-line eq-main">P(g_H, g_A) ∝ Pois(λ_H, g_H) × Pois(λ_A, g_A) × τ(g_H, g_A)</span><span class="eq-line"></span><span class="eq-line eq-sub">Pois(λ, k) = λ^k × e^(−λ) / k!</span></div><div class="formula-vars"><div class="formula-var"><span class="formula-var-name">g_H, g_A</span><span class="formula-var-desc">Gols do mandante e visitante ∈ {0, 1, 2, …, 8} (MAX_GOALS = 8)</span></div><div class="formula-var"><span class="formula-var-name">τ(g_H, g_A)</span><span class="formula-var-desc">Fator de correção Dixon-Coles (ver §3.5)</span></div></div></div>
+
+  <p>As probabilidades marginais de resultado (1X2) são obtidas pela soma das células da matriz:</p>
+
+<div class="formula-block"><div class="formula-eq"><span class="eq-line eq-main">P(Mandante)  = Σ P(g_H, g_A)   ∀ g_H > g_A</span><span class="eq-line eq-sub">P(Empate)    = Σ P(g_H, g_A)   ∀ g_H = g_A</span><span class="eq-line eq-sub">P(Visitante) = Σ P(g_H, g_A)   ∀ g_H &lt; g_A</span></div></div>
+
+  <p>As odds são derivadas dessas probabilidades adicionando um overround (margem da casa), que representa o lucro esperado do bookmaker. Com overround de 6%:</p>
+
+<div class="formula-block"><div class="formula-eq"><span class="eq-line eq-main">odd_H = 1 / (P(H) × (1 + overround))</span><span class="eq-line eq-sub">odd_D = 1 / (P(D) × (1 + overround))</span><span class="eq-line eq-sub">odd_A = 1 / (P(A) × (1 + overround))</span></div><div class="formula-vars"><div class="formula-var"><span class="formula-var-name">overround</span><span class="formula-var-desc">0.06 — soma das probabilidades implícitas = 1.06</span></div><div class="formula-var"><span class="formula-var-name">odd justa</span><span class="formula-var-desc">1 / P(X) sem overround — odd que um mercado eficiente pagaria</span></div></div></div>
+
+  <div class="callout insight">
+    <strong>Log-space para evitar underflow:</strong> Para λ elevados, <code style="font-family:var(--mono);font-size:12px">λ^k / k!</code> pode causar underflow em ponto flutuante. O modelo calcula Poisson em log-space: <code style="font-family:var(--mono);font-size:12px">exp(k × log(λ) − λ − logfact(k))</code>, com log-fatoriais pré-computados em cache.
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<div class="section" id="s5">
+  <div class="section-num">§ 5</div>
+  <h2>Validação e backtesting</h2>
+
+  <p>O modelo inclui um backtest walk-forward: para cada uma das últimas <code style="font-family:var(--mono);font-size:12px">BACKTEST_SEASONS</code> temporadas do Brasileirão, o modelo é treinado em todas as temporadas anteriores e avaliado nos jogos da temporada corrente. As métricas calculadas são:</p>
+
+  <h3>Brier Score (multi-classe)</h3>
+<div class="formula-block"><div class="formula-eq"><span class="eq-line eq-main">BS = (1/N) × Σ [(p_H − o_H)² + (p_D − o_D)² + (p_A − o_A)²]</span></div><div class="formula-vars"><div class="formula-var"><span class="formula-var-name">o_X</span><span class="formula-var-desc">1 se X ocorreu, 0 caso contrário (variável indicadora)</span></div><div class="formula-var"><span class="formula-var-name">range</span><span class="formula-var-desc">0 = perfeito · 2 = totalmente errado</span></div><div class="formula-var"><span class="formula-var-name">benchmark</span><span class="formula-var-desc">~0.667 para modelo uniforme (1/3, 1/3, 1/3)</span></div></div></div>
+
+  <h3>Log-Loss</h3>
+<div class="formula-block"><div class="formula-eq"><span class="eq-line eq-main">LL = −(1/N) × Σ log( p_resultado )</span></div><div class="formula-vars"><div class="formula-var"><span class="formula-var-name">p_resultado</span><span class="formula-var-desc">Probabilidade atribuída pelo modelo ao resultado que de fato ocorreu</span></div><div class="formula-var"><span class="formula-var-name">penalidade</span><span class="formula-var-desc">Confiança errada é punida mais do que incerteza — log(0.1) >> log(0.4)</span></div><div class="formula-var"><span class="formula-var-name">benchmark</span><span class="formula-var-desc">log(3) ≈ 1.099 para modelo uniforme</span></div></div></div>
+
+  <h3>Acurácia 1X2</h3>
+  <p>Percentual de jogos em que o palpite do modelo (resultado mais provável) coincidiu com o resultado real. Sassamarumark de referência: ~46% (proporção de vitórias do mandante). O modelo historicamente atinge ~52–55% no Brasileirão.</p>
+
+  <h3>Calibração</h3>
+  <p>O modelo é considerado calibrado se, entre todos os jogos para os quais atribuiu probabilidade ~30%, aproximadamente 30% desses jogos ocorreram. A calibração é visualizada em um gráfico de confiabilidade com 10 bins de 10% cada.</p>
+
+  <div class="callout note">
+    <strong>Nota metodológica:</strong> O backtest usa o modelo treinado em dados históricos completos (até a temporada de teste), não um modelo re-treinado a cada rodada. Isso é uma simplificação que pode introduzir leve viés otimista, mas é computacionalmente viável para execução no navegador.
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<div class="section" id="s6">
+  <div class="section-num">§ 6</div>
+  <h2>Simulação Monte Carlo</h2>
+
+  <p>Para os apps de simulação de temporada (Brasileirão e Copa do Mundo), o modelo é usado para gerar distribuições de resultados possíveis via Monte Carlo: o torneio inteiro é simulado N vezes (tipicamente 5 000), e as frequências de cada evento (campeão, classificado, rebaixado, etc.) são estimadas empiricamente.</p>
+
+  <p>Em cada simulação, para cada partida:</p>
+
+<div class="formula-block"><div class="formula-eq"><span class="eq-line eq-sub">Para cada partida em cada simulação:</span><span class="eq-line"> </span><span class="eq-line eq-sub">  1.  Calcular λ_H, λ_A via pipeline completo</span><span class="eq-line eq-sub">  2.  Construir matriz P(g_H, g_A) com correção Dixon-Coles</span><span class="eq-line eq-main">  3.  Amostrar (g_H, g_A) ~ P(g_H, g_A)</span><span class="eq-line eq-sub">  4.  Atualizar pontuação e saldo de gols</span></div><div class="formula-note">5 000 simulações × 380 partidas = ~1.9 milhões de placares amostrados por execução.</div></div>
+
+  <p>Para jogos eliminatórios (Copa do Mundo), o empate não existe como resultado final. Se a distribuição Poisson + DC gera empate, o vencedor é determinado por um sorteio ponderado pela razão P(H) / (P(H) + P(A)), emulando pênaltis.</p>
+
+  <h3>Escalonamento e responsividade</h3>
+  <p>Para evitar travar o navegador, o loop Monte Carlo cede o controle ao event loop do JavaScript a cada 50–100 iterações via <code style="font-family:var(--mono);font-size:12px">await new Promise(r => setTimeout(r, 0))</code>. Isso permite atualizar a barra de progresso e manter a interface responsiva durante o cálculo.</p>
+
+  <h3>Interpretação das probabilidades</h3>
+  <p>Com N = 5 000 simulações, o erro padrão de uma probabilidade de 50% é √(0.5 × 0.5 / 5000) ≈ 0.7%. Para probabilidades extremas (ex.: rebaixamento do favorito, ~2%), o erro padrão é ≈ 0.2%, suficiente para diferenciar candidatos ao rebaixamento com confiança razoável.</p>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<div class="section" id="s7">
+  <div class="section-num">§ 7</div>
+  <h2>Diferenças entre os apps</h2>
+
+  <table class="param-table">
+    <thead>
+      <tr>
+        <th>Característica</th>
+        <th>Sassamaru Rodada</th>
+        <th>Sassamaru Brasileirão</th>
+        <th>Sassamaru Seleções</th>
+        <th>Sassamaru Copa</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Dataset</td>
+        <td style="font-family:var(--sans);font-size:12px">Brasileirão 2003–26</td>
+        <td style="font-family:var(--sans);font-size:12px">Brasileirão 2003–26</td>
+        <td style="font-family:var(--sans);font-size:12px">Internacional 1872–26</td>
+        <td style="font-family:var(--sans);font-size:12px">Internacional 1872–26</td>
+      </tr>
+      <tr>
+        <td>Unidade de tempo</td>
+        <td style="font-family:var(--sans);font-size:12px">Rodadas</td>
+        <td style="font-family:var(--sans);font-size:12px">Rodadas</td>
+        <td style="font-family:var(--sans);font-size:12px">Dias</td>
+        <td style="font-family:var(--sans);font-size:12px">Dias</td>
+      </tr>
+      <tr>
+        <td>Campo neutro</td>
+        <td style="font-family:var(--sans);font-size:12px">Não</td>
+        <td style="font-family:var(--sans);font-size:12px">Não</td>
+        <td style="font-family:var(--sans);font-size:12px">Sim (flag CSV)</td>
+        <td style="font-family:var(--sans);font-size:12px">Sim (grupo/fase)</td>
+      </tr>
+      <tr>
+        <td>Fator descanso</td>
+        <td style="font-family:var(--sans);font-size:12px">Sim</td>
+        <td style="font-family:var(--sans);font-size:12px">Não (MC)</td>
+        <td style="font-family:var(--sans);font-size:12px">Não</td>
+        <td style="font-family:var(--sans);font-size:12px">Não</td>
+      </tr>
+      <tr>
+        <td>Detecção de temporadas</td>
+        <td style="font-family:var(--sans);font-size:12px">Auto (clusters)</td>
+        <td style="font-family:var(--sans);font-size:12px">Auto (clusters)</td>
+        <td style="font-family:var(--sans);font-size:12px">N/A</td>
+        <td style="font-family:var(--sans);font-size:12px">N/A</td>
+      </tr>
+      <tr>
+        <td>Modo de saída</td>
+        <td style="font-family:var(--sans);font-size:12px">Por partida</td>
+        <td style="font-family:var(--sans);font-size:12px">Classificação Monte Carlo</td>
+        <td style="font-family:var(--sans);font-size:12px">Por partida</td>
+        <td style="font-family:var(--sans);font-size:12px">Torneio Monte Carlo</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<div class="section" id="s8">
+  <div class="section-num">§ 8</div>
+  <h2>Limitações conhecidas</h2>
+
+  <p>Nenhum modelo é completo. As limitações mais relevantes do Sassamaru são:</p>
+
+  <h3>Informação não modelada</h3>
+  <p>O modelo não sabe que Neymar está lesionado, que um técnico foi demitido ontem, que o jogo é disputado em altitude de 3 600m, que chove forte ou que um time está concentrado em outra competição. Toda essa informação contextual é real e relevante — o modelo ignora completamente.</p>
+
+  <h3>Empates</h3>
+  <p>O modelo de Poisson bivariado tende a subestimar a probabilidade de empate em comparação com o mercado real. A correção Dixon-Coles mitiga isso parcialmente (via aumento de P(0-0) e P(1-1)), mas o problema persiste para placares maiores (2-2, 3-3).</p>
+
+  <h3>Times com poucos dados</h3>
+  <p>Times recém-promovidos ou seleções com histórico limitado no dataset têm estimativas de força pouco confiáveis. O modelo usa fallback para médias da liga, o que pode super ou subestimar esses times.</p>
+
+  <h3>Não-estacionaridade</h3>
+  <p>O futebol muda: estilos de jogo, volume de transferências, intensidade física. O modelo trata toda a história (desde 2003 / 1990) como amostras do mesmo processo, ponderando pelo decay. Isso é uma aproximação — o futebol de 2026 não é estatisticamente idêntico ao de 2003, mesmo com decay.</p>
+
+  <h3>Independência entre gols</h3>
+  <p>O modelo assume que os gols do mandante e do visitante são independentes. Na prática, o estado do jogo influencia o comportamento: um time que abre 3-0 não joga da mesma forma que em 0-0. Essa correlação dinâmica não é capturada.</p>
+
+  <h3>Monte Carlo e o bracket da Copa</h3>
+  <p>O chaveamento da Copa do Mundo 2026 para a fase eliminatória é complexo — o chaveamento real depende de quais grupos os 8 melhores terceiros colocados vieram. O simulador usa uma simplificação de pareamento sequencial, o que pode gerar matches que não seriam possíveis no torneio real.</p>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<div class="section" id="s9">
+  <div class="section-num">§ 9</div>
+  <h2>ToDo e próximos passos</h2>
+
+  <p>O modelo atual é funcional e produz previsões razoáveis, mas há espaço significativo para melhoria. Os itens abaixo estão ordenados por impacto esperado na qualidade das previsões.</p>
+
+  <h3>Modelo</h3>
+  <ul class="todo-list">
+    <li>
+      <span class="todo-tag model">Modelo</span>
+      <div class="todo-text">
+        <strong>Dixon-Coles completo com iteração MLE</strong>
+        <small>A implementação atual usa grid search de ρ isolado. A estimação rigorosa do Dixon-Coles envolve maximizar todos os parâmetros simultaneamente (ataque, defesa, home advantage, ρ) via gradiente ou BFGS. Isso melhoraria a calibração geral do modelo.</small>
+      </div>
+    </li>
+    <li>
+      <span class="todo-tag model">Modelo</span>
+      <div class="todo-text">
+        <strong>Modelo de correlação de gols (bivariate Poisson ou Weibull-gamma)</strong>
+        <small>Substitui a independência entre λ_H e λ_A por uma distribuição bivariada que captura correlações negativas (quando um time marca mais, o outro tende a recuar). O modelo de Dixon &amp; Robinson (1998) é uma extensão natural.</small>
+      </div>
+    </li>
+    <li>
+      <span class="todo-tag model">Modelo</span>
+      <div class="todo-text">
+        <strong>Inflação de empates por pressão de resultado</strong>
+        <small>Times que precisam de ponto extra tendem a jogar para o empate. Um fator situacional baseado na diferença de pontos na tabela poderia corrigir a subestimação de empates em rodadas finais.</small>
+      </div>
+    </li>
+    <li>
+      <span class="todo-tag model">Modelo</span>
+      <div class="todo-text">
+        <strong>Calibração isotônica pós-treinamento</strong>
+        <small>Aplicar Platt scaling ou regressão isotônica às probabilidades brutas do modelo para corrigir vieses sistemáticos de calibração (ex.: o modelo pode ser consistentemente over-confident em placares 1-0).</small>
+      </div>
+    </li>
+    <li>
+      <span class="todo-tag model">Modelo</span>
+      <div class="todo-text">
+        <strong>Home advantage por estádio/time</strong>
+        <small>Atualmente o modelo usa a média da liga para vantagem de casa. Times com forte vantagem de casa (ex.: Grêmio na Arena Porto Alegre) poderiam ter um fator individual estimado. Já existe uma implementação parcial no Sassamaru-seleções que poderia ser portada.</small>
+      </div>
+    </li>
+  </ul>
+
+  <h3>Dados</h3>
+  <ul class="todo-list">
+    <li>
+      <span class="todo-tag dados">Dados</span>
+      <div class="todo-text">
+        <strong>Atualização automática do CSV via API</strong>
+        <small>Integrar com APIs públicas (Sofascore, ESPN, football-data.org) para atualizar o dataset automaticamente após cada rodada, sem necessidade de atualização manual do arquivo.</small>
+      </div>
+    </li>
+    <li>
+      <span class="todo-tag dados">Dados</span>
+      <div class="todo-text">
+        <strong>Inclusão de dados de posse, chutes a gol e xG</strong>
+        <small>Expected Goals (xG) é substancialmente mais preditivo do que gols marcados para estimar a força real de um time. Datasets públicos como o Statsbomb Open Data ou a API do Understat contêm xG histórico.</small>
+      </div>
+    </li>
+    <li>
+      <span class="todo-tag dados">Dados</span>
+      <div class="todo-text">
+        <strong>Séries B, C e estaduais para times recém-promovidos</strong>
+        <small>Times que sobem da Série B chegam ao modelo com histórico apenas em divisões inferiores. Incluir dados da Série B com desconto de força (divisão inferior penaliza ataque/defesa estimados) melhoraria as previsões para times como Remo e Chapecoense.</small>
+      </div>
+    </li>
+    <li>
+      <span class="todo-tag dados">Dados</span>
+      <div class="todo-text">
+        <strong>Datas reais no dataset do Brasileirão</strong>
+        <small>O CSV atual usa apenas o número da rodada, sem data. Com datas reais seria possível usar decay date-based (como no modelo de seleções), que é mais preciso durante a janela de transferências ou após longos períodos sem jogos.</small>
+      </div>
+    </li>
+  </ul>
+
+  <h3>Interface</h3>
+  <ul class="todo-list">
+    <li>
+      <span class="todo-tag ui">UI</span>
+      <div class="todo-text">
+        <strong>Modo "o que mudou" — comparação de rodadas</strong>
+        <small>Permitir ao usuário rodar o modelo em duas rodadas diferentes e ver como as probabilidades mudaram para cada confronto, com setas de variação e destaques automáticos.</small>
+      </div>
+    </li>
+    <li>
+      <span class="todo-tag ui">UI</span>
+      <div class="todo-text">
+        <strong>Exportação de resultados como CSV / JSON</strong>
+        <small>Um botão para exportar todas as previsões da rodada ou da simulação Monte Carlo como CSV, para quem quiser analisar os dados externamente.</small>
+      </div>
+    </li>
+    <li>
+      <span class="todo-tag ui">UI</span>
+      <div class="todo-text">
+        <strong>Modo mobile otimizado para o Sassamaru-rodada</strong>
+        <small>A tabela de resultados com 11 colunas não é legível em tela pequena. Uma visualização alternativa em cards verticais para mobile melhoraria a usabilidade.</small>
+      </div>
+    </li>
+    <li>
+      <span class="todo-tag ui">UI</span>
+      <div class="todo-text">
+        <strong>Bracket visual interativo para a Copa 2026</strong>
+        <small>O simulador da Copa exibe probabilidades em tabelas, mas um chaveamento visual (tipo ESPN bracket) seria muito mais legível para a fase eliminatória.</small>
+      </div>
+    </li>
+  </ul>
+
+  <h3>Infraestrutura</h3>
+  <ul class="todo-list">
+    <li>
+      <span class="todo-tag infra">Infra</span>
+      <div class="todo-text">
+        <strong>Testes automatizados para o modelo de seleções</strong>
+        <small>O Sassamaru-rodada tem 89 testes unitários em model.test.js. O modelo de seleções não tem cobertura de testes, o que torna refatorações arriscadas.</small>
+      </div>
+    </li>
+    <li>
+      <span class="todo-tag infra">Infra</span>
+      <div class="todo-text">
+        <strong>Web Worker para o Monte Carlo</strong>
+        <small>Mover o loop de simulação para um Web Worker eliminaria completamente o risco de travar a UI, mesmo com 50 000 simulações, e permitiria cancelar uma simulação em andamento.</small>
+      </div>
+    </li>
+    <li>
+      <span class="todo-tag infra">Infra</span>
+      <div class="todo-text">
+        <strong>Compressão do CSV embutido</strong>
+        <small>O CSV do Brasileirão ocupa ~400 KB e o de seleções ~3.7 MB inline no HTML. Comprimir com pako (gzip via JS) reduziria o tamanho dos arquivos em ~70% e aceleraria o carregamento inicial.</small>
+      </div>
+    </li>
+  </ul>
+</div>
+
+<!-- ── Footer ── -->
+<footer>
+  <span>Sassamaru Docs v1.0 · Março 2026</span>
+  <span>Dixon &amp; Coles (1997) · Maher (1982) · Elo (1978) · Hvattum &amp; Arntzen (2010)</span>
+</footer>
+
+</div>
+</body>
+</html>
