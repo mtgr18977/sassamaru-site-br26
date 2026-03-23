@@ -413,8 +413,11 @@ p:last-child { margin-bottom: 0; }
 .todo-tag.dados   { background: #EFF6FF; color: #1E40AF; }
 .todo-tag.ui      { background: #F0EEE8; color: var(--muted); }
 .todo-tag.infra   { background: #FEF3C7; color: #92400E; }
+.todo-tag.done    { background: #F0F0EC; color: #9A9892; }
 .todo-text strong { font-weight: 600; }
 .todo-text small  { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; }
+.todo-done-item   { opacity: 0.6; }
+.todo-done-item .todo-text strong::before { content: '✓ '; color: var(--accent); font-size: 11px; }
 
 /* ── Footer ── */
 footer {
@@ -511,7 +514,7 @@ footer {
   <h2>Dados</h2>
 
   <h3>Brasileirão</h3>
-  <p>Dataset customizado <code style="font-family:var(--mono);font-size:12.5px">campeonatobrasileirolimpo.csv</code> com 9 200+ partidas do Campeonato Brasileiro Série A entre 2003 e 2026 (rodadas 1–6 da edição atual). As colunas usadas são: rodada (<code style="font-family:var(--mono);font-size:12px">rodata</code>), mandante, visitante e placar.</p>
+  <p>Dataset customizado <code style="font-family:var(--mono);font-size:12.5px">campeonatobrasileirolimpo.csv</code> com 9 200+ partidas do Campeonato Brasileiro Série A entre 2003 e 2026 (rodadas 1–8 da edição atual). As colunas usadas são: rodada (<code style="font-family:var(--mono);font-size:12px">rodata</code>), mandante, visitante e placar.</p>
 
   <div class="callout warn">
     <strong>Atenção — estrutura temporal:</strong> O dataset não contém datas — apenas o número da rodada. O modelo usa a rodada como unidade de tempo, o que exige detecção automática de temporadas via clustering de "rodada 1" (mínimo de 5 ocorrências consecutivas). Isso torna o decay temporal independente de calendário, mas também significa que jogos fora de rodada (amistosos, copas) não estão presentes.
@@ -830,11 +833,11 @@ footer {
 
   <h3>Modelo</h3>
   <ul class="todo-list">
-    <li>
-      <span class="todo-tag model">Modelo</span>
+    <li class="todo-done-item">
+      <span class="todo-tag done">Modelo</span>
       <div class="todo-text">
         <strong>Dixon-Coles completo com iteração MLE</strong>
-        <small>A implementação atual usa grid search de ρ isolado. A estimação rigorosa do Dixon-Coles envolve maximizar todos os parâmetros simultaneamente (ataque, defesa, home advantage, ρ) via gradiente ou BFGS. Isso melhoraria a calibração geral do modelo.</small>
+        <small>Implementado em <code style="font-family:var(--mono);font-size:11px">modelos/model.js</code>: todos os parâmetros (α ataque, β defesa, γ home advantage, μ base, ρ) estimados conjuntamente via gradiente analítico da log-verossimilhança com 400 iterações Adam e penalidades de identificabilidade.</small>
       </div>
     </li>
     <li>
@@ -858,11 +861,11 @@ footer {
         <small>Aplicar Platt scaling ou regressão isotônica às probabilidades brutas do modelo para corrigir vieses sistemáticos de calibração (ex.: o modelo pode ser consistentemente over-confident em placares 1-0).</small>
       </div>
     </li>
-    <li>
-      <span class="todo-tag model">Modelo</span>
+    <li class="todo-done-item">
+      <span class="todo-tag done">Modelo</span>
       <div class="todo-text">
         <strong>Home advantage por estádio/time</strong>
-        <small>Atualmente o modelo usa a média da liga para vantagem de casa. Times com forte vantagem de casa (ex.: Grêmio na Arena Porto Alegre) poderiam ter um fator individual estimado. Já existe uma implementação parcial no Sassamaru-seleções que poderia ser portada.</small>
+        <small>Implementado em <code style="font-family:var(--mono);font-size:11px">modelos/model.js</code>: fator individual estimado para times com ≥10 jogos ponderados em casa (map <code style="font-family:var(--mono);font-size:11px">homeAdv</code>), limitado ao intervalo [0.85, 1.15]. Times sem dados suficientes usam o fator médio da liga.</small>
       </div>
     </li>
   </ul>
@@ -908,11 +911,11 @@ footer {
         <small>Permitir ao usuário rodar o modelo em duas rodadas diferentes e ver como as probabilidades mudaram para cada confronto, com setas de variação e destaques automáticos.</small>
       </div>
     </li>
-    <li>
-      <span class="todo-tag ui">UI</span>
+    <li class="todo-done-item">
+      <span class="todo-tag done">UI</span>
       <div class="todo-text">
         <strong>Exportação de resultados como CSV / JSON</strong>
-        <small>Um botão para exportar todas as previsões da rodada ou da simulação Monte Carlo como CSV, para quem quiser analisar os dados externamente.</small>
+        <small>Implementado em <code style="font-family:var(--mono);font-size:11px">apps/index.html</code>: botão de exportação que gera CSV com todas as previsões da rodada.</small>
       </div>
     </li>
     <li>
@@ -922,22 +925,22 @@ footer {
         <small>A tabela de resultados com 11 colunas não é legível em tela pequena. Uma visualização alternativa em cards verticais para mobile melhoraria a usabilidade.</small>
       </div>
     </li>
-    <li>
-      <span class="todo-tag ui">UI</span>
+    <li class="todo-done-item">
+      <span class="todo-tag done">UI</span>
       <div class="todo-text">
         <strong>Bracket visual interativo para a Copa 2026</strong>
-        <small>O simulador da Copa exibe probabilidades em tabelas, mas um chaveamento visual (tipo ESPN bracket) seria muito mais legível para a fase eliminatória.</small>
+        <small>Implementado em <code style="font-family:var(--mono);font-size:11px">simulacoes/bench-copa2026.html</code>: layout estilo ESPN com chaveamento visual completo da fase eliminatória.</small>
       </div>
     </li>
   </ul>
 
   <h3>Infraestrutura</h3>
   <ul class="todo-list">
-    <li>
-      <span class="todo-tag infra">Infra</span>
+    <li class="todo-done-item">
+      <span class="todo-tag done">Infra</span>
       <div class="todo-text">
         <strong>Testes automatizados para o modelo de seleções</strong>
-        <small>O Sassamaru-rodada tem 89 testes unitários em model.test.js. O modelo de seleções não tem cobertura de testes, o que torna refatorações arriscadas.</small>
+        <small>Implementado em <code style="font-family:var(--mono);font-size:11px">tests/selecoes-model.test.js</code>: 110+ testes cobrindo helpers matemáticos, pesos temporais, buildModel e predict. Executar via <code style="font-family:var(--mono);font-size:11px">npm run test:selecoes</code>.</small>
       </div>
     </li>
     <li>
