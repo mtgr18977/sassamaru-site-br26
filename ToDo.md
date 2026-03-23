@@ -17,8 +17,8 @@
 - [ ] **Calibração isotônica pós-treinamento**  
   Aplicar Platt scaling ou regressão isotônica às probabilidades brutas do modelo para corrigir vieses sistemáticos de calibração (ex.: o modelo pode ser consistentemente over-confident em placares 1-0).
 
-- [ ] **Home advantage por estádio/time**  
-  Atualmente o modelo usa a média da liga para vantagem de casa. Times com forte vantagem de casa (ex.: Grêmio na Arena Porto Alegre) poderiam ter um fator individual estimado. Já existe uma implementação parcial no bench-selecoes que poderia ser portada.
+- [x] **Home advantage por estádio/time**
+  Implementado em `modelos/model.js`: fator individual por time estimado quando há ≥10 jogos ponderados em casa (`homeAdv` map, linha ~405). Times sem dados suficientes usam o fator médio da liga.
 
 
 ## Dados
