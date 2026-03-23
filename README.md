@@ -17,9 +17,9 @@ Simulador de **seleções (Copa do Mundo)** e de **clubes (Campeonato Brasileiro
 Este projeto **não requer build** — são arquivos HTML estáticos. Abra direto no navegador ou use um servidor local para evitar restrições de CORS:
 
 ```bash
-cd apps
+cd /caminho/para/o/repositorio
 python -m http.server 8000
-# acesse http://localhost:8000/
+# acesse http://localhost:8000/apps/
 ```
 
 ## Testes
