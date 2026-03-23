@@ -48,7 +48,7 @@ Os modelos em `modelos/` implementam regressão de Poisson com correção de Dix
 
 ## Atualização de dados
 
-Para adicionar novas rodadas, edite o arquivo correspondente em `simulacoes/` (ex.: `bench-brasileirao2026.html`), que contém o modelo e os dados embutidos inline.
+Para adicionar novas rodadas, atualize o artefato de simulação em `simulacoes/` (ex.: `simulacoes/bench-brasileirao2026.html`), que contém o modelo e os dados embutidos inline. Os webapps em `apps/` (ex.: `apps/index.html`, `apps/bench-selecoes.html`) também incluem dados embutidos (via `window.__EMBEDDED_CSV__`) e são os arquivos referenciados na seção **"Webapps disponíveis"**; se você estiver alterando os dados do simulador principal, lembre-se de atualizar tanto o HTML em `simulacoes/` quanto o HTML correspondente em `apps/`, mantendo os blocos de dados sincronizados.
 
 ## Contribuição
 
