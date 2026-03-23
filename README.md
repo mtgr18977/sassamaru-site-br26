@@ -35,7 +35,7 @@ npm run test:pwa         # validação do PWA (manifest, service worker, ícones
 Os modelos em `modelos/` implementam regressão de Poisson com correção de Dixon-Coles:
 
 - **Força de ataque/defesa** por equipe estimada via MLE (Adam optimizer, 400 iterações)
-- **Sistema Elo** com decaimento temporal (meia-vida: 730 dias para clubes, 2 anos para seleções)
+- **Sistema Elo** com decaimento temporal (meia-vida: 730 dias / 2 anos para clubes e seleções)
 - **Fator de forma** baseado nos últimos jogos com bônus de recência
 - **Vantagem em casa** calculada por equipe quando há dados suficientes
 
