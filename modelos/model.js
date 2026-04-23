@@ -8,7 +8,7 @@
     HOME_GOALS_COL: "mandante_Placar",
     AWAY_GOALS_COL: "visitante_Placar",
     HALF_LIFE_ELO_DAYS: 365 * 2,
-    HALF_LIFE_POISSON_DAYS: 365 * 4,
+    HALF_LIFE_POISSON_DAYS: 365 * 2,
     ELO_INITIAL: 1500,
     ELO_K_BASE: 30,
     SEASON_RESET_ALPHA: 0.20,
@@ -23,7 +23,7 @@
     FORM_FACTOR_MAX: 1.25,
     OVERROUND: 0.06,
     MIN_W_ELO: 0.15,
-    MIN_W_POI: 0.30,
+    MIN_W_POI: 0.15,
   };
 
   function normalizeTeam(name) {

@@ -227,12 +227,12 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
 
     // ── Temporal weights (expressed in ROUNDS, not days) ──
     HALF_LIFE_ELO_ROUNDS:     76,      // ~2 seasons of 38 rounds
-    HALF_LIFE_POISSON_ROUNDS: 152,     // ~4 seasons
+    HALF_LIFE_POISSON_ROUNDS: 76,      // ~2 seasons (matches Elo half-life)
     HALF_LIFE_FORM_ROUNDS:    19,      // ~half a season
 
     // ── Minimum weights ──
     MIN_W_ELO:  0.15,
-    MIN_W_POI:  0.30,
+    MIN_W_POI:  0.15,
     MIN_W_FORM: 0.40,
 
     // ── Elo settings ──
