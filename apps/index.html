@@ -1454,6 +1454,10 @@
     .bt-stat-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; }
     .bt-stat-lbl { font-size: 11.5px; color: var(--muted); }
     .bt-stat-val { font-family: var(--mono); font-size: 13px; font-weight: 600; }
+    .bt-prec-row { display: flex; justify-content: space-between; align-items: baseline; margin-top: -3px; margin-bottom: 7px; cursor: default; }
+    .bt-prec-lbl { font-size: 10.5px; color: var(--muted); padding-left: 10px; }
+    .bt-prec-val { font-family: var(--mono); font-size: 11.5px; font-weight: 600; }
+    .bt-td-prec  { display: block; font-size: 9.5px; margin-top: 2px; font-weight: 600; }
 
     /* ── Comparação ── */
     .cmp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
@@ -11378,13 +11382,16 @@ function renderBacktest({ seasonResults, calBins }) {
   function accCls(v)     { return v > 0.52 ? "bt-good" : v > 0.47 ? "bt-neutral" : "bt-bad"; }
   function llCls(v)      { return v < 1.02 ? "bt-good" : v < 1.08 ? "bt-neutral" : "bt-bad"; }
   function roiCls(v)     { return v > 2    ? "bt-good" : v > -2   ? "bt-neutral" : "bt-bad"; }
+  function brierToPrec(v){ return (1 - v / 2) * 100; }
+  function precCls(v)    { return v > 70 ? "bt-good" : v >= 67 ? "bt-neutral" : "bt-bad"; }
+  const PREC_TOOLTIP = "Precisão equivalente de DeFinetti: (1 − Brier/2) × 100. Baseline ingênuo = 66,7% (chutar 33,3% em todos os resultados).";
 
   // ── Tabela por temporada ──
   const rows = seasonResults.map(r => `
     <tr>
       <td>${r.year}</td>
       <td>${r.n}</td>
-      <td class="${brierCls(r.brier)}">${r.brier.toFixed(4)}</td>
+      <td class="${brierCls(r.brier)}" title="${PREC_TOOLTIP}">${r.brier.toFixed(4)}<span class="bt-td-prec ${precCls(brierToPrec(r.brier))}">${brierToPrec(r.brier).toFixed(1)}%</span></td>
       <td class="${accCls(r.accuracy)}">${(r.accuracy*100).toFixed(1)}%</td>
       <td class="${llCls(r.logLoss)}">${r.logLoss.toFixed(4)}</td>
       <td class="${roiCls(r.roi)}">${r.roi >= 0 ? '+' : ''}${r.roi.toFixed(1)}%</td>
@@ -11394,7 +11401,7 @@ function renderBacktest({ seasonResults, calBins }) {
     <tr class="avg-row">
       <td>Média</td>
       <td>—</td>
-      <td class="${brierCls(avgBrier)}">${avgBrier.toFixed(4)}</td>
+      <td class="${brierCls(avgBrier)}" title="${PREC_TOOLTIP}">${avgBrier.toFixed(4)}<span class="bt-td-prec ${precCls(brierToPrec(avgBrier))}">${brierToPrec(avgBrier).toFixed(1)}%</span></td>
       <td class="${accCls(avgAcc)}">${(avgAcc*100).toFixed(1)}%</td>
       <td class="${llCls(avgLL)}">${avgLL.toFixed(4)}</td>
       <td class="${roiCls(avgRoi)}">${avgRoi >= 0 ? '+' : ''}${avgRoi.toFixed(1)}%</td>
@@ -11405,7 +11412,7 @@ function renderBacktest({ seasonResults, calBins }) {
       <thead><tr>
         <th>Temporada</th>
         <th>Jogos</th>
-        <th title="Brier score multi-classe (0–2). Menor = melhor.">Brier ↓</th>
+        <th title="Brier score multi-classe (0–2). Menor = melhor. Linha secundária: precisão equivalente de DeFinetti (66,7% = baseline ingênuo).">Brier ↓ / Prec.</th>
         <th title="% de palpites 1X2 corretos">Acurácia ↑</th>
         <th title="Log-loss. Menor = melhor.">Log-loss ↓</th>
         <th title="ROI simulado apostando 1u no palpite favorito a odds justas do próprio modelo. Referência interna — não reflete odds de mercado.">ROI* ↑</th>
@@ -11426,6 +11433,7 @@ function renderBacktest({ seasonResults, calBins }) {
       <div class="bt-card">
         <div class="bt-card-title">Métricas médias (últimas ${seasonResults.length} temporadas)</div>
         <div class="bt-stat-row"><span class="bt-stat-lbl">Brier score</span><span class="bt-stat-val ${brierCls(avgBrier)}">${avgBrier.toFixed(4)}</span></div>
+        <div class="bt-prec-row" title="${PREC_TOOLTIP}"><span class="bt-prec-lbl">↳ Precisão equiv.</span><span class="bt-prec-val ${precCls(brierToPrec(avgBrier))}">${brierToPrec(avgBrier).toFixed(1)}%</span></div>
         <div class="bt-stat-row"><span class="bt-stat-lbl">Acurácia 1X2</span><span class="bt-stat-val ${accCls(avgAcc)}">${(avgAcc*100).toFixed(1)}%</span></div>
         <div class="bt-stat-row"><span class="bt-stat-lbl">Log-loss</span><span class="bt-stat-val ${llCls(avgLL)}">${avgLL.toFixed(4)}</span></div>
         <div class="bt-stat-row"><span class="bt-stat-lbl">ROI médio*</span><span class="bt-stat-val ${roiCls(avgRoi)}">${avgRoi >= 0 ? '+' : ''}${avgRoi.toFixed(1)}%</span></div>
