@@ -1459,6 +1459,27 @@
     .bt-prec-val { font-family: var(--mono); font-size: 11.5px; font-weight: 600; }
     .bt-td-prec  { display: block; font-size: 9.5px; margin-top: 2px; font-weight: 600; }
 
+    /* ── Monte Carlo ── */
+    .mc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .mc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 10px; margin-top: 14px; }
+    .mc-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; }
+    .mc-card-title { border-color: #a7c7b5; background: var(--accent-lt); }
+    .mc-card-rel   { border-color: #fca5a5; background: var(--bad-lt); }
+    .mc-pos  { font-size: 10px; color: var(--muted); margin-bottom: 4px; }
+    .mc-team { font-size: 12px; font-weight: 600; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mc-row { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; font-size: 10.5px; }
+    .mc-row-lbl { width: 30px; color: var(--muted); flex-shrink: 0; font-size: 10px; }
+    .mc-bar-wrap { flex: 1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+    .mc-bar { height: 100%; border-radius: 2px; }
+    .mc-bar-t   { background: var(--accent); }
+    .mc-bar-g4  { background: #4caf50; }
+    .mc-bar-rel { background: var(--bad); }
+    .mc-pct { font-family: var(--mono); font-size: 10px; font-weight: 600; min-width: 38px; text-align: right; }
+    .mc-pct-t   { color: var(--good); }
+    .mc-pct-g4  { color: #2e7d32; }
+    .mc-pct-rel { color: var(--bad); }
+    .mc-note { font-size: 10.5px; color: var(--muted); margin-top: 10px; line-height: 1.5; }
+
     /* ── Comparação ── */
     .cmp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
     @media (max-width: 600px) { .cmp-grid { grid-template-columns: 1fr; } }
@@ -10933,6 +10954,37 @@ athletico-pr x botafogo</textarea>
       <div id="btResult"></div>
     </div>
 
+    <!-- Monte Carlo do Campeonato -->
+    <div class="card" style="margin-top:14px;">
+      <div class="mc-header">
+        <div class="mono" style="font-weight:700;">Simulação Monte Carlo</div>
+        <span class="small" style="color:var(--muted);" id="mcMeta"></span>
+      </div>
+      <label for="mcFixtures" style="font-size:11px;color:var(--muted);">Jogos restantes (um por linha — Mandante x Visitante)</label>
+      <div style="position:relative;margin-top:6px;">
+        <textarea id="mcFixtures" spellcheck="false" style="height:110px;"
+          placeholder="flamengo x vasco&#10;palmeiras x santos&#10;atletico-mg x corinthians&#10;…"></textarea>
+      </div>
+      <div class="row" style="margin-top:12px;gap:10px;align-items:center;flex-wrap:wrap;">
+        <button id="mcBtn" disabled>Simular Campeonato</button>
+        <label style="font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px;">
+          Simulações:
+          <select id="mcN" style="padding:3px 8px;font-size:11px;background:rgba(0,0,0,.25);
+            color:var(--text);border:1px solid var(--border);border-radius:6px;cursor:pointer;outline:none;">
+            <option value="1000">1 000</option>
+            <option value="5000" selected>5 000</option>
+            <option value="10000">10 000</option>
+          </select>
+        </label>
+      </div>
+      <div class="status" id="mcStatus" style="margin-top:10px;"></div>
+    </div>
+    <div id="mcSection" style="display:none;margin-top:14px;">
+      <div class="bt-progress"><div class="bt-progress-fill" id="mcProgressFill" style="width:0%"></div></div>
+      <div id="mcResult"></div>
+      <p class="bt-note" id="mcNote"></p>
+    </div>
+
     <!-- Comparação de Times -->
     <div class="card" id="cmpSection" style="margin-top:14px;display:none;">
       <div class="row" style="justify-content:space-between;margin-bottom:12px;">
@@ -11500,6 +11552,182 @@ function buildCalibrationPlot(bins) {
   </svg>`;
 }
 
+/** ===================== Monte Carlo ===================== */
+
+const MC_WORKER_CODE = `
+self.onmessage = function(e) {
+  const { fixtures, standings, forces, homeAdv, leagueHomeAvg, leagueAwayAvg, n } = e.data;
+  function poissonSample(lam) {
+    if (lam <= 0) return 0;
+    const L = Math.exp(-lam);
+    let k = 0, p = 1;
+    do { k++; p *= Math.random(); } while (p > L);
+    return k - 1;
+  }
+  const teams = Object.keys(standings);
+  const cnt = {};
+  teams.forEach(t => cnt[t] = { title: 0, g4: 0, rel: 0 });
+  for (let s = 0; s < n; s++) {
+    const pts = {}, gd = {}, gf = {};
+    teams.forEach(t => { pts[t] = standings[t].pts; gd[t] = standings[t].gd; gf[t] = standings[t].gf; });
+    for (const [home, away] of fixtures) {
+      const fH = forces[home] || { atkH: 1, defH: 1, atkA: 1, defA: 1 };
+      const fA = forces[away] || { atkH: 1, defH: 1, atkA: 1, defA: 1 };
+      const hadv = homeAdv[home] || 1;
+      const lH = Math.max(0.1, fH.atkH * fA.defA * leagueHomeAvg * hadv);
+      const lA = Math.max(0.1, fA.atkA * fH.defH * leagueAwayAvg);
+      const gh = poissonSample(lH);
+      const ga = poissonSample(lA);
+      if (gh > ga)      pts[home] = (pts[home] || 0) + 3;
+      else if (gh < ga) pts[away] = (pts[away] || 0) + 3;
+      else { pts[home] = (pts[home] || 0) + 1; pts[away] = (pts[away] || 0) + 1; }
+      gd[home] = (gd[home] || 0) + gh - ga; gd[away] = (gd[away] || 0) + ga - gh;
+      gf[home] = (gf[home] || 0) + gh;      gf[away] = (gf[away] || 0) + ga;
+    }
+    const nT = teams.length;
+    teams.slice().sort((a, b) =>
+      (pts[b]||0)-(pts[a]||0) || (gd[b]||0)-(gd[a]||0) || (gf[b]||0)-(gf[a]||0)
+    ).forEach((t, i) => {
+      if (i === 0)       cnt[t].title++;
+      if (i < 4)         cnt[t].g4++;
+      if (i >= nT - 4)   cnt[t].rel++;
+    });
+  }
+  const results = {};
+  teams.forEach(t => {
+    results[t] = { title: cnt[t].title/n*100, g4: cnt[t].g4/n*100, rel: cnt[t].rel/n*100 };
+  });
+  self.postMessage({ results });
+};
+`;
+
+const _mcWorkerUrl = URL.createObjectURL(
+  new Blob([MC_WORKER_CODE], { type: 'application/javascript' })
+);
+
+const mcBtn    = $("mcBtn");
+const mcSection = $("mcSection");
+const mcResult = $("mcResult");
+const mcStatus = $("mcStatus");
+const mcNote   = $("mcNote");
+
+function computeCurrentStandings(rawParsed) {
+  // Find start of current season: last contiguous cluster of rodata=1 rows
+  let seasonStart = -1;
+  for (let i = rawParsed.length - 1; i >= 0; i--) {
+    const rod = parseFloat(rawParsed[i][CONFIG.DATE_COL]);
+    if (rod === 1) { seasonStart = i; }
+    else if (seasonStart >= 0 && rod > 0) break;
+  }
+  if (seasonStart < 0) return {};
+  const stnd = {};
+  for (let i = seasonStart; i < rawParsed.length; i++) {
+    const row = rawParsed[i];
+    if (!(parseFloat(row[CONFIG.DATE_COL]) > 0)) continue;
+    const home = normalizeTeam(row[CONFIG.HOME_TEAM_COL]);
+    const away = normalizeTeam(row[CONFIG.AWAY_TEAM_COL]);
+    const hg   = parseInt(row[CONFIG.HOME_GOALS_COL]);
+    const ag   = parseInt(row[CONFIG.AWAY_GOALS_COL]);
+    if (!home || !away || isNaN(hg) || isNaN(ag)) continue;
+    if (!stnd[home]) stnd[home] = { pts: 0, gd: 0, gf: 0 };
+    if (!stnd[away]) stnd[away] = { pts: 0, gd: 0, gf: 0 };
+    if (hg > ag)      stnd[home].pts += 3;
+    else if (hg < ag) stnd[away].pts += 3;
+    else { stnd[home].pts++; stnd[away].pts++; }
+    stnd[home].gd += hg - ag; stnd[away].gd += ag - hg;
+    stnd[home].gf += hg;      stnd[away].gf += ag;
+  }
+  return stnd;
+}
+
+mcBtn.addEventListener("click", () => {
+  if (!MODEL || !_rawParsed) return;
+  const fixtures = parseFixtures($("mcFixtures").value);
+  if (!fixtures.length) {
+    mcStatus.innerHTML = '<span class="bad">Nenhum jogo válido. Use "Mandante x Visitante", um por linha.</span>';
+    return;
+  }
+  const n        = parseInt($("mcN").value, 10) || 5000;
+  const standings = computeCurrentStandings(_rawParsed);
+  if (!Object.keys(standings).length) {
+    mcStatus.innerHTML = '<span class="bad">Não foi possível calcular a tabela atual do CSV.</span>';
+    return;
+  }
+  mcBtn.disabled = true;
+  mcBtn.textContent = "Simulando…";
+  mcSection.style.display = "block";
+  mcResult.innerHTML = "";
+  mcNote.textContent = "";
+  $("mcProgressFill").style.width = "0%";
+  mcStatus.innerHTML = `Rodando <b>${n.toLocaleString("pt-BR")}</b> simulações em segundo plano…`;
+
+  const forces = {}, homeAdv = {};
+  MODEL.forces.forEach((v, k) => forces[k] = v);
+  MODEL.homeAdv.forEach((v, k) => homeAdv[k] = v);
+
+  const t0 = performance.now();
+  const worker = new Worker(_mcWorkerUrl);
+  worker.onmessage = ({ data: { results } }) => {
+    worker.terminate();
+    const elapsed = ((performance.now() - t0) / 1000).toFixed(1);
+    $("mcProgressFill").style.width = "100%";
+    mcBtn.disabled = false;
+    mcBtn.textContent = "Simular Campeonato";
+    mcStatus.innerHTML = `<span class="ok">OK</span> — ${n.toLocaleString("pt-BR")} simulações em ${elapsed}s · ${fixtures.length} jogos restantes`;
+    $("mcMeta").textContent = `n=${n.toLocaleString("pt-BR")} · ${elapsed}s`;
+    renderMonteCarlo(results, standings);
+  };
+  worker.onerror = err => {
+    worker.terminate();
+    mcBtn.disabled = false;
+    mcBtn.textContent = "Simular Campeonato";
+    mcStatus.innerHTML = `<span class="bad">Erro: ${err.message}</span>`;
+  };
+  worker.postMessage({ fixtures, standings, forces, homeAdv,
+    leagueHomeAvg: MODEL.leagueHomeAvg, leagueAwayAvg: MODEL.leagueAwayAvg, n });
+});
+
+function renderMonteCarlo(results, standings) {
+  const sorted = Object.keys(standings).sort((a, b) =>
+    standings[b].pts - standings[a].pts || standings[b].gd - standings[a].gd
+  );
+  const nT = sorted.length;
+  const cards = sorted.map((team, idx) => {
+    const r   = results[team] || { title: 0, g4: 0, rel: 0 };
+    const pos = idx + 1;
+    const pts = standings[team].pts;
+    const gd  = standings[team].gd;
+    let cls = "mc-card";
+    if (r.title >= 10)     cls += " mc-card-title";
+    else if (r.rel >= 10)  cls += " mc-card-rel";
+    const tPct   = r.title.toFixed(1);
+    const g4Pct  = r.g4.toFixed(1);
+    const relPct = r.rel.toFixed(1);
+    return `
+      <div class="${cls}" title="${displayName(team)}">
+        <div class="mc-pos">#${pos} · ${pts}pts · DG${gd >= 0 ? '+' : ''}${gd}</div>
+        <div class="mc-team">${displayName(team)}</div>
+        <div class="mc-row">
+          <span class="mc-row-lbl" title="Probabilidade de título">🏆</span>
+          <div class="mc-bar-wrap"><div class="mc-bar mc-bar-t" style="width:${Math.min(+tPct,100)}%"></div></div>
+          <span class="mc-pct mc-pct-t">${tPct}%</span>
+        </div>
+        <div class="mc-row">
+          <span class="mc-row-lbl" title="Top-4 (Libertadores)">G4</span>
+          <div class="mc-bar-wrap"><div class="mc-bar mc-bar-g4" style="width:${Math.min(+g4Pct,100)}%"></div></div>
+          <span class="mc-pct mc-pct-g4">${g4Pct}%</span>
+        </div>
+        <div class="mc-row">
+          <span class="mc-row-lbl" title="Rebaixamento (posições 17–20)">↓Z4</span>
+          <div class="mc-bar-wrap"><div class="mc-bar mc-bar-rel" style="width:${Math.min(+relPct,100)}%"></div></div>
+          <span class="mc-pct mc-pct-rel">${relPct}%</span>
+        </div>
+      </div>`;
+  }).join("");
+  mcResult.innerHTML = `<div class="mc-grid">${cards}</div>`;
+  mcNote.textContent = "Tabela inicial derivada do CSV carregado. G4 = Libertadores direto. Rebaixamento = posições 17–20. Critério de desempate: saldo de gols.";
+}
+
 /** ===================== Comparação de Times ===================== */
 const cmpSection = $("cmpSection");
 const cmpTeamA   = $("cmpTeamA");
@@ -11704,6 +11932,7 @@ async function loadCSV(){
 
   runBtn.disabled = false;
   btBtn.disabled  = false;
+  mcBtn.disabled  = false;
   populateCmpSelects();
   runValidation();
   setModelPill(`Modelo pronto • ${MODEL.teamCount} times`, "");
