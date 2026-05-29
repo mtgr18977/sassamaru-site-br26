@@ -50087,6 +50087,17 @@ function renderBracket(stats){
     return{t:best,p:bestC/N};
   }
 
+  function topOfUnused(map,used){
+    if(!map||map.size===0)return{t:'?',p:0};
+    let best=null,bestC=0;
+    for(const[t,c]of map.entries())if(!used.has(t)&&c>bestC){bestC=c;best=t;}
+    if(best===null){
+      // fallback: allow reuse if no unused candidate
+      for(const[t,c]of map.entries())if(c>bestC){bestC=c;best=t;}
+    }
+    return{t:best||'?',p:bestC/N};
+  }
+
   function matchCard(t1,t2,winSlot){
     const w1=(winSlot?.get(t1)||0)/N;
     const w2=(winSlot?.get(t2)||0)/N;
@@ -50118,32 +50129,46 @@ function renderBracket(stats){
 
   const gap='<div class="vb-gap"></div>';
 
-  // R32: 16 matches — top 2 entrants per slot
+  // R32: 16 matches — top 2 entrants per slot, deduped across slots
+  const usedR32=new Set();
   const r32Html=roundHtml('Oitavas',stats.r32Entrants.map((ents,i)=>{
     const sorted=[...ents.entries()].sort((a,b)=>b[1]-a[1]);
-    return{t1:sorted[0]?.[0]||'?',t2:sorted[1]?.[0]||'?',win:stats.r32WinSlots[i]};
+    const t1=sorted.find(([t])=>!usedR32.has(t))?.[0]||sorted[0]?.[0]||'?';
+    usedR32.add(t1);
+    const t2=sorted.find(([t])=>!usedR32.has(t))?.[0]||sorted[1]?.[0]||'?';
+    usedR32.add(t2);
+    return{t1,t2,win:stats.r32WinSlots[i]};
   }));
 
-  // R16: 8 matches — most likely R32 winners per pair
-  const r16Html=roundHtml('R16',stats.r16WinSlots.map((win,i)=>({
-    t1:topOf(stats.r32WinSlots[2*i]).t,
-    t2:topOf(stats.r32WinSlots[2*i+1]).t,
-    win
-  })));
+  // R16: 8 matches — most likely R32 winners per pair, deduped
+  const usedR16=new Set();
+  const r16Html=roundHtml('R16',stats.r16WinSlots.map((win,i)=>{
+    const r1=topOfUnused(stats.r32WinSlots[2*i],usedR16);
+    usedR16.add(r1.t);
+    const r2=topOfUnused(stats.r32WinSlots[2*i+1],usedR16);
+    usedR16.add(r2.t);
+    return{t1:r1.t,t2:r2.t,win};
+  }));
 
-  // QF: 4 matches
-  const qfHtml=roundHtml('Quartas',stats.qfWinSlots.map((win,i)=>({
-    t1:topOf(stats.r16WinSlots[2*i]).t,
-    t2:topOf(stats.r16WinSlots[2*i+1]).t,
-    win
-  })));
+  // QF: 4 matches, deduped
+  const usedQF=new Set();
+  const qfHtml=roundHtml('Quartas',stats.qfWinSlots.map((win,i)=>{
+    const r1=topOfUnused(stats.r16WinSlots[2*i],usedQF);
+    usedQF.add(r1.t);
+    const r2=topOfUnused(stats.r16WinSlots[2*i+1],usedQF);
+    usedQF.add(r2.t);
+    return{t1:r1.t,t2:r2.t,win};
+  }));
 
-  // SF: 2 matches
-  const sfHtml=roundHtml('Semi',stats.sfWinSlots.map((win,i)=>({
-    t1:topOf(stats.qfWinSlots[2*i]).t,
-    t2:topOf(stats.qfWinSlots[2*i+1]).t,
-    win
-  })));
+  // SF: 2 matches, deduped
+  const usedSF=new Set();
+  const sfHtml=roundHtml('Semi',stats.sfWinSlots.map((win,i)=>{
+    const r1=topOfUnused(stats.qfWinSlots[2*i],usedSF);
+    usedSF.add(r1.t);
+    const r2=topOfUnused(stats.qfWinSlots[2*i+1],usedSF);
+    usedSF.add(r2.t);
+    return{t1:r1.t,t2:r2.t,win};
+  }));
 
   // Final: 1 match
   const finalHtml=roundHtml('Final',[{
