@@ -49598,8 +49598,12 @@ function simulateKnockout(homeRaw,awayRaw,model){
 
 // ════════════════════════════════════════════════
 //  Groups definition (Copa do Mundo 2026)
-//  Playoffs: Italy(A), Ukraine(B), Turkey(C), Denmark(D) = likely winners
-//  Inter-conf: DR Congo (K), Iraq (I)
+//  Playoffs UEFA confirmados (março/2026):
+//    Path A: Bósnia-Herzegovina (bateu Itália nos pênaltis)
+//    Path B: Suécia (bateu Polônia 3-2)
+//    Path C: Turquia (bateu Kosovo 1-0)
+//    Path D: República Tcheca (bateu Dinamarca nos pênaltis)
+//  Inter-conf: Congo-Kinshasa (K) bateu Jamaica; Iraque (I) bateu Bolívia 2-1
 // ════════════════════════════════════════════════
 
 // HOST NATIONS: Mexico, USA, Canada have home advantage in their group games
@@ -49611,12 +49615,12 @@ const HOST_HOME = {
 };
 
 const GROUPS_RAW = {
-  A: { name:'Grupo A', teams:['Mexico','South Korea','South Africa','Denmark'] },
-  B: { name:'Grupo B', teams:['Canada','Switzerland','Qatar','Italy'] },
+  A: { name:'Grupo A', teams:['Mexico','South Korea','South Africa','Czech Republic'] },
+  B: { name:'Grupo B', teams:['Canada','Switzerland','Qatar','Bosnia and Herzegovina'] },
   C: { name:'Grupo C', teams:['Brazil','Morocco','Haiti','Scotland'] },
   D: { name:'Grupo D', teams:['United States','Paraguay','Australia','Turkey'] },
   E: { name:'Grupo E', teams:['Germany','Curacao','Ivory Coast','Ecuador'] },
-  F: { name:'Grupo F', teams:['Netherlands','Japan','Tunisia','Ukraine'] },
+  F: { name:'Grupo F', teams:['Netherlands','Japan','Tunisia','Sweden'] },
   G: { name:'Grupo G', teams:['Belgium','Egypt','Iran','New Zealand'] },
   H: { name:'Grupo H', teams:['Spain','Cape Verde','Saudi Arabia','Uruguay'] },
   I: { name:'Grupo I', teams:['France','Senegal','Norway','Iraq'] },
