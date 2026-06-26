@@ -274,45 +274,66 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
 .result-l{color:var(--red)}
 
 /* ── Mata-Mata / Chaveamento ── */
-.bracket-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:8px}
-.bracket-tree{display:flex;gap:3px;min-width:900px;height:calc(8 * 56px)} /* 448px — 8 R32 per side */
-.bracket-col{display:flex;flex-direction:column;flex:1;min-width:0}
-.bracket-col.center-col{flex:.75}
-.bracket-col-hdr{font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.07em;
-  color:var(--muted);text-align:center;padding:5px 3px;border-bottom:1px solid var(--border);
-  margin-bottom:0;flex-shrink:0;white-space:nowrap}
-.bracket-slots{display:flex;flex-direction:column;flex:1}
-/* Each slot is a fixed-height container; card is vertically centered inside */
+.bracket-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:12px}
+/* Slot base height: 64px. Total = 8×64=512px. Each round doubles. */
+.bracket-tree{display:flex;align-items:stretch;gap:0;min-width:960px;height:calc(8 * 64px)}
+/* Column widths: R32 wider, inner rounds narrower */
+.bracket-col{display:flex;flex-direction:column;flex:1.4;min-width:0;position:relative}
+.bracket-col.rnd-r16{flex:1.1}
+.bracket-col.rnd-qf {flex:0.9}
+.bracket-col.rnd-sf {flex:0.85}
+.bracket-col.center-col{flex:1}
+/* Column header */
+.bracket-col-hdr{font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;
+  color:var(--muted);text-align:center;padding:4px 4px 6px;border-bottom:2px solid var(--border);
+  margin-bottom:0;flex-shrink:0;white-space:nowrap;background:var(--bg)}
+.bracket-slots{display:flex;flex-direction:column;flex:1;padding:0 4px}
+/* Each slot is fixed-height; card centers inside it */
 .bracket-slot{display:flex;align-items:center;flex-shrink:0;position:relative}
-.bracket-slot.r32{height:56px}
-.bracket-slot.r16{height:112px}
-.bracket-slot.qf {height:224px}
-.bracket-slot.sf {height:448px}
-.bracket-slot.fn {height:448px}
-/* Left side connectors: right edge */
-.con-right .bracket-slot::after{content:'';position:absolute;right:0;top:50%;width:3px;height:1px;background:var(--border)}
-.con-right .bracket-slot.line-top::before{content:'';position:absolute;right:0;top:50%;width:1px;height:50%;background:var(--border)}
-.con-right .bracket-slot.line-bot::before{content:'';position:absolute;right:0;bottom:50%;width:1px;height:50%;background:var(--border)}
-/* Right side connectors: left edge */
-.con-left .bracket-slot::after{content:'';position:absolute;left:0;top:50%;width:3px;height:1px;background:var(--border)}
-.con-left .bracket-slot.line-top::before{content:'';position:absolute;left:0;top:50%;width:1px;height:50%;background:var(--border)}
-.con-left .bracket-slot.line-bot::before{content:'';position:absolute;left:0;bottom:50%;width:1px;height:50%;background:var(--border)}
+.bracket-slot.r32{height:64px}
+.bracket-slot.r16{height:128px}
+.bracket-slot.qf {height:256px}
+.bracket-slot.sf {height:512px}
+.bracket-slot.fn {height:512px}
+/* ── Connector lines ──
+   Horizontal tick: 8px wide stub from the slot edge.
+   Vertical bar: runs from midpoint to the sibling slot's midpoint. */
+/* Left-side columns: connectors on right */
+.con-right .bracket-slot::after{
+  content:'';position:absolute;right:-4px;top:50%;
+  width:8px;height:2px;background:#C8C5BB;z-index:1}
+.con-right .bracket-slot.line-top::before{
+  content:'';position:absolute;right:-4px;top:50%;
+  width:2px;height:50%;background:#C8C5BB;z-index:1}
+.con-right .bracket-slot.line-bot::before{
+  content:'';position:absolute;right:-4px;bottom:50%;
+  width:2px;height:50%;background:#C8C5BB;z-index:1}
+/* Right-side columns: connectors on left */
+.con-left .bracket-slot::after{
+  content:'';position:absolute;left:-4px;top:50%;
+  width:8px;height:2px;background:#C8C5BB;z-index:1}
+.con-left .bracket-slot.line-top::before{
+  content:'';position:absolute;left:-4px;top:50%;
+  width:2px;height:50%;background:#C8C5BB;z-index:1}
+.con-left .bracket-slot.line-bot::before{
+  content:'';position:absolute;left:-4px;bottom:50%;
+  width:2px;height:50%;background:#C8C5BB;z-index:1}
 /* Match card */
-.bm{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-  width:calc(100% - 6px);margin:0 3px;overflow:hidden;flex-shrink:0}
-.bm-hdr{font-size:8.5px;font-family:var(--mono);color:var(--muted);padding:2px 6px;
-  border-bottom:1px solid #F0EEE8;display:flex;justify-content:space-between}
-.bm-team{display:flex;align-items:center;gap:4px;padding:5px 6px;font-size:10.5px;line-height:1.2;
-  min-width:0;border-bottom:1px solid #F0EEE8}
-.bm-team:last-child{border-bottom:none}
-.bm-flag{font-size:12px;line-height:1;flex-shrink:0}
-.bm-nm{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.bm-nm.tbd{color:var(--muted);font-size:9.5px}
-.bm-sc{font-family:var(--mono);font-size:11px;font-weight:700;flex-shrink:0;min-width:14px;text-align:right}
+.bm{background:var(--surface);border:1px solid var(--border);border-radius:5px;
+  width:100%;overflow:hidden;flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.bm-jid{font-size:7.5px;font-family:var(--mono);color:var(--muted);padding:2px 5px 1px;
+  border-bottom:1px solid #F0EEE8;letter-spacing:.04em}
+.bm-team{display:flex;align-items:center;gap:4px;padding:4px 5px;font-size:10px;line-height:1.25;min-width:0}
+.bm-team+.bm-team{border-top:1px solid #F0EEE8}
+.bm-flag{font-size:11px;line-height:1;flex-shrink:0}
+.bm-nm{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:10px}
+.bm-nm.tbd{color:var(--muted);font-size:8.5px;font-family:var(--mono)}
+.bm-sc{font-family:var(--mono);font-size:10px;font-weight:700;flex-shrink:0;min-width:12px;text-align:right}
 .bm-team.winner .bm-nm{font-weight:700;color:var(--accent)}
 .bm-team.winner .bm-sc{color:var(--accent)}
-.third-match-wrap{margin-top:12px;max-width:220px}
-.third-match-label{font-size:9.5px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:6px}
+.third-match-wrap{margin-top:16px;max-width:200px}
+.third-match-label{font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.07em;
+  color:var(--muted);margin-bottom:6px;font-weight:500}
 
 @media(max-width:580px){
   .groups-grid{grid-template-columns:1fr}
@@ -1138,13 +1159,8 @@ function bmHtml(m, homeCode, awayCode, homeLbl, awayLbl) {
     </div>`;
   }
 
-  const jidStr = m.jid ? `<span>${m.jid}</span>` : '';
-  const dateStr = m.date ? `<span>${fmtDate(m.date)}</span>` : '';
-  const hdr = (jidStr||dateStr) ? `<div class="bm-hdr">${jidStr}${dateStr}</div>` : '';
-  return `<div class="bm">${hdr}
-    ${teamRow(ht, m.hs, homeWins, homeLbl)}
-    ${teamRow(at, m.as, awayWins, awayLbl)}
-  </div>`;
+  const jid = m.jid ? `<div class="bm-jid">${m.jid}${m.date?' · '+fmtDate(m.date):''}</div>` : '';
+  return `<div class="bm">${jid}${teamRow(ht, m.hs, homeWins, homeLbl)}${teamRow(at, m.as, awayWins, awayLbl)}</div>`;
 }
 
 function renderBracket() {
@@ -1158,8 +1174,9 @@ function renderBracket() {
   function r32HomeLbl(m) { return m.homeLabel || posLabel(m.homePos); }
   function r32AwayLbl(m) { return m.awayLabel || posLabel(m.awayPos); }
 
-  function renderCol(label, matches, slotClass, conClass, isR32) {
-    let h = `<div class="bracket-col ${conClass}"><div class="bracket-col-hdr">${label}</div><div class="bracket-slots">`;
+  // colClass: extra CSS class for width control
+  function renderCol(label, matches, slotClass, conClass, isR32, colClass) {
+    let h = `<div class="bracket-col ${conClass} ${colClass||''}"><div class="bracket-col-hdr">${label}</div><div class="bracket-slots">`;
     matches.forEach((m, mi) => {
       const lc = matches.length > 1 ? (mi % 2 === 0 ? ' line-top' : ' line-bot') : '';
       const hc = isR32 ? r32Home(m) : m.home;
@@ -1173,22 +1190,22 @@ function renderBracket() {
 
   let html = '';
   // Left side (outer→center)
-  html += renderCol('R32',      BL_R32, 'r32', 'con-right', true);
-  html += renderCol('Oitavas',  BL_R16, 'r16', 'con-right', false);
-  html += renderCol('Quartas',  BL_QF,  'qf',  'con-right', false);
-  html += renderCol('Semifinal',BL_SF,  'sf',  '',          false);
+  html += renderCol('R32',       BL_R32, 'r32', 'con-right', true,  '');
+  html += renderCol('Oitavas',   BL_R16, 'r16', 'con-right', false, 'rnd-r16');
+  html += renderCol('Quartas',   BL_QF,  'qf',  'con-right', false, 'rnd-qf');
+  html += renderCol('Semifinal', BL_SF,  'sf',  '',          false, 'rnd-sf');
   // Center: Final
   html += `<div class="bracket-col center-col">
-    <div class="bracket-col-hdr">Final · J104</div>
+    <div class="bracket-col-hdr">Final</div>
     <div class="bracket-slots">
       <div class="bracket-slot fn">${bmHtml(B_FINAL, B_FINAL.home, B_FINAL.away, B_FINAL.hl, B_FINAL.al)}</div>
     </div>
   </div>`;
   // Right side (center→outer)
-  html += renderCol('Semifinal',BR_SF,  'sf',  '',          false);
-  html += renderCol('Quartas',  BR_QF,  'qf',  'con-left',  false);
-  html += renderCol('Oitavas',  BR_R16, 'r16', 'con-left',  false);
-  html += renderCol('R32',      BR_R32, 'r32', 'con-left',  true);
+  html += renderCol('Semifinal', BR_SF,  'sf',  '',          false, 'rnd-sf');
+  html += renderCol('Quartas',   BR_QF,  'qf',  'con-left',  false, 'rnd-qf');
+  html += renderCol('Oitavas',   BR_R16, 'r16', 'con-left',  false, 'rnd-r16');
+  html += renderCol('R32',       BR_R32, 'r32', 'con-left',  true,  '');
 
   document.getElementById('bracket-tree').innerHTML = html;
 
