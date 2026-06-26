@@ -273,6 +273,68 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
 .result-d{color:var(--orange)}
 .result-l{color:var(--red)}
 
+/* ── Mata-Mata / Chaveamento ── */
+.bracket-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:12px}
+/* Slot base height: 64px. Total = 8×64=512px. Each round doubles. */
+.bracket-tree{display:flex;align-items:stretch;gap:0;min-width:960px;height:calc(8 * 64px)}
+/* Column widths: R32 wider, inner rounds narrower */
+.bracket-col{display:flex;flex-direction:column;flex:1.4;min-width:0;position:relative}
+.bracket-col.rnd-r16{flex:1.1}
+.bracket-col.rnd-qf {flex:0.9}
+.bracket-col.rnd-sf {flex:0.85}
+.bracket-col.center-col{flex:1}
+/* Column header */
+.bracket-col-hdr{font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;
+  color:var(--muted);text-align:center;padding:4px 4px 6px;border-bottom:2px solid var(--border);
+  margin-bottom:0;flex-shrink:0;white-space:nowrap;background:var(--bg)}
+.bracket-slots{display:flex;flex-direction:column;flex:1;padding:0 4px}
+/* Each slot is fixed-height; card centers inside it */
+.bracket-slot{display:flex;align-items:center;flex-shrink:0;position:relative}
+.bracket-slot.r32{height:64px}
+.bracket-slot.r16{height:128px}
+.bracket-slot.qf {height:256px}
+.bracket-slot.sf {height:512px}
+.bracket-slot.fn {height:512px}
+/* ── Connector lines ──
+   Horizontal tick: 8px wide stub from the slot edge.
+   Vertical bar: runs from midpoint to the sibling slot's midpoint. */
+/* Left-side columns: connectors on right */
+.con-right .bracket-slot::after{
+  content:'';position:absolute;right:-4px;top:50%;
+  width:8px;height:2px;background:#C8C5BB;z-index:1}
+.con-right .bracket-slot.line-top::before{
+  content:'';position:absolute;right:-4px;top:50%;
+  width:2px;height:50%;background:#C8C5BB;z-index:1}
+.con-right .bracket-slot.line-bot::before{
+  content:'';position:absolute;right:-4px;bottom:50%;
+  width:2px;height:50%;background:#C8C5BB;z-index:1}
+/* Right-side columns: connectors on left */
+.con-left .bracket-slot::after{
+  content:'';position:absolute;left:-4px;top:50%;
+  width:8px;height:2px;background:#C8C5BB;z-index:1}
+.con-left .bracket-slot.line-top::before{
+  content:'';position:absolute;left:-4px;top:50%;
+  width:2px;height:50%;background:#C8C5BB;z-index:1}
+.con-left .bracket-slot.line-bot::before{
+  content:'';position:absolute;left:-4px;bottom:50%;
+  width:2px;height:50%;background:#C8C5BB;z-index:1}
+/* Match card */
+.bm{background:var(--surface);border:1px solid var(--border);border-radius:5px;
+  width:100%;overflow:hidden;flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.bm-jid{font-size:7.5px;font-family:var(--mono);color:var(--muted);padding:2px 5px 1px;
+  border-bottom:1px solid #F0EEE8;letter-spacing:.04em}
+.bm-team{display:flex;align-items:center;gap:4px;padding:4px 5px;font-size:10px;line-height:1.25;min-width:0}
+.bm-team+.bm-team{border-top:1px solid #F0EEE8}
+.bm-flag{font-size:11px;line-height:1;flex-shrink:0}
+.bm-nm{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:10px}
+.bm-nm.tbd{color:var(--muted);font-size:8.5px;font-family:var(--mono)}
+.bm-sc{font-family:var(--mono);font-size:10px;font-weight:700;flex-shrink:0;min-width:12px;text-align:right}
+.bm-team.winner .bm-nm{font-weight:700;color:var(--accent)}
+.bm-team.winner .bm-sc{color:var(--accent)}
+.third-match-wrap{margin-top:16px;max-width:200px}
+.third-match-label{font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.07em;
+  color:var(--muted);margin-bottom:6px;font-weight:500}
+
 @media(max-width:580px){
   .groups-grid{grid-template-columns:1fr}
   .modal-score-row{gap:8px}
@@ -305,6 +367,7 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
   <button class="tab-btn" data-tab="resultados">Resultados</button>
   <button class="tab-btn" data-tab="agenda">Agenda</button>
   <button class="tab-btn" data-tab="terceiros">Melhores Terceiros</button>
+  <button class="tab-btn" data-tab="matamata">Mata-Mata</button>
   <button class="tab-btn" data-tab="chances">Chances de título</button>
   <button class="tab-btn" data-tab="confrontos">Confrontos</button>
 </nav>
@@ -339,6 +402,15 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
   </div>
   <div class="section-label">Classificação dos 3ºs colocados</div>
   <div class="thirds-grid" id="thirds-container"></div>
+</div>
+
+<!-- TAB: Mata-Mata -->
+<div id="tab-matamata" class="tab-panel">
+  <div class="section-label">Chaveamento — Copa do Mundo 2026</div>
+  <div class="bracket-wrap">
+    <div class="bracket-tree" id="bracket-tree"></div>
+  </div>
+  <div class="third-match-wrap" id="third-place-match"></div>
 </div>
 
 <!-- TAB: Chances de título -->
@@ -702,6 +774,73 @@ const MATCHES = [
 ];
 
 // ──────────────────────────────────────────────
+// KNOCKOUT / CHAVEAMENTO
+// Atualizar diariamente.
+// Em R32: homePos/awayPos = {g:'A',r:1} resolve o time automaticamente
+//         via computeStandings. Ou setar home/away com código fixo se já
+//         conhecido (grupo encerrado).
+// hs/as = null enquanto não jogado. winner = código do vencedor.
+// ──────────────────────────────────────────────
+
+// ── BRACKET DATA — Mata-Mata oficial Copa do Mundo 2026 ──
+// homePos/awayPos: posição de grupo {g,r} | homeLabel/awayLabel: rótulo TBD (3os melhores)
+// home/away: código fixo se já confirmado | hs/as/winner: preencher conforme resultados
+// Atualizar diariamente a partir de 28/jun.
+
+// LADO ESQUERDO — R32 (cima→baixo)
+const BL_R32 = [
+  {jid:'J74', date:'2026-06-29', homePos:{g:'E',r:1}, awayLabel:'3ABCDF',  home:null,away:null,hs:null,as:null,winner:null},
+  {jid:'J77', date:'2026-06-30', homePos:{g:'I',r:1}, awayLabel:'3CDFGH',  home:null,away:null,hs:null,as:null,winner:null},
+  {jid:'J73', date:'2026-06-28', homePos:{g:'A',r:2}, awayPos:{g:'B',r:2}, home:null,away:null,hs:null,as:null,winner:null},
+  {jid:'J75', date:'2026-06-29', homePos:{g:'F',r:1}, awayPos:{g:'C',r:2}, home:null,away:null,hs:null,as:null,winner:null},
+  {jid:'J83', date:'2026-07-02', homePos:{g:'K',r:2}, awayPos:{g:'L',r:2}, home:null,away:null,hs:null,as:null,winner:null},
+  {jid:'J84', date:'2026-07-02', homePos:{g:'H',r:1}, awayPos:{g:'J',r:2}, home:null,away:null,hs:null,as:null,winner:null},
+  {jid:'J81', date:'2026-07-01', homePos:{g:'D',r:1}, awayPos:{g:'B',r:3}, home:null,away:null,hs:null,as:null,winner:null},
+  {jid:'J82', date:'2026-07-01', homePos:{g:'G',r:1}, awayLabel:'3AEHIJ',  home:null,away:null,hs:null,as:null,winner:null},
+];
+const BL_R16 = [
+  {jid:'J89', date:'2026-07-04', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ74', al:'VJ77'},
+  {jid:'J90', date:'2026-07-04', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ73', al:'VJ75'},
+  {jid:'J93', date:'2026-07-06', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ83', al:'VJ84'},
+  {jid:'J94', date:'2026-07-06', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ81', al:'VJ82'},
+];
+const BL_QF = [
+  {jid:'J97', date:'2026-07-09', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ89', al:'VJ90'},
+  {jid:'J98', date:'2026-07-10', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ93', al:'VJ94'},
+];
+const BL_SF = [
+  {jid:'J101',date:'2026-07-14', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ97', al:'VJ98'},
+];
+
+// LADO DIREITO — R32 (cima→baixo)
+const BR_R32 = [
+  {jid:'J76', date:'2026-06-29', homePos:{g:'C',r:1}, awayPos:{g:'F',r:2}, home:null,away:null,hs:null,as:null,winner:null},
+  {jid:'J78', date:'2026-06-30', homePos:{g:'E',r:2}, awayPos:{g:'I',r:2}, home:null,away:null,hs:null,as:null,winner:null},
+  {jid:'J79', date:'2026-06-30', homePos:{g:'A',r:1}, awayLabel:'3CEFHI',  home:null,away:null,hs:null,as:null,winner:null},
+  {jid:'J80', date:'2026-07-01', homePos:{g:'L',r:1}, awayLabel:'3EHIJK',  home:null,away:null,hs:null,as:null,winner:null},
+  {jid:'J86', date:'2026-07-03', homePos:{g:'J',r:1}, awayPos:{g:'H',r:2}, home:null,away:null,hs:null,as:null,winner:null},
+  {jid:'J88', date:'2026-07-03', homePos:{g:'D',r:2}, awayPos:{g:'G',r:2}, home:null,away:null,hs:null,as:null,winner:null},
+  {jid:'J85', date:'2026-07-03', homePos:{g:'B',r:1}, awayLabel:'3EFGIJ',  home:null,away:null,hs:null,as:null,winner:null},
+  {jid:'J87', date:'2026-07-03', homePos:{g:'K',r:1}, awayLabel:'3DEIJL',  home:null,away:null,hs:null,as:null,winner:null},
+];
+const BR_R16 = [
+  {jid:'J91', date:'2026-07-05', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ76', al:'VJ78'},
+  {jid:'J92', date:'2026-07-05', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ79', al:'VJ80'},
+  {jid:'J95', date:'2026-07-07', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ86', al:'VJ88'},
+  {jid:'J96', date:'2026-07-07', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ85', al:'VJ87'},
+];
+const BR_QF = [
+  {jid:'J99', date:'2026-07-11', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ91', al:'VJ92'},
+  {jid:'J100',date:'2026-07-11', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ95', al:'VJ96'},
+];
+const BR_SF = [
+  {jid:'J102',date:'2026-07-15', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ99', al:'VJ100'},
+];
+
+const B_FINAL = {jid:'J104',date:'2026-07-19',home:null,away:null,hs:null,as:null,winner:null, hl:'VJ101', al:'VJ102'};
+const B_THIRD = {jid:'J103',date:'2026-07-18',home:null,away:null,hs:null,as:null,winner:null, hl:'RU-J101', al:'RU-J102'};
+
+// ──────────────────────────────────────────────
 // STANDINGS COMPUTATION
 // ──────────────────────────────────────────────
 function computeStandings(groupKey) {
@@ -983,6 +1122,99 @@ document.getElementById('modal-overlay').addEventListener('click',e=>{
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
 
 // ──────────────────────────────────────────────
+// BRACKET RENDER
+// ──────────────────────────────────────────────
+
+// Cache de standings por grupo
+const _standings = {};
+function getStandings(g) {
+  if (!_standings[g]) _standings[g] = computeStandings(g);
+  return _standings[g];
+}
+
+/// Resolve o time de uma posição de grupo (ex: {g:'A',r:1} → 'MEX')
+function resolveTeam(pos, fixedCode) {
+  if (fixedCode) return fixedCode;
+  if (!pos) return null;
+  const rows = getStandings(pos.g);
+  return rows[pos.r - 1]?.code || null;
+}
+
+// Gera o HTML de um match card do chaveamento
+// homeCode/awayCode: código de time (ou null) | homeLbl/awayLbl: rótulo TBD
+function bmHtml(m, homeCode, awayCode, homeLbl, awayLbl) {
+  const ht = homeCode ? TEAMS[homeCode] : null;
+  const at = awayCode ? TEAMS[awayCode] : null;
+  const played = m.hs !== null && m.as !== null;
+  const homeWins = played && m.hs > m.as;
+  const awayWins = played && m.as > m.hs;
+
+  function teamRow(t, score, isWinner, lbl) {
+    const win = played && isWinner ? ' winner' : '';
+    if (!t) return `<div class="bm-team${win}"><span class="bm-nm tbd">${lbl||'A definir'}</span>${played ? `<span class="bm-sc">${score}</span>` : ''}</div>`;
+    return `<div class="bm-team${win}">
+      <span class="bm-flag">${t.flag}</span>
+      <span class="bm-nm">${t.name}</span>
+      ${played ? `<span class="bm-sc">${score}</span>` : ''}
+    </div>`;
+  }
+
+  const jid = m.jid ? `<div class="bm-jid">${m.jid}${m.date?' · '+fmtDate(m.date):''}</div>` : '';
+  return `<div class="bm">${jid}${teamRow(ht, m.hs, homeWins, homeLbl)}${teamRow(at, m.as, awayWins, awayLbl)}</div>`;
+}
+
+function renderBracket() {
+  Object.keys(GROUPS).forEach(g => { _standings[g] = computeStandings(g); });
+
+  const posLabel = pos => pos ? (['','1º','2º','3º'][pos.r] + ' ' + pos.g) : 'A definir';
+
+  // Resolve home/away for R32 (supports homePos, homeLabel, or fixed home code)
+  function r32Home(m) { return m.home || resolveTeam(m.homePos, null); }
+  function r32Away(m) { return m.away || resolveTeam(m.awayPos, null); }
+  function r32HomeLbl(m) { return m.homeLabel || posLabel(m.homePos); }
+  function r32AwayLbl(m) { return m.awayLabel || posLabel(m.awayPos); }
+
+  // colClass: extra CSS class for width control
+  function renderCol(label, matches, slotClass, conClass, isR32, colClass) {
+    let h = `<div class="bracket-col ${conClass} ${colClass||''}"><div class="bracket-col-hdr">${label}</div><div class="bracket-slots">`;
+    matches.forEach((m, mi) => {
+      const lc = matches.length > 1 ? (mi % 2 === 0 ? ' line-top' : ' line-bot') : '';
+      const hc = isR32 ? r32Home(m) : m.home;
+      const ac = isR32 ? r32Away(m) : m.away;
+      const hl = isR32 ? r32HomeLbl(m) : (m.hl || 'A definir');
+      const al = isR32 ? r32AwayLbl(m) : (m.al || 'A definir');
+      h += `<div class="bracket-slot ${slotClass}${lc}">${bmHtml(m, hc, ac, hl, al)}</div>`;
+    });
+    return h + '</div></div>';
+  }
+
+  let html = '';
+  // Left side (outer→center)
+  html += renderCol('R32',       BL_R32, 'r32', 'con-right', true,  '');
+  html += renderCol('Oitavas',   BL_R16, 'r16', 'con-right', false, 'rnd-r16');
+  html += renderCol('Quartas',   BL_QF,  'qf',  'con-right', false, 'rnd-qf');
+  html += renderCol('Semifinal', BL_SF,  'sf',  '',          false, 'rnd-sf');
+  // Center: Final
+  html += `<div class="bracket-col center-col">
+    <div class="bracket-col-hdr">Final</div>
+    <div class="bracket-slots">
+      <div class="bracket-slot fn">${bmHtml(B_FINAL, B_FINAL.home, B_FINAL.away, B_FINAL.hl, B_FINAL.al)}</div>
+    </div>
+  </div>`;
+  // Right side (center→outer)
+  html += renderCol('Semifinal', BR_SF,  'sf',  '',          false, 'rnd-sf');
+  html += renderCol('Quartas',   BR_QF,  'qf',  'con-left',  false, 'rnd-qf');
+  html += renderCol('Oitavas',   BR_R16, 'r16', 'con-left',  false, 'rnd-r16');
+  html += renderCol('R32',       BR_R32, 'r32', 'con-left',  true,  '');
+
+  document.getElementById('bracket-tree').innerHTML = html;
+
+  // 3rd place match
+  document.getElementById('third-place-match').innerHTML =
+    `<div class="third-match-label">3º Lugar — J103</div>${bmHtml(B_THIRD, B_THIRD.home, B_THIRD.away, B_THIRD.hl, B_THIRD.al)}`;
+}
+
+// ──────────────────────────────────────────────
 // TABS
 // ──────────────────────────────────────────────
 document.querySelectorAll('.tab-btn').forEach(btn=>{
@@ -1001,6 +1233,7 @@ renderGroups();
 renderResults();
 renderAgenda();
 renderThirds();
+renderBracket();
 
 // ══════════════════════════════════════════════
 // MODELO DE SELEÇÕES — carga lazy
