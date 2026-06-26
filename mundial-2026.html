@@ -275,9 +275,9 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
 
 /* ── Mata-Mata / Chaveamento ── */
 .bracket-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:8px}
-.bracket-tree{display:flex;gap:3px;min-width:760px;height:calc(16 * 56px)} /* 896px */
+.bracket-tree{display:flex;gap:3px;min-width:900px;height:calc(8 * 56px)} /* 448px — 8 R32 per side */
 .bracket-col{display:flex;flex-direction:column;flex:1;min-width:0}
-.bracket-col.final-col{flex:.7}
+.bracket-col.center-col{flex:.75}
 .bracket-col-hdr{font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.07em;
   color:var(--muted);text-align:center;padding:5px 3px;border-bottom:1px solid var(--border);
   margin-bottom:0;flex-shrink:0;white-space:nowrap}
@@ -288,16 +288,20 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
 .bracket-slot.r16{height:112px}
 .bracket-slot.qf {height:224px}
 .bracket-slot.sf {height:448px}
-.bracket-slot.fn {height:896px}
-/* Connector lines: right edge draws the bracket "elbow" */
-.bracket-slot::after{content:'';position:absolute;right:0;top:50%;width:3px;height:1px;background:var(--border)}
-.bracket-col:last-child .bracket-slot::after{display:none}
-/* Vertical bar connecting two slots to next round */
-.bracket-slot.line-top::before{content:'';position:absolute;right:0;top:50%;width:1px;height:50%;background:var(--border)}
-.bracket-slot.line-bot::before{content:'';position:absolute;right:0;bottom:50%;width:1px;height:50%;background:var(--border)}
+.bracket-slot.fn {height:448px}
+/* Left side connectors: right edge */
+.con-right .bracket-slot::after{content:'';position:absolute;right:0;top:50%;width:3px;height:1px;background:var(--border)}
+.con-right .bracket-slot.line-top::before{content:'';position:absolute;right:0;top:50%;width:1px;height:50%;background:var(--border)}
+.con-right .bracket-slot.line-bot::before{content:'';position:absolute;right:0;bottom:50%;width:1px;height:50%;background:var(--border)}
+/* Right side connectors: left edge */
+.con-left .bracket-slot::after{content:'';position:absolute;left:0;top:50%;width:3px;height:1px;background:var(--border)}
+.con-left .bracket-slot.line-top::before{content:'';position:absolute;left:0;top:50%;width:1px;height:50%;background:var(--border)}
+.con-left .bracket-slot.line-bot::before{content:'';position:absolute;left:0;bottom:50%;width:1px;height:50%;background:var(--border)}
 /* Match card */
 .bm{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
   width:calc(100% - 6px);margin:0 3px;overflow:hidden;flex-shrink:0}
+.bm-hdr{font-size:8.5px;font-family:var(--mono);color:var(--muted);padding:2px 6px;
+  border-bottom:1px solid #F0EEE8;display:flex;justify-content:space-between}
 .bm-team{display:flex;align-items:center;gap:4px;padding:5px 6px;font-size:10.5px;line-height:1.2;
   min-width:0;border-bottom:1px solid #F0EEE8}
 .bm-team:last-child{border-bottom:none}
@@ -307,6 +311,8 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
 .bm-sc{font-family:var(--mono);font-size:11px;font-weight:700;flex-shrink:0;min-width:14px;text-align:right}
 .bm-team.winner .bm-nm{font-weight:700;color:var(--accent)}
 .bm-team.winner .bm-sc{color:var(--accent)}
+.third-match-wrap{margin-top:12px;max-width:220px}
+.third-match-label{font-size:9.5px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:6px}
 
 @media(max-width:580px){
   .groups-grid{grid-template-columns:1fr}
@@ -383,6 +389,7 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
   <div class="bracket-wrap">
     <div class="bracket-tree" id="bracket-tree"></div>
   </div>
+  <div class="third-match-wrap" id="third-place-match"></div>
 </div>
 
 <!-- TAB: Chances de título -->
@@ -754,51 +761,63 @@ const MATCHES = [
 // hs/as = null enquanto não jogado. winner = código do vencedor.
 // ──────────────────────────────────────────────
 
-// R32 — 16 partidas. Confrontos seguem o critério FIFA de grupos adjacentes
-// (1A×2B, 1B×2A, 1C×2D … + 4 partidas com melhores terceiros).
-// Atualizar home/away/hs/as/winner conforme resultados saírem (a partir de 29/jun).
-const BR32 = [
-  {id:1,  homePos:{g:'A',r:1}, awayPos:{g:'B',r:2}, home:null,away:null,hs:null,as:null,winner:null,date:'2026-06-29'},
-  {id:2,  homePos:{g:'B',r:1}, awayPos:{g:'A',r:2}, home:null,away:null,hs:null,as:null,winner:null,date:'2026-06-29'},
-  {id:3,  homePos:{g:'C',r:1}, awayPos:{g:'D',r:2}, home:null,away:null,hs:null,as:null,winner:null,date:'2026-06-30'},
-  {id:4,  homePos:{g:'D',r:1}, awayPos:{g:'C',r:2}, home:null,away:null,hs:null,as:null,winner:null,date:'2026-06-30'},
-  {id:5,  homePos:{g:'E',r:1}, awayPos:{g:'F',r:2}, home:null,away:null,hs:null,as:null,winner:null,date:'2026-07-01'},
-  {id:6,  homePos:{g:'F',r:1}, awayPos:{g:'E',r:2}, home:null,away:null,hs:null,as:null,winner:null,date:'2026-07-01'},
-  {id:7,  homePos:{g:'G',r:1}, awayPos:{g:'H',r:2}, home:null,away:null,hs:null,as:null,winner:null,date:'2026-07-02'},
-  {id:8,  homePos:{g:'H',r:1}, awayPos:{g:'G',r:2}, home:null,away:null,hs:null,as:null,winner:null,date:'2026-07-02'},
-  {id:9,  homePos:{g:'I',r:1}, awayPos:{g:'J',r:2}, home:null,away:null,hs:null,as:null,winner:null,date:'2026-07-03'},
-  {id:10, homePos:{g:'J',r:1}, awayPos:{g:'I',r:2}, home:null,away:null,hs:null,as:null,winner:null,date:'2026-07-03'},
-  {id:11, homePos:{g:'K',r:1}, awayPos:{g:'L',r:2}, home:null,away:null,hs:null,as:null,winner:null,date:'2026-07-04'},
-  {id:12, homePos:{g:'L',r:1}, awayPos:{g:'K',r:2}, home:null,away:null,hs:null,as:null,winner:null,date:'2026-07-04'},
-  // Partidas 13–16: melhores 8 terceiros (ordem definida pela FIFA após grupos)
-  {id:13, homePos:null, awayPos:null, home:null,away:null,hs:null,as:null,winner:null,date:'2026-07-05',label:'Melhor 3º #1 × Melhor 3º #2'},
-  {id:14, homePos:null, awayPos:null, home:null,away:null,hs:null,as:null,winner:null,date:'2026-07-05',label:'Melhor 3º #3 × Melhor 3º #4'},
-  {id:15, homePos:null, awayPos:null, home:null,away:null,hs:null,as:null,winner:null,date:'2026-07-06',label:'Melhor 3º #5 × Melhor 3º #6'},
-  {id:16, homePos:null, awayPos:null, home:null,away:null,hs:null,as:null,winner:null,date:'2026-07-06',label:'Melhor 3º #7 × Melhor 3º #8'},
+// ── BRACKET DATA — Mata-Mata oficial Copa do Mundo 2026 ──
+// homePos/awayPos: posição de grupo {g,r} | homeLabel/awayLabel: rótulo TBD (3os melhores)
+// home/away: código fixo se já confirmado | hs/as/winner: preencher conforme resultados
+// Atualizar diariamente a partir de 28/jun.
+
+// LADO ESQUERDO — R32 (cima→baixo)
+const BL_R32 = [
+  {jid:'J74', date:'2026-06-29', homePos:{g:'E',r:1}, awayLabel:'3ABCDF',  home:null,away:null,hs:null,as:null,winner:null},
+  {jid:'J77', date:'2026-06-30', homePos:{g:'I',r:1}, awayLabel:'3CDFGH',  home:null,away:null,hs:null,as:null,winner:null},
+  {jid:'J73', date:'2026-06-28', homePos:{g:'A',r:2}, awayPos:{g:'B',r:2}, home:null,away:null,hs:null,as:null,winner:null},
+  {jid:'J75', date:'2026-06-29', homePos:{g:'F',r:1}, awayPos:{g:'C',r:2}, home:null,away:null,hs:null,as:null,winner:null},
+  {jid:'J83', date:'2026-07-02', homePos:{g:'K',r:2}, awayPos:{g:'L',r:2}, home:null,away:null,hs:null,as:null,winner:null},
+  {jid:'J84', date:'2026-07-02', homePos:{g:'H',r:1}, awayPos:{g:'J',r:2}, home:null,away:null,hs:null,as:null,winner:null},
+  {jid:'J81', date:'2026-07-01', homePos:{g:'D',r:1}, awayPos:{g:'B',r:3}, home:null,away:null,hs:null,as:null,winner:null},
+  {jid:'J82', date:'2026-07-01', homePos:{g:'G',r:1}, awayLabel:'3AEHIJ',  home:null,away:null,hs:null,as:null,winner:null},
+];
+const BL_R16 = [
+  {jid:'J89', date:'2026-07-04', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ74', al:'VJ77'},
+  {jid:'J90', date:'2026-07-04', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ73', al:'VJ75'},
+  {jid:'J93', date:'2026-07-06', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ83', al:'VJ84'},
+  {jid:'J94', date:'2026-07-06', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ81', al:'VJ82'},
+];
+const BL_QF = [
+  {jid:'J97', date:'2026-07-09', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ89', al:'VJ90'},
+  {jid:'J98', date:'2026-07-10', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ93', al:'VJ94'},
+];
+const BL_SF = [
+  {jid:'J101',date:'2026-07-14', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ97', al:'VJ98'},
 ];
 
-// R16 — pares: (R32[0]×R32[1])→R16[0], (R32[2]×R32[3])→R16[1] etc.
-const BR16 = [
-  {id:1,home:null,away:null,hs:null,as:null,winner:null,date:null},
-  {id:2,home:null,away:null,hs:null,as:null,winner:null,date:null},
-  {id:3,home:null,away:null,hs:null,as:null,winner:null,date:null},
-  {id:4,home:null,away:null,hs:null,as:null,winner:null,date:null},
-  {id:5,home:null,away:null,hs:null,as:null,winner:null,date:null},
-  {id:6,home:null,away:null,hs:null,as:null,winner:null,date:null},
-  {id:7,home:null,away:null,hs:null,as:null,winner:null,date:null},
-  {id:8,home:null,away:null,hs:null,as:null,winner:null,date:null},
+// LADO DIREITO — R32 (cima→baixo)
+const BR_R32 = [
+  {jid:'J76', date:'2026-06-29', homePos:{g:'C',r:1}, awayPos:{g:'F',r:2}, home:null,away:null,hs:null,as:null,winner:null},
+  {jid:'J78', date:'2026-06-30', homePos:{g:'E',r:2}, awayPos:{g:'I',r:2}, home:null,away:null,hs:null,as:null,winner:null},
+  {jid:'J79', date:'2026-06-30', homePos:{g:'A',r:1}, awayLabel:'3CEFHI',  home:null,away:null,hs:null,as:null,winner:null},
+  {jid:'J80', date:'2026-07-01', homePos:{g:'L',r:1}, awayLabel:'3EHIJK',  home:null,away:null,hs:null,as:null,winner:null},
+  {jid:'J86', date:'2026-07-03', homePos:{g:'J',r:1}, awayPos:{g:'H',r:2}, home:null,away:null,hs:null,as:null,winner:null},
+  {jid:'J88', date:'2026-07-03', homePos:{g:'D',r:2}, awayPos:{g:'G',r:2}, home:null,away:null,hs:null,as:null,winner:null},
+  {jid:'J85', date:'2026-07-03', homePos:{g:'B',r:1}, awayLabel:'3EFGIJ',  home:null,away:null,hs:null,as:null,winner:null},
+  {jid:'J87', date:'2026-07-03', homePos:{g:'K',r:1}, awayLabel:'3DEIJL',  home:null,away:null,hs:null,as:null,winner:null},
 ];
-const BQF = [
-  {id:1,home:null,away:null,hs:null,as:null,winner:null,date:null},
-  {id:2,home:null,away:null,hs:null,as:null,winner:null,date:null},
-  {id:3,home:null,away:null,hs:null,as:null,winner:null,date:null},
-  {id:4,home:null,away:null,hs:null,as:null,winner:null,date:null},
+const BR_R16 = [
+  {jid:'J91', date:'2026-07-05', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ76', al:'VJ78'},
+  {jid:'J92', date:'2026-07-05', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ79', al:'VJ80'},
+  {jid:'J95', date:'2026-07-07', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ86', al:'VJ88'},
+  {jid:'J96', date:'2026-07-07', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ85', al:'VJ87'},
 ];
-const BSF = [
-  {id:1,home:null,away:null,hs:null,as:null,winner:null,date:null},
-  {id:2,home:null,away:null,hs:null,as:null,winner:null,date:null},
+const BR_QF = [
+  {jid:'J99', date:'2026-07-11', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ91', al:'VJ92'},
+  {jid:'J100',date:'2026-07-11', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ95', al:'VJ96'},
 ];
-const BFINAL = [{id:1,home:null,away:null,hs:null,as:null,winner:null,date:'2026-07-19'}];
+const BR_SF = [
+  {jid:'J102',date:'2026-07-15', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ99', al:'VJ100'},
+];
+
+const B_FINAL = {jid:'J104',date:'2026-07-19',home:null,away:null,hs:null,as:null,winner:null, hl:'VJ101', al:'VJ102'};
+const B_THIRD = {jid:'J103',date:'2026-07-18',home:null,away:null,hs:null,as:null,winner:null, hl:'RU-J101', al:'RU-J102'};
 
 // ──────────────────────────────────────────────
 // STANDINGS COMPUTATION
@@ -1092,7 +1111,7 @@ function getStandings(g) {
   return _standings[g];
 }
 
-// Resolve o time de uma posição de grupo (ex: {g:'A',r:1} → 'MEX')
+/// Resolve o time de uma posição de grupo (ex: {g:'A',r:1} → 'MEX')
 function resolveTeam(pos, fixedCode) {
   if (fixedCode) return fixedCode;
   if (!pos) return null;
@@ -1101,19 +1120,17 @@ function resolveTeam(pos, fixedCode) {
 }
 
 // Gera o HTML de um match card do chaveamento
-function bmHtml(m, homeCode, awayCode) {
+// homeCode/awayCode: código de time (ou null) | homeLbl/awayLbl: rótulo TBD
+function bmHtml(m, homeCode, awayCode, homeLbl, awayLbl) {
   const ht = homeCode ? TEAMS[homeCode] : null;
   const at = awayCode ? TEAMS[awayCode] : null;
   const played = m.hs !== null && m.as !== null;
+  const homeWins = played && m.hs > m.as;
+  const awayWins = played && m.as > m.hs;
 
-  function teamRow(t, score, isWinner) {
-    if (!t) {
-      const lbl = m.label
-        ? (score === m.hs ? m.label.split('×')[0].trim() : m.label.split('×')[1]?.trim() || 'A definir')
-        : 'A definir';
-      return `<div class="bm-team"><span class="bm-nm tbd">${lbl}</span></div>`;
-    }
+  function teamRow(t, score, isWinner, lbl) {
     const win = played && isWinner ? ' winner' : '';
+    if (!t) return `<div class="bm-team${win}"><span class="bm-nm tbd">${lbl||'A definir'}</span>${played ? `<span class="bm-sc">${score}</span>` : ''}</div>`;
     return `<div class="bm-team${win}">
       <span class="bm-flag">${t.flag}</span>
       <span class="bm-nm">${t.name}</span>
@@ -1121,58 +1138,63 @@ function bmHtml(m, homeCode, awayCode) {
     </div>`;
   }
 
-  const homeWins = played && m.hs > m.as;
-  const awayWins = played && m.as > m.hs;
-  return `<div class="bm">
-    ${teamRow(ht, m.hs, homeWins)}
-    ${teamRow(at, m.as, awayWins)}
+  const jidStr = m.jid ? `<span>${m.jid}</span>` : '';
+  const dateStr = m.date ? `<span>${fmtDate(m.date)}</span>` : '';
+  const hdr = (jidStr||dateStr) ? `<div class="bm-hdr">${jidStr}${dateStr}</div>` : '';
+  return `<div class="bm">${hdr}
+    ${teamRow(ht, m.hs, homeWins, homeLbl)}
+    ${teamRow(at, m.as, awayWins, awayLbl)}
   </div>`;
 }
 
 function renderBracket() {
-  // Recompute standings
   Object.keys(GROUPS).forEach(g => { _standings[g] = computeStandings(g); });
 
-  const rounds = [
-    { key:'r32', label:'R32',      data:BR32,   slotClass:'r32', count:16 },
-    { key:'r16', label:'Oitavas',  data:BR16,   slotClass:'r16', count:8  },
-    { key:'qf',  label:'Quartas',  data:BQF,    slotClass:'qf',  count:4  },
-    { key:'sf',  label:'Semis',    data:BSF,    slotClass:'sf',  count:2  },
-    { key:'fn',  label:'Final',    data:BFINAL, slotClass:'fn',  count:1  },
-  ];
+  const posLabel = pos => pos ? (['','1º','2º','3º'][pos.r] + ' ' + pos.g) : 'A definir';
+
+  // Resolve home/away for R32 (supports homePos, homeLabel, or fixed home code)
+  function r32Home(m) { return m.home || resolveTeam(m.homePos, null); }
+  function r32Away(m) { return m.away || resolveTeam(m.awayPos, null); }
+  function r32HomeLbl(m) { return m.homeLabel || posLabel(m.homePos); }
+  function r32AwayLbl(m) { return m.awayLabel || posLabel(m.awayPos); }
+
+  function renderCol(label, matches, slotClass, conClass, isR32) {
+    let h = `<div class="bracket-col ${conClass}"><div class="bracket-col-hdr">${label}</div><div class="bracket-slots">`;
+    matches.forEach((m, mi) => {
+      const lc = matches.length > 1 ? (mi % 2 === 0 ? ' line-top' : ' line-bot') : '';
+      const hc = isR32 ? r32Home(m) : m.home;
+      const ac = isR32 ? r32Away(m) : m.away;
+      const hl = isR32 ? r32HomeLbl(m) : (m.hl || 'A definir');
+      const al = isR32 ? r32AwayLbl(m) : (m.al || 'A definir');
+      h += `<div class="bracket-slot ${slotClass}${lc}">${bmHtml(m, hc, ac, hl, al)}</div>`;
+    });
+    return h + '</div></div>';
+  }
 
   let html = '';
-  rounds.forEach((rnd, ri) => {
-    const isLast = ri === rounds.length - 1;
-    html += `<div class="bracket-col${isLast ? ' final-col' : ''}">
-      <div class="bracket-col-hdr">${rnd.label}</div>
-      <div class="bracket-slots">`;
-
-    rnd.data.forEach((m, mi) => {
-      // Determine connector lines: top slot of a pair = line-top, bottom = line-bot
-      const lineClass = ri < rounds.length - 1
-        ? (mi % 2 === 0 ? ' line-top' : ' line-bot')
-        : '';
-
-      // Resolve teams
-      let homeCode, awayCode;
-      if (rnd.key === 'r32') {
-        homeCode = resolveTeam(m.homePos, m.home);
-        awayCode = resolveTeam(m.awayPos, m.away);
-      } else {
-        homeCode = m.home;
-        awayCode = m.away;
-      }
-
-      html += `<div class="bracket-slot ${rnd.slotClass}${lineClass}">
-        ${bmHtml(m, homeCode, awayCode)}
-      </div>`;
-    });
-
-    html += '</div></div>';
-  });
+  // Left side (outer→center)
+  html += renderCol('R32',      BL_R32, 'r32', 'con-right', true);
+  html += renderCol('Oitavas',  BL_R16, 'r16', 'con-right', false);
+  html += renderCol('Quartas',  BL_QF,  'qf',  'con-right', false);
+  html += renderCol('Semifinal',BL_SF,  'sf',  '',          false);
+  // Center: Final
+  html += `<div class="bracket-col center-col">
+    <div class="bracket-col-hdr">Final · J104</div>
+    <div class="bracket-slots">
+      <div class="bracket-slot fn">${bmHtml(B_FINAL, B_FINAL.home, B_FINAL.away, B_FINAL.hl, B_FINAL.al)}</div>
+    </div>
+  </div>`;
+  // Right side (center→outer)
+  html += renderCol('Semifinal',BR_SF,  'sf',  '',          false);
+  html += renderCol('Quartas',  BR_QF,  'qf',  'con-left',  false);
+  html += renderCol('Oitavas',  BR_R16, 'r16', 'con-left',  false);
+  html += renderCol('R32',      BR_R32, 'r32', 'con-left',  true);
 
   document.getElementById('bracket-tree').innerHTML = html;
+
+  // 3rd place match
+  document.getElementById('third-place-match').innerHTML =
+    `<div class="third-match-label">3º Lugar — J103</div>${bmHtml(B_THIRD, B_THIRD.home, B_THIRD.away, B_THIRD.hl, B_THIRD.al)}`;
 }
 
 // ──────────────────────────────────────────────
