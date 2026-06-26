@@ -273,6 +273,33 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
 .result-d{color:var(--orange)}
 .result-l{color:var(--red)}
 
+/* ── Mata-Mata ── */
+.bracket-qual-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:8px}
+.bracket-group-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.bracket-group-header{background:#F9F8F5;padding:8px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px}
+.bracket-group-letter{font-size:13px;font-weight:700;color:var(--accent);font-family:var(--mono)}
+.bracket-qual-row{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid #F0EEE8}
+.bracket-qual-row:last-child{border-bottom:none}
+.bracket-qual-row.q1{background:rgba(26,71,49,.04)}
+.bracket-qual-row.q2{background:rgba(34,197,94,.02)}
+.bracket-qual-row.third{background:rgba(212,175,55,.05)}
+.bracket-pos{font-family:var(--mono);font-size:10px;color:var(--muted);width:20px;flex-shrink:0}
+.bracket-flag{font-size:16px;line-height:1;flex-shrink:0}
+.bracket-name{flex:1;font-size:12.5px;font-weight:500}
+.bracket-pts{font-family:var(--mono);font-size:11px;color:var(--muted);flex-shrink:0}
+.ko-match-list{display:flex;flex-direction:column;gap:8px;margin-bottom:8px}
+.ko-match-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px}
+.ko-match-row{display:flex;align-items:center;gap:10px}
+.ko-match-badge{font-family:var(--mono);font-size:9.5px;padding:2px 7px;border-radius:3px;background:#F0EEE8;color:var(--muted);white-space:nowrap;flex-shrink:0}
+.ko-match-teams{flex:1;display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0}
+.ko-match-team{display:flex;align-items:center;gap:6px;min-width:0}
+.ko-match-team.away{flex-direction:row-reverse}
+.ko-match-name{font-size:12.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ko-match-score{font-family:var(--mono);font-size:15px;font-weight:600;white-space:nowrap;background:#F0EEE8;padding:3px 10px;border-radius:4px;letter-spacing:1px;flex-shrink:0}
+.ko-match-score.upcoming{background:none;padding:3px 0;color:var(--muted);font-size:12px;font-weight:400}
+.ko-match-info{font-size:10.5px;color:var(--muted);margin-top:5px}
+.ko-tbd-note{background:var(--blue-lt);border:1px solid #BFDBFE;border-radius:var(--radius);padding:12px 16px;font-size:12px;color:var(--blue);line-height:1.6;margin-bottom:16px}
+
 @media(max-width:580px){
   .groups-grid{grid-template-columns:1fr}
   .modal-score-row{gap:8px}
@@ -305,6 +332,7 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
   <button class="tab-btn" data-tab="resultados">Resultados</button>
   <button class="tab-btn" data-tab="agenda">Agenda</button>
   <button class="tab-btn" data-tab="terceiros">Melhores Terceiros</button>
+  <button class="tab-btn" data-tab="matamata">Mata-Mata</button>
   <button class="tab-btn" data-tab="chances">Chances de título</button>
   <button class="tab-btn" data-tab="confrontos">Confrontos</button>
 </nav>
@@ -339,6 +367,19 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
   </div>
   <div class="section-label">Classificação dos 3ºs colocados</div>
   <div class="thirds-grid" id="thirds-container"></div>
+</div>
+
+<!-- TAB: Mata-Mata -->
+<div id="tab-matamata" class="tab-panel">
+  <div class="section-label">Classificados — fase de grupos</div>
+  <div class="legend">
+    <div class="legend-item"><span class="qualify-dot q1"></span>1º colocado</div>
+    <div class="legend-item"><span class="qualify-dot q2"></span>2º colocado</div>
+  </div>
+  <div class="bracket-qual-grid" id="bracket-qual-container"></div>
+
+  <div class="section-label" style="margin-top:28px">Fase de 32 — R32</div>
+  <div id="bracket-r32-container"></div>
 </div>
 
 <!-- TAB: Chances de título -->
@@ -702,6 +743,17 @@ const MATCHES = [
 ];
 
 // ──────────────────────────────────────────────
+// KNOCKOUT DATA
+// Partidas do mata-mata — atualizar diariamente.
+// home/away: código do time ou null se ainda não definido.
+// hs/as: placar ou null se não jogado.
+// ──────────────────────────────────────────────
+const KNOCKOUT_R32 = [
+  // Confrontos ainda não definidos — grupos G–L encerram em 26–27/jun
+  // Será atualizado com os confrontos oficiais após encerramento dos grupos
+];
+
+// ──────────────────────────────────────────────
 // STANDINGS COMPUTATION
 // ──────────────────────────────────────────────
 function computeStandings(groupKey) {
@@ -983,6 +1035,84 @@ document.getElementById('modal-overlay').addEventListener('click',e=>{
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
 
 // ──────────────────────────────────────────────
+// KNOCKOUT RENDER
+// ──────────────────────────────────────────────
+function renderKnockout() {
+  // ── Classificados por grupo ──
+  const qualContainer = document.getElementById('bracket-qual-container');
+  let qualHtml = '';
+  Object.keys(GROUPS).forEach(g => {
+    const rows = computeStandings(g);
+    const groupMatches = MATCHES.filter(m => m.group === g);
+    const playedCount = groupMatches.filter(m => m.played && m.hs !== null).length;
+    const isComplete = playedCount === groupMatches.length;
+
+    const first = rows[0], second = rows[1];
+    const t1 = TEAMS[first.code], t2 = TEAMS[second.code];
+    const label = isComplete
+      ? `<span class="results-badge">✓ Encerrado</span>`
+      : `<span class="upcoming-badge">⏳ Provisório</span>`;
+
+    qualHtml += `<div class="bracket-group-card">
+      <div class="bracket-group-header">
+        <span class="bracket-group-letter">Grupo ${g}</span>
+        ${label}
+      </div>
+      <div class="bracket-qual-row q1">
+        <span class="bracket-pos">1º</span>
+        <span class="bracket-flag">${t1.flag}</span>
+        <span class="bracket-name">${t1.name}</span>
+        <span class="bracket-pts">${first.pts} pts</span>
+      </div>
+      <div class="bracket-qual-row q2">
+        <span class="bracket-pos">2º</span>
+        <span class="bracket-flag">${t2.flag}</span>
+        <span class="bracket-name">${t2.name}</span>
+        <span class="bracket-pts">${second.pts} pts</span>
+      </div>
+    </div>`;
+  });
+  qualContainer.innerHTML = qualHtml;
+
+  // ── R32 ──
+  const r32Container = document.getElementById('bracket-r32-container');
+  if (!KNOCKOUT_R32.length) {
+    r32Container.innerHTML = `<div class="ko-tbd-note">
+      Os confrontos do R32 serão definidos após o encerramento de todos os grupos (27/jun).
+      Esta seção será atualizada assim que os confrontos forem confirmados.
+    </div>`;
+    return;
+  }
+
+  let r32Html = '<div class="ko-match-list">';
+  KNOCKOUT_R32.forEach(m => {
+    const ht = m.home ? TEAMS[m.home] : null;
+    const at = m.away ? TEAMS[m.away] : null;
+    const homeDisp = ht ? `${ht.flag} ${ht.name}` : `<span style="color:var(--muted)">A definir</span>`;
+    const awayDisp = at ? `${at.flag} ${at.name}` : `<span style="color:var(--muted)">A definir</span>`;
+    let scoreHtml;
+    if (m.hs !== null && m.as !== null) {
+      scoreHtml = `<div class="ko-match-score">${m.hs} – ${m.as}</div>`;
+    } else {
+      scoreHtml = `<div class="ko-match-score upcoming">${m.date ? fmtDate(m.date) : 'A definir'}</div>`;
+    }
+    r32Html += `<div class="ko-match-card">
+      <div class="ko-match-row">
+        <span class="ko-match-badge">R32 · Jogo ${m.id}</span>
+        <div class="ko-match-teams">
+          <div class="ko-match-team">${homeDisp}</div>
+          ${scoreHtml}
+          <div class="ko-match-team away">${awayDisp}</div>
+        </div>
+      </div>
+      ${m.venue ? `<div class="ko-match-info">📍 ${m.venue}</div>` : ''}
+    </div>`;
+  });
+  r32Html += '</div>';
+  r32Container.innerHTML = r32Html;
+}
+
+// ──────────────────────────────────────────────
 // TABS
 // ──────────────────────────────────────────────
 document.querySelectorAll('.tab-btn').forEach(btn=>{
@@ -1001,6 +1131,7 @@ renderGroups();
 renderResults();
 renderAgenda();
 renderThirds();
+renderKnockout();
 
 // ══════════════════════════════════════════════
 // MODELO DE SELEÇÕES — carga lazy
