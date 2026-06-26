@@ -7,5 +7,8 @@
     "test:selecoes": "node tests/selecoes-model.test.js",
     "test:pwa": "node tests/pwa.test.js",
     "test:copa": "node tests/copa2026-bracket.test.js"
+  },
+  "dependencies": {
+    "papaparse": "^5.5.4"
   }
 }
