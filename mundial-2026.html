@@ -1025,6 +1025,26 @@ const TEAM_MODEL_NAMES = {
 let _model = null;
 let _modelPromise = null;
 
+function buildCopaRows() {
+  // Converte os jogos da Copa 2026 do array MATCHES para o formato do dataset.
+  // Inclui apenas partidas já disputadas com placar conhecido.
+  // Só adicionamos jogos a partir de 2026-06-15 para evitar duplicatas com o
+  // dataset (cujo corte é ~15/06/2026); jogos anteriores já estão no CSV.
+  return MATCHES
+    .filter(m => m.played && m.hs !== null && m.date >= '2026-06-15')
+    .map(m => ({
+      date: m.date,
+      home_team: TEAM_MODEL_NAMES[m.home] || m.home,
+      away_team: TEAM_MODEL_NAMES[m.away] || m.away,
+      home_score: String(m.hs),
+      away_score: String(m.as),
+      tournament: 'FIFA World Cup',
+      city: '',
+      country: 'United States',
+      neutral: 'TRUE',
+    }));
+}
+
 async function loadSelecoesModel(onStatus) {
   if (_model) return _model;
   if (_modelPromise) return _modelPromise;
@@ -1032,9 +1052,21 @@ async function loadSelecoesModel(onStatus) {
     if (onStatus) onStatus('Baixando dataset histórico…');
     const resp = await fetch('datasets/results.csv');
     const text = await resp.text();
-    if (onStatus) onStatus('Construindo modelo Poisson + Elo…');
+    if (onStatus) onStatus('Construindo modelo (2010–2026)…');
     const parsed = Papa.parse(text, { header: true, skipEmptyLines: true });
-    _model = SelecoesModel.buildModel(parsed.data);
+
+    // Filtrar apenas partidas de 2010 em diante.
+    // Isso remove o peso dos títulos de 1994/2002/1998 do Brasil e
+    // da era clássica de outros times, focando na força atual das seleções.
+    // O decaimento temporal do modelo (HL_ELO=730d, HL_POISSON=1460d) já
+    // dá prioridade extra às eliminatórias 2022+ e à Copa 2026.
+    const rows = parsed.data.filter(r => r.date >= '2010-01-01');
+
+    // Injetar resultados da Copa 2026 ainda não cobertos pelo dataset
+    const copaRows = buildCopaRows();
+    const allRows = rows.concat(copaRows);
+
+    _model = SelecoesModel.buildModel(allRows);
     return _model;
   })();
   return _modelPromise;
