@@ -13,6 +13,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <script src="papaparse.min.js"></script>
+  <script src="modelos/selecoes-model.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -190,6 +192,87 @@ header{display:flex;align-items:center;justify-content:space-between;
 footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
   font-size:11px;color:var(--muted);font-family:var(--mono);display:flex;gap:16px;flex-wrap:wrap;justify-content:space-between}
 
+/* ── Chances de título ── */
+.sim-controls{display:flex;align-items:center;gap:10px;margin-bottom:28px;flex-wrap:wrap}
+.btn-sim{background:var(--accent);color:#fff;border:none;padding:9px 20px;border-radius:var(--radius);
+  cursor:pointer;font-family:var(--sans);font-size:13px;font-weight:500;transition:opacity .15s}
+.btn-sim:hover{opacity:.85}
+.btn-sim:disabled{opacity:.4;cursor:not-allowed}
+.n-select{font-family:var(--mono);font-size:12px;padding:6px 10px;
+  border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);
+  color:var(--text);cursor:pointer;outline:none}
+.sim-meta{font-size:11px;font-family:var(--mono);color:var(--muted)}
+.model-loading{text-align:center;padding:48px 20px}
+.spinner{display:inline-block;width:28px;height:28px;border:3px solid var(--border);
+  border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.model-loading-text{font-size:13px;color:var(--muted);font-family:var(--mono);margin-top:12px}
+.podium-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:28px}
+.podium-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:14px 16px;position:relative;overflow:hidden}
+.podium-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--border)}
+.podium-item.rank-1::before{background:#D4AF37}
+.podium-item.rank-2::before{background:#A8A9AD}
+.podium-item.rank-3::before{background:#CD7F32}
+.podium-rank-label{font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:500;color:var(--muted);margin-bottom:4px}
+.podium-team-name{font-size:14px;font-weight:600;margin-bottom:2px;line-height:1.2}
+.podium-pct{font-family:var(--mono);font-size:22px;font-weight:300;color:var(--text);line-height:1}
+.podium-sub{font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:3px}
+.win-chart-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:24px}
+.wc-row{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.wc-row:last-child{margin-bottom:0}
+.wc-team{font-size:12px;width:150px;flex-shrink:0;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wc-bar-wrap{flex:1;background:var(--bg);border-radius:3px;height:16px;overflow:hidden}
+.wc-bar{height:100%;border-radius:3px;transition:width .5s ease;min-width:1px}
+.wc-pct{font-family:var(--mono);font-size:11px;color:var(--muted);width:42px;text-align:right;flex-shrink:0}
+.chart-progress{width:100%;height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin:12px 0}
+.chart-progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .3s;width:0%}
+
+/* ── Confrontos ── */
+.confronto-selectors{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:end;margin-bottom:24px}
+@media(max-width:600px){.confronto-selectors{grid-template-columns:1fr;gap:10px}}
+.confronto-label{font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;display:block}
+.team-select{width:100%;font-family:var(--sans);font-size:13px;padding:9px 12px;
+  border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);
+  color:var(--text);cursor:pointer;outline:none;transition:border-color .15s}
+.team-select:focus{border-color:var(--accent)}
+.vs-col{display:flex;align-items:flex-end;justify-content:center;padding-bottom:9px;font-weight:600;color:var(--muted)}
+.btn-calc{width:100%;background:var(--accent);color:#fff;border:none;padding:9px 20px;
+  border-radius:var(--radius);cursor:pointer;font-family:var(--sans);font-size:13px;
+  font-weight:500;transition:opacity .15s;margin-top:8px}
+.btn-calc:hover{opacity:.85}
+.btn-calc:disabled{opacity:.4;cursor:not-allowed}
+.prob-display{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:20px;margin-bottom:20px}
+.prob-row{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;margin-bottom:16px}
+.prob-team{text-align:center}
+.prob-flag{font-size:32px;line-height:1;margin-bottom:4px}
+.prob-team-name{font-size:13px;font-weight:600}
+.prob-pct-big{font-family:var(--mono);font-size:26px;font-weight:300;line-height:1;margin-top:4px}
+.prob-draw-col{text-align:center}
+.prob-draw-label{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-family:var(--mono)}
+.prob-draw-pct{font-family:var(--mono);font-size:20px;font-weight:300;margin-top:2px}
+.prob-bar-wrap{display:flex;height:10px;border-radius:5px;overflow:hidden;gap:2px}
+.prob-bar-h{height:100%;border-radius:5px 0 0 5px;background:var(--accent)}
+.prob-bar-d{height:100%;background:var(--muted);opacity:.5}
+.prob-bar-a{height:100%;border-radius:0 5px 5px 0;background:var(--blue)}
+.odds-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px}
+.odds-card{background:#F9F8F5;border-radius:var(--radius);padding:10px 12px;text-align:center}
+.odds-label{font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-family:var(--mono);margin-bottom:4px}
+.odds-val{font-family:var(--mono);font-size:15px;font-weight:600;color:var(--text)}
+.copa-stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.copa-stats-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px}
+.copa-stats-title{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-family:var(--mono);margin-bottom:10px;font-weight:500}
+.stat-line{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;padding:4px 0;border-bottom:1px solid #F0EEE8}
+.stat-line:last-child{border-bottom:none}
+.stat-line-val{font-family:var(--mono);font-weight:600}
+.copa-match-list{margin-top:10px;display:flex;flex-direction:column;gap:5px}
+.copa-match-item{font-size:11.5px;color:var(--muted);font-family:var(--mono);display:flex;justify-content:space-between;align-items:center}
+.copa-match-score{font-weight:600;color:var(--text)}
+.result-w{color:var(--green)}
+.result-d{color:var(--orange)}
+.result-l{color:var(--red)}
+
 @media(max-width:580px){
   .groups-grid{grid-template-columns:1fr}
   .modal-score-row{gap:8px}
@@ -222,6 +305,8 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
   <button class="tab-btn" data-tab="resultados">Resultados</button>
   <button class="tab-btn" data-tab="agenda">Agenda</button>
   <button class="tab-btn" data-tab="terceiros">Melhores Terceiros</button>
+  <button class="tab-btn" data-tab="chances">Chances de título</button>
+  <button class="tab-btn" data-tab="confrontos">Confrontos</button>
 </nav>
 
 <!-- TAB: Grupos -->
@@ -254,6 +339,50 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
   </div>
   <div class="section-label">Classificação dos 3ºs colocados</div>
   <div class="thirds-grid" id="thirds-container"></div>
+</div>
+
+<!-- TAB: Chances de título -->
+<div id="tab-chances" class="tab-panel">
+  <div class="sim-controls">
+    <button class="btn-sim" id="btn-chances">▶ Simular campeonato</button>
+    <select class="n-select" id="n-sims-chances">
+      <option value="1000">1 000 simulações</option>
+      <option value="5000" selected>5 000 simulações</option>
+      <option value="10000">10 000 simulações</option>
+    </select>
+    <span class="sim-meta" id="chances-meta"></span>
+  </div>
+  <div id="chances-loading" style="display:none;text-align:center;padding:48px 20px">
+    <div class="spinner"></div>
+    <div class="model-loading-text" id="chances-loading-text">Carregando modelo…</div>
+    <div class="chart-progress"><div class="chart-progress-fill" id="chances-progress"></div></div>
+  </div>
+  <div id="chances-results" style="display:none">
+    <div class="section-label">Favoritos ao título</div>
+    <div class="podium-grid" id="chances-podium"></div>
+    <div class="win-chart-wrap" id="chances-chart"></div>
+  </div>
+</div>
+
+<!-- TAB: Confrontos -->
+<div id="tab-confrontos" class="tab-panel">
+  <div class="confronto-selectors">
+    <div>
+      <label class="confronto-label">Seleção A</label>
+      <select class="team-select" id="team-a"></select>
+    </div>
+    <div class="vs-col">×</div>
+    <div>
+      <label class="confronto-label">Seleção B</label>
+      <select class="team-select" id="team-b"></select>
+    </div>
+  </div>
+  <button class="btn-calc" id="btn-confronto" disabled>Calcular probabilidades</button>
+  <div id="confronto-loading" style="display:none;text-align:center;padding:36px 20px">
+    <div class="spinner"></div>
+    <div class="model-loading-text">Carregando modelo histórico…</div>
+  </div>
+  <div id="confronto-result" style="display:none;margin-top:24px"></div>
 </div>
 
 <!-- Modal -->
@@ -872,6 +1001,372 @@ renderGroups();
 renderResults();
 renderAgenda();
 renderThirds();
+
+// ══════════════════════════════════════════════
+// MODELO DE SELEÇÕES — carga lazy
+// ══════════════════════════════════════════════
+
+// Mapeamento código → nome inglês (dataset Mart Jürisoo)
+const TEAM_MODEL_NAMES = {
+  MEX:'Mexico', RSA:'South Africa', KOR:'South Korea', CZE:'Czech Republic',
+  CAN:'Canada', QAT:'Qatar', SUI:'Switzerland', BIH:'Bosnia and Herzegovina',
+  BRA:'Brazil', MAR:'Morocco', HAI:'Haiti', SCO:'Scotland',
+  USA:'United States', PAR:'Paraguay', AUS:'Australia', TUR:'Turkey',
+  GER:'Germany', CUW:'Curacao', CIV:'Ivory Coast', ECU:'Ecuador',
+  NED:'Netherlands', JPN:'Japan', SWE:'Sweden', TUN:'Tunisia',
+  BEL:'Belgium', EGY:'Egypt', IRN:'Iran', NZL:'New Zealand',
+  ESP:'Spain', CPV:'Cape Verde', KSA:'Saudi Arabia', URU:'Uruguay',
+  FRA:'France', SEN:'Senegal', IRQ:'Iraq', NOR:'Norway',
+  ARG:'Argentina', ALG:'Algeria', AUT:'Austria', JOR:'Jordan',
+  POR:'Portugal', COD:'DR Congo', COL:'Colombia', UZB:'Uzbekistan',
+  ENG:'England', CRO:'Croatia', GHA:'Ghana', PAN:'Panama',
+};
+
+let _model = null;
+let _modelPromise = null;
+
+async function loadSelecoesModel(onStatus) {
+  if (_model) return _model;
+  if (_modelPromise) return _modelPromise;
+  _modelPromise = (async () => {
+    if (onStatus) onStatus('Baixando dataset histórico…');
+    const resp = await fetch('datasets/results.csv');
+    const text = await resp.text();
+    if (onStatus) onStatus('Construindo modelo Poisson + Elo…');
+    const parsed = Papa.parse(text, { header: true, skipEmptyLines: true });
+    _model = SelecoesModel.buildModel(parsed.data);
+    return _model;
+  })();
+  return _modelPromise;
+}
+
+// ══════════════════════════════════════════════
+// SIMULAÇÃO — Copa do Mundo 2026
+// ══════════════════════════════════════════════
+
+function simMatchModel(homeCode, awayCode, mdl, neutral) {
+  const pr = SelecoesModel.predict(TEAM_MODEL_NAMES[homeCode]||homeCode, TEAM_MODEL_NAMES[awayCode]||awayCode, mdl, neutral);
+  let cum = 0;
+  const r = Math.random();
+  for (const [k, p] of pr.scoreAdj.entries()) {
+    cum += p;
+    if (r < cum) { const [hg,ag]=k.split(',').map(Number); return {hg,ag}; }
+  }
+  return {hg:0,ag:0};
+}
+
+function simKnockoutModel(homeCode, awayCode, mdl) {
+  const pr = SelecoesModel.predict(TEAM_MODEL_NAMES[homeCode]||homeCode, TEAM_MODEL_NAMES[awayCode]||awayCode, mdl, true);
+  const r = Math.random();
+  if (r < pr.pH) return homeCode;
+  if (r < pr.pH + pr.pA) return awayCode;
+  return Math.random() < pr.pH/(pr.pH+pr.pA) ? homeCode : awayCode;
+}
+
+function simOnce(mdl) {
+  // 1. Fase de grupos — partir dos resultados reais já conhecidos
+  const grpKeys = Object.keys(GROUPS);
+  const finalStandings = {};
+
+  for (const grpKey of grpKeys) {
+    const codes = GROUPS[grpKey];
+    const pts={}, gd={}, gf={}, ga={};
+    for (const c of codes) { pts[c]=0; gd[c]=0; gf[c]=0; ga[c]=0; }
+
+    // Resultados já jogados
+    for (const m of MATCHES) {
+      if (m.group!==grpKey || !m.played || m.hs===null) continue;
+      pts[m.home]+= m.hs>m.as?3:(m.hs===m.as?1:0);
+      pts[m.away]+= m.as>m.hs?3:(m.as===m.hs?1:0);
+      gd[m.home]+=m.hs-m.as; gd[m.away]+=m.as-m.hs;
+      gf[m.home]+=m.hs; gf[m.away]+=m.as;
+      ga[m.home]+=m.as; ga[m.away]+=m.hs;
+    }
+
+    // Simular jogos pendentes
+    for (const m of MATCHES) {
+      if (m.group!==grpKey || m.played) continue;
+      const {hg,ag} = simMatchModel(m.home, m.away, mdl, false);
+      pts[m.home]+= hg>ag?3:(hg===ag?1:0);
+      pts[m.away]+= ag>hg?3:(ag===hg?1:0);
+      gd[m.home]+=hg-ag; gd[m.away]+=ag-hg;
+      gf[m.home]+=hg; gf[m.away]+=ag;
+      ga[m.home]+=ag; ga[m.away]+=hg;
+    }
+
+    const st = codes.map(c=>({code:c,pts:pts[c],gd:gd[c],gf:gf[c],ga:ga[c]}));
+    st.sort((a,b)=>b.pts-a.pts||b.gd-a.gd||b.gf-a.gf);
+    finalStandings[grpKey] = st;
+  }
+
+  // 2. Classificados: top 2 por grupo + 8 melhores 3ºs
+  const thirds = [];
+  const qualW = {}, qualR = {};
+  for (const [k, st] of Object.entries(finalStandings)) {
+    qualW[k] = st[0].code;
+    qualR[k] = st[1].code;
+    thirds.push({...st[2], group:k});
+  }
+  thirds.sort((a,b)=>b.pts-a.pts||b.gd-a.gd||b.gf-a.gf);
+  const best8 = thirds.slice(0,8);
+
+  // 3. Chaveamento R32 (simplificado)
+  const pairings=[
+    ['A','B'],['B','A'],['C','D'],['D','C'],
+    ['E','F'],['F','E'],['G','H'],['H','G'],
+    ['I','J'],['J','I'],['K','L'],['L','K'],
+  ];
+  const r32 = pairings.map(([wg,rg])=>[qualW[wg],qualR[rg]]);
+  for (let i=0;i<8;i+=2) r32.push([best8[i].code, best8[i+1].code]);
+
+  // 4. Fases eliminatórias
+  const r32w = r32.map(([h,a])=>simKnockoutModel(h,a,mdl));
+  const r16=[]; for(let i=0;i<16;i+=2) r16.push([r32w[i],r32w[i+1]]);
+  const r16w = r16.map(([h,a])=>simKnockoutModel(h,a,mdl));
+  const qf=[]; for(let i=0;i<8;i+=2) qf.push([r16w[i],r16w[i+1]]);
+  const qfw = qf.map(([h,a])=>simKnockoutModel(h,a,mdl));
+  const sf=[[qfw[0],qfw[1]],[qfw[2],qfw[3]]];
+  const sfw = sf.map(([h,a])=>simKnockoutModel(h,a,mdl));
+  return simKnockoutModel(sfw[0],sfw[1],mdl);
+}
+
+async function runChancesSim(N, onProgress) {
+  const winCounts = new Map();
+  const allCodes = Object.values(GROUPS).flat();
+  for (const c of allCodes) winCounts.set(c,0);
+
+  const BATCH=50;
+  for (let i=0;i<N;i++) {
+    const champ = simOnce(_model);
+    winCounts.set(champ,(winCounts.get(champ)||0)+1);
+    if (i%BATCH===BATCH-1) {
+      onProgress(i+1,N);
+      await new Promise(r=>setTimeout(r,0));
+    }
+  }
+  onProgress(N,N);
+  return winCounts;
+}
+
+function colorChance(p) {
+  if (p>0.18) return '#1A4731';
+  if (p>0.07) return '#D97706';
+  if (p>0.02) return '#5A5750';
+  return '#C9C6BC';
+}
+
+function renderChancesResults(winCounts, N) {
+  const allCodes = Object.values(GROUPS).flat();
+  const sorted = allCodes
+    .map(c=>({c, p:winCounts.get(c)/N}))
+    .sort((a,b)=>b.p-a.p)
+    .filter(x=>x.p>0.0005);
+
+  // Pódio (top 6)
+  const podiumLabels = ['Favorito','2°','3°','4°','5°','6°'];
+  document.getElementById('chances-podium').innerHTML = sorted.slice(0,6).map((x,i)=>`
+    <div class="podium-item rank-${i+1}">
+      <div class="podium-rank-label">${podiumLabels[i]}</div>
+      <div class="podium-team-name">${TEAMS[x.c].flag} ${TEAMS[x.c].name}</div>
+      <div class="podium-pct">${(x.p*100).toFixed(1)}%</div>
+      <div class="podium-sub">chance de título</div>
+    </div>`).join('');
+
+  // Gráfico de barras (top 20)
+  const top20 = sorted.slice(0,20);
+  const maxP = top20[0]?.p||1;
+  document.getElementById('chances-chart').innerHTML =
+    `<div class="section-label" style="margin-bottom:12px">Probabilidade de título — top 20</div>` +
+    top20.map(x=>`
+      <div class="wc-row">
+        <div class="wc-team">${TEAMS[x.c].flag} ${TEAMS[x.c].name}</div>
+        <div class="wc-bar-wrap">
+          <div class="wc-bar" style="width:${(x.p/maxP*100).toFixed(1)}%;background:${colorChance(x.p)}"></div>
+        </div>
+        <div class="wc-pct">${(x.p*100).toFixed(1)}%</div>
+      </div>`).join('');
+
+  document.getElementById('chances-results').style.display='';
+}
+
+document.getElementById('btn-chances').addEventListener('click', async () => {
+  const btn = document.getElementById('btn-chances');
+  const N = parseInt(document.getElementById('n-sims-chances').value,10);
+  btn.disabled = true;
+  document.getElementById('chances-results').style.display='none';
+  document.getElementById('chances-loading').style.display='';
+  document.getElementById('chances-meta').textContent='';
+
+  const progressEl = document.getElementById('chances-progress');
+  const loadingText = document.getElementById('chances-loading-text');
+
+  try {
+    await loadSelecoesModel(txt=>{ loadingText.textContent=txt; });
+    loadingText.textContent='Rodando simulações…';
+
+    const t0 = Date.now();
+    const winCounts = await runChancesSim(N, (done,total)=>{
+      progressEl.style.width=(done/total*100)+'%';
+    });
+    const elapsed = ((Date.now()-t0)/1000).toFixed(1);
+
+    document.getElementById('chances-loading').style.display='none';
+    document.getElementById('chances-meta').textContent=`${N.toLocaleString('pt-BR')} simulações · ${elapsed}s`;
+    renderChancesResults(winCounts, N);
+  } catch(e) {
+    loadingText.textContent='Erro ao carregar modelo: '+e.message;
+    console.error(e);
+  }
+  btn.disabled=false;
+});
+
+// ══════════════════════════════════════════════
+// CONFRONTOS
+// ══════════════════════════════════════════════
+
+function getTeamCopaStats(code) {
+  const stats={p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0};
+  const matches=[];
+  for (const m of MATCHES) {
+    if (!m.played||m.hs===null) continue;
+    let isHome=false, isAway=false;
+    if (m.home===code) isHome=true;
+    else if (m.away===code) isAway=true;
+    else continue;
+    stats.p++;
+    const tGf=isHome?m.hs:m.as;
+    const tGa=isHome?m.as:m.hs;
+    const opp=isHome?m.away:m.home;
+    stats.gf+=tGf; stats.ga+=tGa;
+    let res='';
+    if (tGf>tGa){stats.w++;stats.pts+=3;res='w';}
+    else if(tGf<tGa){stats.l++;res='l';}
+    else{stats.d++;stats.pts+=1;res='d';}
+    matches.push({opp, tGf, tGa, res, round:m.round, group:m.group, date:m.date});
+  }
+  return {stats, matches};
+}
+
+function renderCopaStatsCard(code) {
+  const t = TEAMS[code];
+  const {stats, matches} = getTeamCopaStats(code);
+  if (!stats.p) return `<div class="copa-stats-card">
+    <div class="copa-stats-title">${t.flag} ${t.name} — Copa 2026</div>
+    <div style="font-size:12px;color:var(--muted)">Nenhuma partida disputada ainda</div>
+  </div>`;
+
+  const matchesHtml = matches.map(m=>{
+    const opp = TEAMS[m.opp];
+    return `<div class="copa-match-item">
+      <span>${opp.flag} ${opp.name} (Gr.${m.group} R${m.round})</span>
+      <span class="copa-match-score result-${m.res}">${m.tGf}–${m.tGa}</span>
+    </div>`;
+  }).join('');
+
+  return `<div class="copa-stats-card">
+    <div class="copa-stats-title">${t.flag} ${t.name} — Copa 2026</div>
+    <div class="stat-line"><span>Jogos</span><span class="stat-line-val">${stats.p}</span></div>
+    <div class="stat-line"><span>V / E / D</span><span class="stat-line-val">${stats.w}/${stats.d}/${stats.l}</span></div>
+    <div class="stat-line"><span>Gols</span><span class="stat-line-val">${stats.gf}:${stats.ga} (SG ${stats.gf-stats.ga>0?'+':''}${stats.gf-stats.ga})</span></div>
+    <div class="stat-line"><span>Pontos</span><span class="stat-line-val">${stats.pts}</span></div>
+    <div class="copa-match-list">${matchesHtml}</div>
+  </div>`;
+}
+
+async function calcConfronto() {
+  const codeA = document.getElementById('team-a').value;
+  const codeB = document.getElementById('team-b').value;
+  if (!codeA||!codeB||codeA===codeB) {
+    alert('Selecione duas seleções diferentes.');
+    return;
+  }
+
+  const btn = document.getElementById('btn-confronto');
+  btn.disabled=true;
+  document.getElementById('confronto-result').style.display='none';
+  document.getElementById('confronto-loading').style.display='';
+
+  try {
+    await loadSelecoesModel();
+    const pr = SelecoesModel.predict(TEAM_MODEL_NAMES[codeA]||codeA, TEAM_MODEL_NAMES[codeB]||codeB, _model, true);
+    document.getElementById('confronto-loading').style.display='none';
+
+    const tA = TEAMS[codeA], tB = TEAMS[codeB];
+    const pH=pr.pH*100, pD=pr.pD*100, pA=pr.pA*100;
+
+    const html=`
+      <div class="prob-display">
+        <div class="prob-row">
+          <div class="prob-team">
+            <div class="prob-flag">${tA.flag}</div>
+            <div class="prob-team-name">${tA.name}</div>
+            <div class="prob-pct-big" style="color:var(--accent)">${pH.toFixed(1)}%</div>
+          </div>
+          <div class="prob-draw-col">
+            <div class="prob-draw-label">Empate</div>
+            <div class="prob-draw-pct">${pD.toFixed(1)}%</div>
+          </div>
+          <div class="prob-team">
+            <div class="prob-flag">${tB.flag}</div>
+            <div class="prob-team-name">${tB.name}</div>
+            <div class="prob-pct-big" style="color:var(--blue)">${pA.toFixed(1)}%</div>
+          </div>
+        </div>
+        <div class="prob-bar-wrap">
+          <div class="prob-bar-h" style="width:${pH.toFixed(1)}%"></div>
+          <div class="prob-bar-d" style="width:${pD.toFixed(1)}%"></div>
+          <div class="prob-bar-a" style="width:${pA.toFixed(1)}%"></div>
+        </div>
+        <div class="odds-row">
+          <div class="odds-card">
+            <div class="odds-label">${tA.name} ganha</div>
+            <div class="odds-val">${pr.oh.toFixed(2)}</div>
+          </div>
+          <div class="odds-card">
+            <div class="odds-label">Empate</div>
+            <div class="odds-val">${pr.od.toFixed(2)}</div>
+          </div>
+          <div class="odds-card">
+            <div class="odds-label">${tB.name} ganha</div>
+            <div class="odds-val">${pr.oa.toFixed(2)}</div>
+          </div>
+        </div>
+        <div style="margin-top:10px;font-size:10.5px;color:var(--muted);font-family:var(--mono)">
+          Placar mais provável: ${pr.bestGH}–${pr.bestGA} · λ ${TEAM_MODEL_NAMES[codeA]}: ${pr.lamH.toFixed(2)} · λ ${TEAM_MODEL_NAMES[codeB]}: ${pr.lamA.toFixed(2)}
+          · Partida considerada em campo neutro
+        </div>
+      </div>
+      <div class="copa-stats-grid">
+        ${renderCopaStatsCard(codeA)}
+        ${renderCopaStatsCard(codeB)}
+      </div>
+      <div style="margin-top:12px;font-size:10.5px;color:var(--muted);font-family:var(--mono)">
+        Modelo: Dixon-Coles Poisson + Elo · Dataset: Mart Jürisoo (1872–2026) · Overround 6%
+      </div>`;
+
+    document.getElementById('confronto-result').innerHTML=html;
+    document.getElementById('confronto-result').style.display='';
+  } catch(e) {
+    document.getElementById('confronto-loading').innerHTML='<div style="color:var(--red)">Erro: '+e.message+'</div>';
+    console.error(e);
+  }
+  btn.disabled=false;
+}
+
+// Popular dropdowns
+(function populateDropdowns() {
+  const allCodes = Object.values(GROUPS).flat();
+  const sorted = [...allCodes].sort((a,b)=>TEAMS[a].name.localeCompare(TEAMS[b].name,'pt-BR'));
+  const opts = sorted.map(c=>`<option value="${c}">${TEAMS[c].flag} ${TEAMS[c].name}</option>`).join('');
+  document.getElementById('team-a').innerHTML=opts;
+  document.getElementById('team-b').innerHTML=opts;
+  // Default: Brasil vs Argentina
+  document.getElementById('team-a').value='BRA';
+  document.getElementById('team-b').value='ARG';
+  document.getElementById('btn-confronto').disabled=false;
+})();
+
+document.getElementById('btn-confronto').addEventListener('click', calcConfronto);
 </script>
 </body>
 </html>
