@@ -49833,12 +49833,21 @@ function simulateKnockout(homeRaw,awayRaw,model){
 
 // ════════════════════════════════════════════════
 //  Groups definition (Copa do Mundo 2026)
-//  Playoffs UEFA confirmados (março/2026):
+//  Fase de grupos encerrada em 27/jun/2026.
+//  Playoffs UEFA (março/2026):
 //    Path A: Bósnia-Herzegovina (bateu Itália nos pênaltis)
 //    Path B: Suécia (bateu Polônia 3-2)
 //    Path C: Turquia (bateu Kosovo 1-0)
 //    Path D: República Tcheca (bateu Dinamarca nos pênaltis)
 //  Inter-conf: Congo-Kinshasa (K) bateu Jamaica; Iraque (I) bateu Bolívia 2-1
+//
+//  Classificados reais para o mata-mata:
+//    1°s: México(A), Suíça(B), Brasil(C), EUA(D), Alemanha(E), Holanda(F),
+//         Bélgica(G), Espanha(H), França(I), Argentina(J), Colômbia(K), Inglaterra(L)
+//    2°s: África do Sul(A), Canadá(B), Marrocos(C), Austrália(D), Costa do Marfim(E),
+//         Japão(F), Egito(G), Cabo Verde(H), Noruega(I), Áustria(J), Portugal(K), Croácia(L)
+//    Melhores 3°s: Equador(E), Paraguai(D), Suécia(F), Senegal(I),
+//                  Argélia(J), RD Congo(K), Gana(L), Bósnia e Herzegovina(B)
 // ════════════════════════════════════════════════
 
 // HOST NATIONS: Mexico, USA, Canada have home advantage in their group games
@@ -49930,44 +49939,67 @@ function simulateOnce(model){
   const bestThirds=thirds.slice(0,8);
   for(const t of bestThirds) qualified.push({team:t.team, rank:3, group:t.group, ...t});
 
-  // 3. Build R32 bracket (32 teams)
-  // Standard pairing: group winners vs runners-up from adjacent group
-  // + best 8 thirds slotted in
-  // Bracket structure (simplified but reasonable):
-  const winners  = 'ABCDEFGHIJKL'.split('').map(k=>groupStandings[k][0].team);
-  const runners  = 'ABCDEFGHIJKL'.split('').map(k=>groupStandings[k][1].team);
-  const thirdsMap = new Set(bestThirds.map(t=>t.team));
-
-  // R32 matchups: pair W[i] vs R[i+1], alternating groups
-  // Plus 8 thirds filling the remaining 4 matches
-  const r32 = [];
-  // 12 W vs R matchups
-  const groupKeys='ABCDEFGHIJKL'.split('');
-  const pairings=[
-    ['A','B'],['B','A'],['C','D'],['D','C'],
-    ['E','F'],['F','E'],['G','H'],['H','G'],
-    ['I','J'],['J','I'],['K','L'],['L','K'],
+  // 3. Build R32 bracket (Copa do Mundo 2026 — bracket oficial)
+  // Pares ordenados para que o emparelhamento sequencial produza os confrontos
+  // corretos das oitavas/quartas/semis conforme chaveamento da FIFA.
+  // Cada par de entradas consecutivas [2i, 2i+1] se enfrenta nas oitavas.
+  // Resultado real da fase de grupos (fase encerrada em 27/jun):
+  //   A: México 1°, África do Sul 2°   B: Suíça 1°, Canadá 2°
+  //   C: Brasil 1°, Marrocos 2°        D: EUA 1°, Austrália 2°
+  //   E: Alemanha 1°, Costa do Marfim 2°  F: Holanda 1°, Japão 2°
+  //   G: Bélgica 1°, Egito 2°          H: Espanha 1°, Cabo Verde 2°
+  //   I: França 1°, Noruega 2°         J: Argentina 1°, Áustria 2°
+  //   K: Colômbia 1°, Portugal 2°      L: Inglaterra 1°, Croácia 2°
+  //   Melhores 3°s: Canadá(B)→já 2°; Equador(E), Paraguai(D), Suécia(F),
+  //                 Senegal(I), Argélia(J), RD Congo(K), Gana(L), Bósnia(B)
+  //
+  // Resultados já disputados (1ª fase mata-mata):
+  //   m73 Canadá 1-0 África do Sul  (28/jun) → Canadá classificado
+  //   m74 Alemanha 10-2 Paraguai    (29/jun) → Alemanha classificada
+  //   m76 Brasil 2-1 Japão          (29/jun) → Brasil classificado
+  const r32 = [
+    // Oitavas A (Houston, 4/jul): W73 vs W75
+    ['south africa','canada'],
+    ['netherlands','morocco'],
+    // Oitavas B (Philadelphia, 4/jul): W74 vs W77
+    ['germany','paraguay'],
+    ['france','sweden'],
+    // Oitavas C (NJ, 5/jul): W76 vs W78
+    ['brazil','japan'],
+    ['ivory coast','norway'],
+    // Oitavas D (Cidade do México, 5/jul): W79 vs W80
+    ['mexico','ecuador'],
+    ['england','dr congo'],
+    // Oitavas E (Seattle, 6/jul): W81 vs W82
+    ['belgium','senegal'],
+    ['croatia','portugal'],
+    // Oitavas F (Dallas, 6/jul): W83 vs W84
+    ['spain','austria'],
+    ['united states','bosnia and herzegovina'],
+    // Oitavas G (Atlanta, 7/jul): W86 vs W88
+    ['australia','egypt'],
+    ['switzerland','algeria'],
+    // Oitavas H (Vancouver, 7/jul): W85 vs W87
+    ['argentina','cape verde'],
+    ['colombia','ghana'],
   ];
-  for(const[wGrp,rGrp]of pairings){
-    r32.push([groupStandings[wGrp][0].team, groupStandings[rGrp][1].team]);
-  }
-  // 4 matches among 8 thirds (pair them off by rank)
-  for(let i=0;i<8;i+=2){
-    r32.push([bestThirds[i].team, bestThirds[i+1].team]);
-  }
-  // Now r32 has 16 matches → 32 teams (some duplicates if a team appears in both W and thirds)
-  // This is a simplification — in reality the bracket would deduplicate
-  // Ensure we have exactly 16 unique matches
-  // (Our simplified bracket may have some overlap in edge cases; accept it for approximation)
+
+  // Resultados já conhecidos: índice da partida → time classificado
+  const LOCKED_R32 = {
+    0: 'canada',    // Canadá 1-0 África do Sul (28/jun)
+    2: 'germany',   // Alemanha 10-2 Paraguai   (29/jun)
+    4: 'brazil',    // Brasil 2-1 Japão          (29/jun)
+  };
 
   // 4. Simulate knockout rounds
   function simRound(matches){
     return matches.map(([h,a])=>simulateKnockout(h,a,model));
   }
 
-  // R32: 16 matches → 16 winners
-  let round=[...r32];
-  const advR32  = simRound(round);
+  // R32: 16 matches → 16 winners (locked results respected)
+  const advR32 = r32.map(([h,a],i)=>
+    LOCKED_R32[i]!==undefined ? LOCKED_R32[i] : simulateKnockout(h,a,model)
+  );
 
   // R16: pair winners sequentially
   const r16=[]; for(let i=0;i<16;i+=2)r16.push([advR32[i],advR32[i+1]]);
