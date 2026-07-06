@@ -273,14 +273,56 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
 .result-d{color:var(--orange)}
 .result-l{color:var(--red)}
 
-/* ── Mata-Mata / Chaveamento Circular ── */
-.bracket-circular-wrap{width:100%;max-width:780px;margin:0 auto}
-.bracket-svg{width:100%;height:auto;display:block}
+/* ── Mata-Mata / Chaveamento ── */
+.bracket-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:12px}
+/* Slot base height: 64px. Total = 8×64=512px. Each round doubles. */
+.bracket-tree{display:flex;align-items:stretch;gap:0;min-width:960px;height:calc(8 * 64px)}
+/* Column widths: R32 wider, inner rounds narrower */
+.bracket-col{display:flex;flex-direction:column;flex:1.4;min-width:0;position:relative}
+.bracket-col.rnd-r16{flex:1.1}
+.bracket-col.rnd-qf {flex:0.9}
+.bracket-col.rnd-sf {flex:0.85}
+.bracket-col.center-col{flex:1}
+/* Column header */
+.bracket-col-hdr{font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;
+  color:var(--muted);text-align:center;padding:4px 4px 6px;border-bottom:2px solid var(--border);
+  margin-bottom:0;flex-shrink:0;white-space:nowrap;background:var(--bg)}
+.bracket-slots{display:flex;flex-direction:column;flex:1;padding:0 4px}
+/* Each slot is fixed-height; card centers inside it */
+.bracket-slot{display:flex;align-items:center;flex-shrink:0;position:relative}
+.bracket-slot.r32{height:64px}
+.bracket-slot.r16{height:128px}
+.bracket-slot.qf {height:256px}
+.bracket-slot.sf {height:512px}
+.bracket-slot.fn {height:512px}
+/* ── Connector lines ──
+   Horizontal tick: 8px wide stub from the slot edge.
+   Vertical bar: runs from midpoint to the sibling slot's midpoint. */
+/* Left-side columns: connectors on right */
+.con-right .bracket-slot::after{
+  content:'';position:absolute;right:-4px;top:50%;
+  width:8px;height:2px;background:#C8C5BB;z-index:1}
+.con-right .bracket-slot.line-top::before{
+  content:'';position:absolute;right:-4px;top:50%;
+  width:2px;height:50%;background:#C8C5BB;z-index:1}
+.con-right .bracket-slot.line-bot::before{
+  content:'';position:absolute;right:-4px;bottom:50%;
+  width:2px;height:50%;background:#C8C5BB;z-index:1}
+/* Right-side columns: connectors on left */
+.con-left .bracket-slot::after{
+  content:'';position:absolute;left:-4px;top:50%;
+  width:8px;height:2px;background:#C8C5BB;z-index:1}
+.con-left .bracket-slot.line-top::before{
+  content:'';position:absolute;left:-4px;top:50%;
+  width:2px;height:50%;background:#C8C5BB;z-index:1}
+.con-left .bracket-slot.line-bot::before{
+  content:'';position:absolute;left:-4px;bottom:50%;
+  width:2px;height:50%;background:#C8C5BB;z-index:1}
 .third-match-wrap{margin-top:16px;max-width:220px}
 .third-match-label{font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.07em;
   color:var(--muted);margin-bottom:6px;font-weight:500}
 .bm{background:var(--surface);border:1px solid var(--border);border-radius:5px;
-  overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+  width:100%;overflow:hidden;flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,.06)}
 .bm-jid{font-size:7.5px;font-family:var(--mono);color:var(--muted);padding:2px 5px 1px;
   border-bottom:1px solid #F0EEE8;letter-spacing:.04em}
 .bm-team{display:flex;align-items:center;gap:4px;padding:4px 5px;font-size:10px;line-height:1.25;min-width:0}
@@ -364,8 +406,8 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
 <!-- TAB: Mata-Mata -->
 <div id="tab-matamata" class="tab-panel">
   <div class="section-label">Chaveamento — Copa do Mundo 2026</div>
-  <div class="bracket-circular-wrap">
-    <svg id="bracket-svg" class="bracket-svg" viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg"></svg>
+  <div class="bracket-wrap">
+    <div class="bracket-tree" id="bracket-tree"></div>
   </div>
   <div class="third-match-wrap" id="third-place-match"></div>
 </div>
@@ -460,7 +502,7 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
 
 <footer>
   <span>Copa do Mundo 2026 — EUA, Canadá e México · 11 jun – 19 jul</span>
-  <span>Dados atualizados em 30/06/2026</span>
+  <span>Dados atualizados em 06/07/2026</span>
 </footer>
 
 </div><!-- .page -->
@@ -754,26 +796,30 @@ const MATCHES = [
 const BL_R32 = [
   // J74 29/jun: GER 1–1 PAR (PAR vence nos pênaltis 4–3)
   {jid:'J74', date:'2026-06-29', homePos:{g:'E',r:1}, awayLabel:'3ABCDF',  home:null,away:'PAR',hs:1,as:1,winner:'PAR',pens:true},
-  // J77 30/jun: FRA vs SWE (ao vivo / ainda sem resultado)
-  {jid:'J77', date:'2026-06-30', homePos:{g:'I',r:1}, awayLabel:'3CDFGH',  home:null,away:'SWE',hs:null,as:null,winner:null},
+  // J77 30/jun: FRA 3–0 SWE
+  {jid:'J77', date:'2026-06-30', homePos:{g:'I',r:1}, awayLabel:'3CDFGH',  home:null,away:'SWE',hs:3,as:0,winner:'FRA'},
   // J73 28/jun: RSA 0–1 CAN
   {jid:'J73', date:'2026-06-28', homePos:{g:'A',r:2}, awayPos:{g:'B',r:2}, home:null,away:null,hs:0,as:1,winner:'CAN'},
   // J75 29/jun: NED 1–1 MAR (MAR vence nos pênaltis 3–2)
   {jid:'J75', date:'2026-06-29', homePos:{g:'F',r:1}, awayPos:{g:'C',r:2}, home:null,away:null,hs:1,as:1,winner:'MAR',pens:true},
-  // J83 02/jul: POR vs CRO
-  {jid:'J83', date:'2026-07-02', homePos:{g:'K',r:2}, awayPos:{g:'L',r:2}, home:null,away:null,hs:null,as:null,winner:null},
-  // J84 02/jul: ESP vs AUT
-  {jid:'J84', date:'2026-07-02', homePos:{g:'H',r:1}, awayPos:{g:'J',r:2}, home:null,away:null,hs:null,as:null,winner:null},
-  // J81 01/jul: USA vs BIH
-  {jid:'J81', date:'2026-07-01', homePos:{g:'D',r:1}, awayPos:{g:'B',r:3}, home:null,away:null,hs:null,as:null,winner:null},
-  // J82 01/jul: BEL vs SEN
-  {jid:'J82', date:'2026-07-01', homePos:{g:'G',r:1}, awayLabel:'3AEHIJ',  home:null,away:'SEN',hs:null,as:null,winner:null},
+  // J83 02/jul: POR 2–1 CRO
+  {jid:'J83', date:'2026-07-02', homePos:{g:'K',r:2}, awayPos:{g:'L',r:2}, home:null,away:null,hs:2,as:1,winner:'POR'},
+  // J84 02/jul: ESP 3–0 AUT
+  {jid:'J84', date:'2026-07-02', homePos:{g:'H',r:1}, awayPos:{g:'J',r:2}, home:null,away:null,hs:3,as:0,winner:'ESP'},
+  // J81 01/jul: USA 2–1 BIH
+  {jid:'J81', date:'2026-07-01', homePos:{g:'D',r:1}, awayPos:{g:'B',r:3}, home:null,away:null,hs:2,as:1,winner:'USA'},
+  // J82 01/jul: BEL 2–1 SEN
+  {jid:'J82', date:'2026-07-01', homePos:{g:'G',r:1}, awayLabel:'3AEHIJ',  home:null,away:'SEN',hs:2,as:1,winner:'BEL'},
 ];
 const BL_R16 = [
-  {jid:'J89', date:'2026-07-04', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ74', al:'VJ77'},
-  {jid:'J90', date:'2026-07-04', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ73', al:'VJ75'},
-  {jid:'J93', date:'2026-07-06', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ83', al:'VJ84'},
-  {jid:'J94', date:'2026-07-06', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ81', al:'VJ82'},
+  // J89 04/jul: PAR 0–2 FRA
+  {jid:'J89', date:'2026-07-04', home:'PAR',away:'FRA',hs:0,as:2,winner:'FRA', hl:'VJ74', al:'VJ77'},
+  // J90 04/jul: CAN 1–2 MAR
+  {jid:'J90', date:'2026-07-04', home:'CAN',away:'MAR',hs:1,as:2,winner:'MAR', hl:'VJ73', al:'VJ75'},
+  // J93 06/jul: POR 1–2 ESP
+  {jid:'J93', date:'2026-07-06', home:'POR',away:'ESP',hs:1,as:2,winner:'ESP', hl:'VJ83', al:'VJ84'},
+  // J94 06/jul: USA 2–1 BEL
+  {jid:'J94', date:'2026-07-06', home:'USA',away:'BEL',hs:2,as:1,winner:'USA', hl:'VJ81', al:'VJ82'},
 ];
 const BL_QF = [
   {jid:'J97', date:'2026-07-09', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ89', al:'VJ90'},
@@ -787,24 +833,26 @@ const BL_SF = [
 const BR_R32 = [
   // J76 29/jun: BRA 2–1 JPN
   {jid:'J76', date:'2026-06-29', homePos:{g:'C',r:1}, awayPos:{g:'F',r:2}, home:null,away:null,hs:2,as:1,winner:'BRA'},
-  // J78 30/jun: CIV vs NOR (ao vivo)
-  {jid:'J78', date:'2026-06-30', homePos:{g:'E',r:2}, awayPos:{g:'I',r:2}, home:null,away:null,hs:null,as:null,winner:null},
-  // J79 30/jun: MEX vs ECU (ao vivo)
-  {jid:'J79', date:'2026-06-30', homePos:{g:'A',r:1}, awayLabel:'3CEFHI',  home:null,away:'ECU',hs:null,as:null,winner:null},
-  // J80 01/jul: ENG vs COD
-  {jid:'J80', date:'2026-07-01', homePos:{g:'L',r:1}, awayLabel:'3EHIJK',  home:null,away:'COD',hs:null,as:null,winner:null},
-  // J86 03/jul: ARG vs CPV
-  {jid:'J86', date:'2026-07-03', homePos:{g:'J',r:1}, awayPos:{g:'H',r:2}, home:null,away:null,hs:null,as:null,winner:null},
-  // J88 03/jul: AUS vs EGY
-  {jid:'J88', date:'2026-07-03', homePos:{g:'D',r:2}, awayPos:{g:'G',r:2}, home:null,away:null,hs:null,as:null,winner:null},
-  // J85 02/jul: SUI vs ALG
-  {jid:'J85', date:'2026-07-02', homePos:{g:'B',r:1}, awayLabel:'3EFGIJ',  home:null,away:'ALG',hs:null,as:null,winner:null},
-  // J87 03/jul: COL vs GHA
-  {jid:'J87', date:'2026-07-03', homePos:{g:'K',r:1}, awayLabel:'3DEIJL',  home:null,away:'GHA',hs:null,as:null,winner:null},
+  // J78 30/jun: CIV 1–2 NOR
+  {jid:'J78', date:'2026-06-30', homePos:{g:'E',r:2}, awayPos:{g:'I',r:2}, home:null,away:null,hs:1,as:2,winner:'NOR'},
+  // J79 30/jun: MEX 2–0 ECU
+  {jid:'J79', date:'2026-06-30', homePos:{g:'A',r:1}, awayLabel:'3CEFHI',  home:null,away:'ECU',hs:2,as:0,winner:'MEX'},
+  // J80 01/jul: ENG 3–0 COD
+  {jid:'J80', date:'2026-07-01', homePos:{g:'L',r:1}, awayLabel:'3EHIJK',  home:null,away:'COD',hs:3,as:0,winner:'ENG'},
+  // J86 03/jul: ARG 3–0 CPV
+  {jid:'J86', date:'2026-07-03', homePos:{g:'J',r:1}, awayPos:{g:'H',r:2}, home:null,away:null,hs:3,as:0,winner:'ARG'},
+  // J88 03/jul: AUS 1–2 EGY
+  {jid:'J88', date:'2026-07-03', homePos:{g:'D',r:2}, awayPos:{g:'G',r:2}, home:null,away:null,hs:1,as:2,winner:'EGY'},
+  // J85 02/jul: SUI 2–1 ALG
+  {jid:'J85', date:'2026-07-02', homePos:{g:'B',r:1}, awayLabel:'3EFGIJ',  home:null,away:'ALG',hs:2,as:1,winner:'SUI'},
+  // J87 03/jul: COL 2–0 GHA
+  {jid:'J87', date:'2026-07-03', homePos:{g:'K',r:1}, awayLabel:'3DEIJL',  home:null,away:'GHA',hs:2,as:0,winner:'COL'},
 ];
 const BR_R16 = [
-  {jid:'J91', date:'2026-07-05', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ76', al:'VJ78'},
-  {jid:'J92', date:'2026-07-05', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ79', al:'VJ80'},
+  // J91 05/jul: BRA 3–1 NOR
+  {jid:'J91', date:'2026-07-05', home:'BRA',away:'NOR',hs:3,as:1,winner:'BRA', hl:'VJ76', al:'VJ78'},
+  // J92 05/jul: MEX 1–2 ENG
+  {jid:'J92', date:'2026-07-05', home:'MEX',away:'ENG',hs:1,as:2,winner:'ENG', hl:'VJ79', al:'VJ80'},
   {jid:'J95', date:'2026-07-07', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ86', al:'VJ88'},
   {jid:'J96', date:'2026-07-07', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ85', al:'VJ87'},
 ];
@@ -1159,202 +1207,49 @@ function r32AwayLbl(m) {
 }
 
 // ──────────────────────────────────────────────
-// CIRCULAR BRACKET RENDERER
+// BRACKET TREE RENDERER (linear)
 // ──────────────────────────────────────────────
 function renderBracket() {
   Object.keys(GROUPS).forEach(g => { _standings[g] = computeStandings(g); });
 
-  const CX = 500, CY = 500;
-  // Radii
-  const R_T  = 422; // team badge centers
-  const R_32 = 348; // R32 match dots
-  const R_16 = 265; // R16 match dots
-  const R_QF = 193; // QF match dots
-  const R_SF = 132; // SF match dots
-  const R_FN = 70;  // Final match dot
-  const TBR  = 20;  // team badge radius
-  const MDR  = 12;  // match dot radius
-
-  const π = Math.PI;
-  function rad(d) { return d * π / 180; }
-  function px(r, a) { return CX + r * Math.cos(a); }
-  function py(r, a) { return CY + r * Math.sin(a); }
-
-  // Slot angles: 16 slots per side, 180° per side, 11.25° per slot
-  const STEP = 11.25, OFF = 5.625;
-  function LA(s) { return rad(-90 - OFF - s * STEP); } // left: CCW from top
-  function RA(s) { return rad(-90 + OFF + s * STEP); } // right: CW from top
-
-  // SVG layers
-  const bgL = [], lineL = [], dotL = [], textL = [];
-
-  function svgLine(x1,y1,x2,y2,w,color){
-    lineL.push(`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${color||'#CCC9C1'}" stroke-width="${w||1.4}"/>`);
-  }
-
-  function svgCircle(x,y,r,fill,stroke,sw){
-    dotL.push(`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" fill="${fill||'#fff'}" stroke="${stroke||'#C8C5BB'}" stroke-width="${sw||1.5}"/>`);
-  }
-
-  function svgText(x,y,txt,size,fill,anchor,weight,family,rotate){
-    const ra = rotate ? ` transform="rotate(${rotate},${x.toFixed(1)},${y.toFixed(1)})"` : '';
-    textL.push(`<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="${anchor||'middle'}" dominant-baseline="middle" font-size="${size}" fill="${fill||'#141412'}" font-weight="${weight||'400'}" font-family="${family||'var(--sans)'}"`+ra+`>${txt}</text>`);
-  }
-
-  // Draw team badge at given angle on outer ring
-  function drawTeam(a, code, label, loser) {
-    const tx = px(R_T, a), ty = py(R_T, a);
-    const team = code ? TEAMS[code] : null;
-    const bg = loser ? '#EDEAE2' : '#fff';
-    const op = loser ? ' opacity="0.55"' : '';
-
-    dotL.push(`<circle cx="${tx.toFixed(1)}" cy="${ty.toFixed(1)}" r="${TBR}" fill="${bg}" stroke="${loser?'#CCC':'#B5B2A8'}" stroke-width="1.5"${op}/>`);
-
-    if (team) {
-      textL.push(`<text x="${tx.toFixed(1)}" y="${(ty+0.5).toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="15"${op}>${team.flag}</text>`);
-    } else {
-      const disp = label ? label.replace('3','3ºs ').substring(0,6) : '?';
-      textL.push(`<text x="${tx.toFixed(1)}" y="${(ty+0.5).toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="6.5" fill="#A8A59D" font-family="IBM Plex Mono,monospace">${disp}</text>`);
-    }
-
-    // Name label — radial, pointing outward
-    const degA = ((a * 180 / π) + 720) % 360;
-    const isLeft = degA > 91 && degA < 269;
-    const nr = R_T + TBR + 7;
-    const nx = px(nr, a), ny = py(nr, a);
-    const rot = isLeft ? (degA + 180).toFixed(1) : degA.toFixed(1);
-    const name = team ? team.name : (label ? label.replace(/3[A-Z]+/,'3ºs melhor').substring(0,9) : 'A def.');
-    const short = name.length > 9 ? name.substring(0,8)+'…' : name;
-    const anc = isLeft ? 'end' : 'start';
-    textL.push(`<text x="${nx.toFixed(1)}" y="${ny.toFixed(1)}" text-anchor="${anc}" dominant-baseline="middle" font-size="7.5" fill="${code?'#5C5A54':'#B0ADA5'}" font-weight="${code?'500':'400'}" font-family="IBM Plex Mono,monospace"${op} transform="rotate(${rot},${nx.toFixed(1)},${ny.toFixed(1)})">${short}</text>`);
-  }
-
-  // Draw match dot with optional score
-  function drawMatchDot(r, a, hs, as_, played, pens, large) {
-    const mx = px(r, a), my = py(r, a);
-    const dr = large ? 16 : MDR;
-    const bg = played ? '#E3E0D7' : '#F4F2ED';
-    const str = played ? '#A8A59D' : '#D0CEC7';
-    dotL.push(`<circle cx="${mx.toFixed(1)}" cy="${my.toFixed(1)}" r="${dr}" fill="${bg}" stroke="${str}" stroke-width="1.5"/>`);
-    if (played && hs !== null) {
-      const sc = `${hs}–${as_}`;
-      textL.push(`<text x="${mx.toFixed(1)}" y="${(my-(pens?2.5:0)).toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="${large?9:7}" font-weight="600" fill="#2A2924" font-family="IBM Plex Mono,monospace">${sc}</text>`);
-      if (pens) {
-        textL.push(`<text x="${mx.toFixed(1)}" y="${(my+4.5).toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="5" fill="#7A786F" font-family="IBM Plex Mono,monospace">PSO</text>`);
-      }
-    }
-    return [mx, my];
-  }
-
-  // Process one side of the bracket
-  function drawSide(r32Arr, r16Arr, qfArr, sfArr, angleFn) {
-    // ── R32 ──
-    const r32angles = r32Arr.map((m, i) => {
-      const hCode = r32Home(m), aCode = r32Away(m);
-      const hLbl = r32HomeLbl(m), aLbl = r32AwayLbl(m);
-      const played = m.hs !== null && m.as !== null;
-      const hWins = m.winner ? m.winner === hCode : (played && m.hs > m.as);
-      const aWins = m.winner ? m.winner === aCode : (played && m.as > m.hs);
-      const hSlot = i * 2, aSlot = i * 2 + 1;
-      const ha = angleFn(hSlot), aa = angleFn(aSlot);
-      const ma = (ha + aa) / 2;
-
-      // Lines: team → match dot
-      svgLine(px(R_T,ha), py(R_T,ha), px(R_32,ma), py(R_32,ma));
-      svgLine(px(R_T,aa), py(R_T,aa), px(R_32,ma), py(R_32,ma));
-
-      drawTeam(ha, hCode, hLbl, played && !hWins && (aWins || m.winner));
-      drawTeam(aa, aCode, aLbl, played && !aWins && (hWins || m.winner));
-      drawMatchDot(R_32, ma, m.hs, m.as, played, m.pens);
-
-      return ma;
+  // colClass: extra CSS class for width control
+  function renderCol(label, matches, slotClass, conClass, isR32, colClass) {
+    let h = `<div class="bracket-col ${conClass} ${colClass||''}"><div class="bracket-col-hdr">${label}</div><div class="bracket-slots">`;
+    matches.forEach((m, mi) => {
+      const lc = matches.length > 1 ? (mi % 2 === 0 ? ' line-top' : ' line-bot') : '';
+      const hc = isR32 ? r32Home(m) : m.home;
+      const ac = isR32 ? r32Away(m) : m.away;
+      const hl = isR32 ? r32HomeLbl(m) : (m.hl || 'A definir');
+      const al = isR32 ? r32AwayLbl(m) : (m.al || 'A definir');
+      h += `<div class="bracket-slot ${slotClass}${lc}">${bmHtml(m, hc, ac, hl, al)}</div>`;
     });
-
-    // ── R16 ──
-    const r16angles = r16Arr.map((m, i) => {
-      const a1 = r32angles[i*2], a2 = r32angles[i*2+1];
-      const ma = (a1+a2)/2;
-      const played = m.hs !== null && m.as !== null;
-      svgLine(px(R_32,a1), py(R_32,a1), px(R_16,ma), py(R_16,ma));
-      svgLine(px(R_32,a2), py(R_32,a2), px(R_16,ma), py(R_16,ma));
-      drawMatchDot(R_16, ma, m.hs, m.as, played, m.pens);
-      return ma;
-    });
-
-    // ── QF ──
-    const qfangles = qfArr.map((m, i) => {
-      const a1 = r16angles[i*2], a2 = r16angles[i*2+1];
-      const ma = (a1+a2)/2;
-      const played = m.hs !== null && m.as !== null;
-      svgLine(px(R_16,a1), py(R_16,a1), px(R_QF,ma), py(R_QF,ma));
-      svgLine(px(R_16,a2), py(R_16,a2), px(R_QF,ma), py(R_QF,ma));
-      drawMatchDot(R_QF, ma, m.hs, m.as, played, m.pens);
-      return ma;
-    });
-
-    // ── SF ──
-    const sfa = (qfangles[0]+qfangles[1])/2;
-    const sfM = sfArr[0];
-    const sfPlayed = sfM.hs !== null && sfM.as !== null;
-    svgLine(px(R_QF,qfangles[0]), py(R_QF,qfangles[0]), px(R_SF,sfa), py(R_SF,sfa));
-    svgLine(px(R_QF,qfangles[1]), py(R_QF,qfangles[1]), px(R_SF,sfa), py(R_SF,sfa));
-    drawMatchDot(R_SF, sfa, sfM.hs, sfM.as, sfPlayed, sfM.pens);
-
-    return sfa;
+    return h + '</div></div>';
   }
 
-  // ── Round labels (concentric) ──
-  const rndLabels = [
-    {r:R_32+MDR+16, label:'R32', a:rad(-90)},
-    {r:R_16+MDR+14, label:'Oitavas', a:rad(-90)},
-    {r:R_QF+MDR+12, label:'Quartas', a:rad(-90)},
-    {r:R_SF+MDR+11, label:'Semi', a:rad(-90)},
-  ];
-  rndLabels.forEach(({r,label,a})=>{
-    bgL.push(`<text x="${px(r,a).toFixed(1)}" y="${py(r,a).toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="7.5" fill="#B0ADA5" font-family="IBM Plex Mono,monospace" letter-spacing="0.05em">${label}</text>`);
-  });
+  let html = '';
+  // Left side (outer→center)
+  html += renderCol('R32',       BL_R32, 'r32', 'con-right', true,  '');
+  html += renderCol('Oitavas',   BL_R16, 'r16', 'con-right', false, 'rnd-r16');
+  html += renderCol('Quartas',   BL_QF,  'qf',  'con-right', false, 'rnd-qf');
+  html += renderCol('Semifinal', BL_SF,  'sf',  '',          false, 'rnd-sf');
+  // Center: Final
+  html += `<div class="bracket-col center-col">
+    <div class="bracket-col-hdr">Final</div>
+    <div class="bracket-slots">
+      <div class="bracket-slot fn">${bmHtml(B_FINAL, B_FINAL.home, B_FINAL.away, B_FINAL.hl, B_FINAL.al)}</div>
+    </div>
+  </div>`;
+  // Right side (center→outer)
+  html += renderCol('Semifinal', BR_SF,  'sf',  '',          false, 'rnd-sf');
+  html += renderCol('Quartas',   BR_QF,  'qf',  'con-left',  false, 'rnd-qf');
+  html += renderCol('Oitavas',   BR_R16, 'r16', 'con-left',  false, 'rnd-r16');
+  html += renderCol('R32',       BR_R32, 'r32', 'con-left',  true,  '');
 
-  // ── Background circles (decorative rings) ──
-  [R_T+TBR+28, R_32+MDR+4, R_16+MDR+4, R_QF+MDR+4, R_SF+MDR+4].forEach(r=>{
-    bgL.push(`<circle cx="${CX}" cy="${CY}" r="${r}" fill="none" stroke="#E2DFD7" stroke-width="0.8" stroke-dasharray="3 4"/>`);
-  });
-
-  // ── Draw both sides ──
-  const lSFa = drawSide(BL_R32, BL_R16, BL_QF, BL_SF, LA);
-  const rSFa = drawSide(BR_R32, BR_R16, BR_QF, BR_SF, RA);
-
-  // ── Connect SFs → Final ──
-  svgLine(px(R_SF,lSFa), py(R_SF,lSFa), px(R_FN,lSFa), py(R_FN,lSFa));
-  svgLine(px(R_SF,rSFa), py(R_SF,rSFa), px(R_FN,rSFa), py(R_FN,rSFa));
-
-  // ── Final dot ──
-  const finPlayed = B_FINAL.hs !== null && B_FINAL.as !== null;
-  dotL.push(`<circle cx="${CX}" cy="${CY}" r="24" fill="${finPlayed?'#E3E0D7':'#F4F2ED'}" stroke="#A8A59D" stroke-width="2"/>`);
-  if (finPlayed) {
-    const sc = `${B_FINAL.hs}–${B_FINAL.as}`;
-    textL.push(`<text x="${CX}" y="${CY}" text-anchor="middle" dominant-baseline="middle" font-size="10" font-weight="700" fill="#1A4731" font-family="IBM Plex Mono,monospace">${sc}</text>`);
-    if (B_FINAL.winner) {
-      const w = TEAMS[B_FINAL.winner];
-      textL.push(`<text x="${CX}" y="${CY+18}" text-anchor="middle" dominant-baseline="middle" font-size="16">${w.flag}</text>`);
-    }
-  } else {
-    textL.push(`<text x="${CX}" y="${CY}" text-anchor="middle" dominant-baseline="middle" font-size="30">🏆</text>`);
-    textL.push(`<text x="${CX}" y="${CY+26}" text-anchor="middle" dominant-baseline="middle" font-size="7" fill="#B0ADA5" font-family="IBM Plex Mono,monospace">FINAL</text>`);
-    textL.push(`<text x="${CX}" y="${CY+34}" text-anchor="middle" dominant-baseline="middle" font-size="7" fill="#B0ADA5" font-family="IBM Plex Mono,monospace">19/JUL</text>`);
-  }
-
-  const svgEl = document.getElementById('bracket-svg');
-  svgEl.innerHTML =
-    `<rect width="1000" height="1000" fill="var(--bg)"/>` +
-    bgL.join('') + lineL.join('') + dotL.join('') + textL.join('');
+  document.getElementById('bracket-tree').innerHTML = html;
 
   // 3rd place match
   document.getElementById('third-place-match').innerHTML =
-    `<div class="third-match-label">3º Lugar — J103 · 18/jul</div>` +
-    `<div class="bm"><div class="bm-jid">J103 · 18 jul · MetLife Stadium</div>` +
-    `<div class="bm-team"><span class="bm-flag">${B_THIRD.home?TEAMS[B_THIRD.home].flag:'?'}</span><span class="bm-nm ${B_THIRD.home?'':'tbd'}">${B_THIRD.home?TEAMS[B_THIRD.home].name:'Vice BL'}</span></div>` +
-    `<div class="bm-team"><span class="bm-flag">${B_THIRD.away?TEAMS[B_THIRD.away].flag:'?'}</span><span class="bm-nm ${B_THIRD.away?'':'tbd'}">${B_THIRD.away?TEAMS[B_THIRD.away].name:'Vice BR'}</span></div>` +
-    `</div>`;
+    `<div class="third-match-label">3º Lugar — J103 · 18/jul</div>${bmHtml(B_THIRD, B_THIRD.home, B_THIRD.away, B_THIRD.hl, B_THIRD.al)}`;
 }
 
 // ──────────────────────────────────────────────
