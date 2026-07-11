@@ -502,7 +502,7 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
 
 <footer>
   <span>Copa do Mundo 2026 — EUA, Canadá e México · 11 jun – 19 jul</span>
-  <span>Dados atualizados em 06/07/2026</span>
+  <span>Dados atualizados em 11/07/2026</span>
 </footer>
 
 </div><!-- .page -->
@@ -806,24 +806,26 @@ const BL_R32 = [
   {jid:'J83', date:'2026-07-02', homePos:{g:'K',r:2}, awayPos:{g:'L',r:2}, home:null,away:null,hs:2,as:1,winner:'POR'},
   // J84 02/jul: ESP 3–0 AUT
   {jid:'J84', date:'2026-07-02', homePos:{g:'H',r:1}, awayPos:{g:'J',r:2}, home:null,away:null,hs:3,as:0,winner:'ESP'},
-  // J81 01/jul: USA 2–1 BIH
-  {jid:'J81', date:'2026-07-01', homePos:{g:'D',r:1}, awayPos:{g:'B',r:3}, home:null,away:null,hs:2,as:1,winner:'USA'},
-  // J82 01/jul: BEL 2–1 SEN
-  {jid:'J82', date:'2026-07-01', homePos:{g:'G',r:1}, awayLabel:'3AEHIJ',  home:null,away:'SEN',hs:2,as:1,winner:'BEL'},
+  // J81 01/jul: USA 2–0 BIH
+  {jid:'J81', date:'2026-07-01', homePos:{g:'D',r:1}, awayPos:{g:'B',r:3}, home:null,away:null,hs:2,as:0,winner:'USA'},
+  // J82 01/jul: BEL 3–2 SEN (prorrogação)
+  {jid:'J82', date:'2026-07-01', homePos:{g:'G',r:1}, awayLabel:'3AEHIJ',  home:null,away:'SEN',hs:3,as:2,winner:'BEL'},
 ];
 const BL_R16 = [
-  // J89 04/jul: PAR 0–2 FRA
-  {jid:'J89', date:'2026-07-04', home:'PAR',away:'FRA',hs:0,as:2,winner:'FRA', hl:'VJ74', al:'VJ77'},
-  // J90 04/jul: CAN 1–2 MAR
-  {jid:'J90', date:'2026-07-04', home:'CAN',away:'MAR',hs:1,as:2,winner:'MAR', hl:'VJ73', al:'VJ75'},
-  // J93 06/jul: POR 1–2 ESP
-  {jid:'J93', date:'2026-07-06', home:'POR',away:'ESP',hs:1,as:2,winner:'ESP', hl:'VJ83', al:'VJ84'},
-  // J94 06/jul: USA 2–1 BEL
-  {jid:'J94', date:'2026-07-06', home:'USA',away:'BEL',hs:2,as:1,winner:'USA', hl:'VJ81', al:'VJ82'},
+  // J89 04/jul: PAR 0–1 FRA
+  {jid:'J89', date:'2026-07-04', home:'PAR',away:'FRA',hs:0,as:1,winner:'FRA', hl:'VJ74', al:'VJ77'},
+  // J90 04/jul: CAN 0–3 MAR
+  {jid:'J90', date:'2026-07-04', home:'CAN',away:'MAR',hs:0,as:3,winner:'MAR', hl:'VJ73', al:'VJ75'},
+  // J93 06/jul: POR 0–1 ESP (gol de Mikel Merino aos 90+1)
+  {jid:'J93', date:'2026-07-06', home:'POR',away:'ESP',hs:0,as:1,winner:'ESP', hl:'VJ83', al:'VJ84'},
+  // J94 06/jul: USA 1–4 BEL
+  {jid:'J94', date:'2026-07-06', home:'USA',away:'BEL',hs:1,as:4,winner:'BEL', hl:'VJ81', al:'VJ82'},
 ];
 const BL_QF = [
-  {jid:'J97', date:'2026-07-09', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ89', al:'VJ90'},
-  {jid:'J98', date:'2026-07-10', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ93', al:'VJ94'},
+  // J97 09/jul: FRA 2–0 MAR (Mbappé)
+  {jid:'J97', date:'2026-07-09', home:'FRA',away:'MAR',hs:2,as:0,winner:'FRA', hl:'VJ89', al:'VJ90'},
+  // J98 10/jul: ESP 2–1 BEL (gol de Mikel Merino aos 90')
+  {jid:'J98', date:'2026-07-10', home:'ESP',away:'BEL',hs:2,as:1,winner:'ESP', hl:'VJ93', al:'VJ94'},
 ];
 const BL_SF = [
   {jid:'J101',date:'2026-07-14', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ97', al:'VJ98'},
@@ -837,24 +839,26 @@ const BR_R32 = [
   {jid:'J78', date:'2026-06-30', homePos:{g:'E',r:2}, awayPos:{g:'I',r:2}, home:null,away:null,hs:1,as:2,winner:'NOR'},
   // J79 30/jun: MEX 2–0 ECU
   {jid:'J79', date:'2026-06-30', homePos:{g:'A',r:1}, awayLabel:'3CEFHI',  home:null,away:'ECU',hs:2,as:0,winner:'MEX'},
-  // J80 01/jul: ENG 3–0 COD
-  {jid:'J80', date:'2026-07-01', homePos:{g:'L',r:1}, awayLabel:'3EHIJK',  home:null,away:'COD',hs:3,as:0,winner:'ENG'},
-  // J86 03/jul: ARG 3–0 CPV
-  {jid:'J86', date:'2026-07-03', homePos:{g:'J',r:1}, awayPos:{g:'H',r:2}, home:null,away:null,hs:3,as:0,winner:'ARG'},
-  // J88 03/jul: AUS 1–2 EGY
-  {jid:'J88', date:'2026-07-03', homePos:{g:'D',r:2}, awayPos:{g:'G',r:2}, home:null,away:null,hs:1,as:2,winner:'EGY'},
-  // J85 02/jul: SUI 2–1 ALG
-  {jid:'J85', date:'2026-07-02', homePos:{g:'B',r:1}, awayLabel:'3EFGIJ',  home:null,away:'ALG',hs:2,as:1,winner:'SUI'},
-  // J87 03/jul: COL 2–0 GHA
-  {jid:'J87', date:'2026-07-03', homePos:{g:'K',r:1}, awayLabel:'3DEIJL',  home:null,away:'GHA',hs:2,as:0,winner:'COL'},
+  // J80 01/jul: ENG 2–1 COD
+  {jid:'J80', date:'2026-07-01', homePos:{g:'L',r:1}, awayLabel:'3EHIJK',  home:null,away:'COD',hs:2,as:1,winner:'ENG'},
+  // J86 03/jul: ARG 3–2 CPV (prorrogação)
+  {jid:'J86', date:'2026-07-03', homePos:{g:'J',r:1}, awayPos:{g:'H',r:2}, home:null,away:null,hs:3,as:2,winner:'ARG'},
+  // J88 03/jul: AUS 1–1 EGY (Egito vence nos pênaltis 4–2)
+  {jid:'J88', date:'2026-07-03', homePos:{g:'D',r:2}, awayPos:{g:'G',r:2}, home:null,away:null,hs:1,as:1,winner:'EGY',pens:true},
+  // J85 02/jul: SUI 2–0 ALG
+  {jid:'J85', date:'2026-07-02', homePos:{g:'B',r:1}, awayLabel:'3EFGIJ',  home:null,away:'ALG',hs:2,as:0,winner:'SUI'},
+  // J87 03/jul: COL 1–0 GHA
+  {jid:'J87', date:'2026-07-03', homePos:{g:'K',r:1}, awayLabel:'3DEIJL',  home:null,away:'GHA',hs:1,as:0,winner:'COL'},
 ];
 const BR_R16 = [
-  // J91 05/jul: BRA 3–1 NOR
-  {jid:'J91', date:'2026-07-05', home:'BRA',away:'NOR',hs:3,as:1,winner:'BRA', hl:'VJ76', al:'VJ78'},
-  // J92 05/jul: MEX 1–2 ENG
-  {jid:'J92', date:'2026-07-05', home:'MEX',away:'ENG',hs:1,as:2,winner:'ENG', hl:'VJ79', al:'VJ80'},
-  {jid:'J95', date:'2026-07-07', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ86', al:'VJ88'},
-  {jid:'J96', date:'2026-07-07', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ85', al:'VJ87'},
+  // J91 05/jul: BRA 1–2 NOR
+  {jid:'J91', date:'2026-07-05', home:'BRA',away:'NOR',hs:1,as:2,winner:'NOR', hl:'VJ76', al:'VJ78'},
+  // J92 05/jul: MEX 2–3 ENG (Bellingham 2x, Kane pên. x Quiñones, Jiménez pên.)
+  {jid:'J92', date:'2026-07-05', home:'MEX',away:'ENG',hs:2,as:3,winner:'ENG', hl:'VJ79', al:'VJ80'},
+  // J95 07/jul: ARG 3–2 EGY
+  {jid:'J95', date:'2026-07-07', home:'ARG',away:'EGY',hs:3,as:2,winner:'ARG', hl:'VJ86', al:'VJ88'},
+  // J96 07/jul: SUI 0–0 COL (Suíça vence nos pênaltis 4–3)
+  {jid:'J96', date:'2026-07-07', home:'SUI',away:'COL',hs:0,as:0,winner:'SUI',pens:true, hl:'VJ85', al:'VJ87'},
 ];
 const BR_QF = [
   {jid:'J99', date:'2026-07-11', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ91', al:'VJ92'},
