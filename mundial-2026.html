@@ -1351,17 +1351,6 @@ async function loadSelecoesModel(onStatus) {
 // SIMULAÇÃO — Copa do Mundo 2026
 // ══════════════════════════════════════════════
 
-function simMatchModel(homeCode, awayCode, mdl, neutral) {
-  const pr = SelecoesModel.predict(TEAM_MODEL_NAMES[homeCode]||homeCode, TEAM_MODEL_NAMES[awayCode]||awayCode, mdl, neutral);
-  let cum = 0;
-  const r = Math.random();
-  for (const [k, p] of pr.scoreAdj.entries()) {
-    cum += p;
-    if (r < cum) { const [hg,ag]=k.split(',').map(Number); return {hg,ag}; }
-  }
-  return {hg:0,ag:0};
-}
-
 function simKnockoutModel(homeCode, awayCode, mdl) {
   const pr = SelecoesModel.predict(TEAM_MODEL_NAMES[homeCode]||homeCode, TEAM_MODEL_NAMES[awayCode]||awayCode, mdl, true);
   const r = Math.random();
@@ -1370,71 +1359,36 @@ function simKnockoutModel(homeCode, awayCode, mdl) {
   return Math.random() < pr.pH/(pr.pH+pr.pA) ? homeCode : awayCode;
 }
 
+// Índice de todas as partidas do mata-mata (R32→Final) por jid, para
+// resolver o campeão a partir do chaveamento REAL — não um chaveamento
+// simplificado reconstruído a partir da fase de grupos. Partidas já
+// disputadas (m.winner definido) contam como fixas; o restante é simulado
+// pelo modelo, propagando o vencedor através dos rótulos hl/al ("VJ<jid>").
+let _matchIndex = null;
+function getMatchIndex() {
+  if (_matchIndex) return _matchIndex;
+  _matchIndex = {};
+  [...BL_R32, ...BR_R32, ...BL_R16, ...BR_R16, ...BL_QF, ...BR_QF, ...BL_SF, ...BR_SF, B_FINAL]
+    .forEach(m => { _matchIndex[m.jid] = m; });
+  return _matchIndex;
+}
+
+function resolveKnockoutWinner(jid, mdl, cache) {
+  if (cache[jid]) return cache[jid];
+  const m = getMatchIndex()[jid];
+  if (m.winner) { cache[jid] = m.winner; return m.winner; }
+  let hCode = r32Home(m), aCode = r32Away(m);
+  if (!hCode && m.hl && m.hl.startsWith('VJ')) hCode = resolveKnockoutWinner(m.hl.slice(1), mdl, cache);
+  if (!aCode && m.al && m.al.startsWith('VJ')) aCode = resolveKnockoutWinner(m.al.slice(1), mdl, cache);
+  const w = simKnockoutModel(hCode, aCode, mdl);
+  cache[jid] = w;
+  return w;
+}
+
 function simOnce(mdl) {
-  // 1. Fase de grupos — partir dos resultados reais já conhecidos
-  const grpKeys = Object.keys(GROUPS);
-  const finalStandings = {};
-
-  for (const grpKey of grpKeys) {
-    const codes = GROUPS[grpKey];
-    const pts={}, gd={}, gf={}, ga={};
-    for (const c of codes) { pts[c]=0; gd[c]=0; gf[c]=0; ga[c]=0; }
-
-    // Resultados já jogados
-    for (const m of MATCHES) {
-      if (m.group!==grpKey || !m.played || m.hs===null) continue;
-      pts[m.home]+= m.hs>m.as?3:(m.hs===m.as?1:0);
-      pts[m.away]+= m.as>m.hs?3:(m.as===m.hs?1:0);
-      gd[m.home]+=m.hs-m.as; gd[m.away]+=m.as-m.hs;
-      gf[m.home]+=m.hs; gf[m.away]+=m.as;
-      ga[m.home]+=m.as; ga[m.away]+=m.hs;
-    }
-
-    // Simular jogos pendentes
-    for (const m of MATCHES) {
-      if (m.group!==grpKey || m.played) continue;
-      const {hg,ag} = simMatchModel(m.home, m.away, mdl, false);
-      pts[m.home]+= hg>ag?3:(hg===ag?1:0);
-      pts[m.away]+= ag>hg?3:(ag===hg?1:0);
-      gd[m.home]+=hg-ag; gd[m.away]+=ag-hg;
-      gf[m.home]+=hg; gf[m.away]+=ag;
-      ga[m.home]+=ag; ga[m.away]+=hg;
-    }
-
-    const st = codes.map(c=>({code:c,pts:pts[c],gd:gd[c],gf:gf[c],ga:ga[c]}));
-    st.sort((a,b)=>b.pts-a.pts||b.gd-a.gd||b.gf-a.gf);
-    finalStandings[grpKey] = st;
-  }
-
-  // 2. Classificados: top 2 por grupo + 8 melhores 3ºs
-  const thirds = [];
-  const qualW = {}, qualR = {};
-  for (const [k, st] of Object.entries(finalStandings)) {
-    qualW[k] = st[0].code;
-    qualR[k] = st[1].code;
-    thirds.push({...st[2], group:k});
-  }
-  thirds.sort((a,b)=>b.pts-a.pts||b.gd-a.gd||b.gf-a.gf);
-  const best8 = thirds.slice(0,8);
-
-  // 3. Chaveamento R32 (simplificado)
-  const pairings=[
-    ['A','B'],['B','A'],['C','D'],['D','C'],
-    ['E','F'],['F','E'],['G','H'],['H','G'],
-    ['I','J'],['J','I'],['K','L'],['L','K'],
-  ];
-  const r32 = pairings.map(([wg,rg])=>[qualW[wg],qualR[rg]]);
-  for (let i=0;i<8;i+=2) r32.push([best8[i].code, best8[i+1].code]);
-
-  // 4. Fases eliminatórias
-  const r32w = r32.map(([h,a])=>simKnockoutModel(h,a,mdl));
-  const r16=[]; for(let i=0;i<16;i+=2) r16.push([r32w[i],r32w[i+1]]);
-  const r16w = r16.map(([h,a])=>simKnockoutModel(h,a,mdl));
-  const qf=[]; for(let i=0;i<8;i+=2) qf.push([r16w[i],r16w[i+1]]);
-  const qfw = qf.map(([h,a])=>simKnockoutModel(h,a,mdl));
-  const sf=[[qfw[0],qfw[1]],[qfw[2],qfw[3]]];
-  const sfw = sf.map(([h,a])=>simKnockoutModel(h,a,mdl));
-  return simKnockoutModel(sfw[0],sfw[1],mdl);
+  // Fase de grupos e todo o mata-mata já disputado entram como resultados
+  // fixos; só o que ainda não aconteceu é simulado pelo modelo.
+  return resolveKnockoutWinner(B_FINAL.jid, mdl, {});
 }
 
 async function runChancesSim(N, onProgress) {
