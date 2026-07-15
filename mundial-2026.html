@@ -1374,6 +1374,20 @@ const TEAM_MODEL_NAMES = {
   ENG:'England', CRO:'Croatia', GHA:'Ghana', PAN:'Panama',
 };
 
+// Snapshot manual de eloratings.net (nomes do dataset) — "Ratings and
+// Statistics as of Tuesday July 14 2026". O site não oferece API pública,
+// então isso é um retrato fixo, não uma leitura ao vivo. Times fora desta
+// lista continuam usando o Elo calculado internamente pelo modelo (a
+// partir do histórico 2010+) como fallback.
+const ELO_REAL_OVERRIDE = {
+  'Spain':2232, 'Argentina':2177, 'France':2121, 'England':2097,
+  'Colombia':2003, 'Portugal':1995, 'Brazil':1993, 'Netherlands':1971,
+  'Norway':1951, 'Belgium':1948, 'Switzerland':1928, 'Mexico':1913,
+  'Germany':1908, 'Morocco':1901, 'Japan':1888, 'Croatia':1882,
+  'Ecuador':1871, 'Denmark':1869, 'Italy':1869, 'Turkey':1852,
+  'Uruguay':1841,
+};
+
 let _model = null;
 let _modelPromise = null;
 
@@ -1419,6 +1433,15 @@ async function loadSelecoesModel(onStatus) {
     const allRows = rows.concat(copaRows);
 
     _model = SelecoesModel.buildModel(allRows);
+
+    // Sobrescreve o Elo interno pelos valores reais do eloratings.net
+    // onde disponíveis (ver ELO_REAL_OVERRIDE). O Elo entra no modelo só
+    // como um ajuste de até ±15% no gol esperado — quem domina a previsão
+    // continua sendo a força de ataque/defesa (Dixon-Coles).
+    for (const [name, rating] of Object.entries(ELO_REAL_OVERRIDE)) {
+      _model.elo.set(SelecoesModel.norm(name), rating);
+    }
+
     return _model;
   })();
   return _modelPromise;
@@ -1666,6 +1689,7 @@ async function calcConfronto() {
       </div>
       <div style="margin-top:12px;font-size:10.5px;color:var(--muted);font-family:var(--mono)">
         Modelo: Dixon-Coles Poisson + Elo · Dataset: Mart Jürisoo (1872–2026) · Overround 6%
+        · Elo ajustado com eloratings.net (14/jul/2026) para 21 seleções top; demais usam Elo interno
       </div>`;
 
     document.getElementById('confronto-result').innerHTML=html;
