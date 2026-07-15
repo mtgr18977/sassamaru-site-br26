@@ -11,6 +11,7 @@
     COL_HG:         'home_score',
     COL_AG:         'away_score',
     COL_NEUTRAL:    'neutral',
+    COL_TOURNAMENT: 'tournament',
 
     // temporal decay (days)
     HL_ELO:         730,
@@ -19,6 +20,11 @@
     MIN_W_ELO:      0.10,
     MIN_W_POI:      0.25,
     MIN_W_FORM:     0.35,
+
+    // match-importance weight multiplier (applied on top of temporal decay)
+    TOURN_W_DEFAULT:   1.0,  // amistosos e demais torneios
+    TOURN_W_QUALIFIER: 1.5,  // eliminatórias (qualquer "* qualification")
+    TOURN_W_WORLDCUP:  2.0,  // fase final da Copa do Mundo
 
     // Elo
     ELO_INITIAL:    1500,
@@ -175,6 +181,16 @@
     return Math.max(minW, Math.pow(0.5, ageDays / halfLifeDays));
   }
 
+  // Amistosos pesam menos que eliminatórias, que pesam menos que a fase
+  // final da Copa do Mundo — jogos de maior importância refletem melhor a
+  // força real das seleções.
+  function tournamentWeight(tournament) {
+    const t = String(tournament || '').trim().toLowerCase();
+    if (t === 'fifa world cup') return CFG.TOURN_W_WORLDCUP;
+    if (t.includes('qualification')) return CFG.TOURN_W_QUALIFIER;
+    return CFG.TOURN_W_DEFAULT;
+  }
+
   // ═══════════════════════════════════════════════
   //  MLE for Dixon-Coles rho
   // ═══════════════════════════════════════════════
@@ -239,12 +255,14 @@
       const ageDays = daysBetween(date, refDate);
       if (ageDays < 0) continue;
 
+      const tw = tournamentWeight(r[CFG.COL_TOURNAMENT]);
+
       parsed.push({
         home, away,
         hg: hg|0, ag: ag|0,
         date, ageDays, neutral,
-        wElo: temporalWeight(ageDays, CFG.HL_ELO,     CFG.MIN_W_ELO),
-        wPoi: temporalWeight(ageDays, CFG.HL_POISSON,  CFG.MIN_W_POI),
+        wElo: temporalWeight(ageDays, CFG.HL_ELO,     CFG.MIN_W_ELO)    * tw,
+        wPoi: temporalWeight(ageDays, CFG.HL_POISSON,  CFG.MIN_W_POI)   * tw,
       });
     }
 
@@ -449,6 +467,7 @@
     parseDate,
     daysBetween,
     temporalWeight,
+    tournamentWeight,
     estimateRho,
     buildModel,
     predict,
