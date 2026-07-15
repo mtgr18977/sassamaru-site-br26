@@ -274,7 +274,23 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
 .result-l{color:var(--red)}
 
 /* ── Mata-Mata / Chaveamento ── */
-.bracket-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:12px}
+.bracket-scroll-hint{display:none;font-size:10.5px;font-family:var(--mono);color:var(--muted);
+  text-align:center;margin-bottom:8px;letter-spacing:.03em}
+@media(max-width:1000px){.bracket-scroll-hint{display:block}}
+.bracket-outer{position:relative}
+.bracket-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:14px;
+  border-radius:var(--radius);
+  scrollbar-width:thin;scrollbar-color:#C8C5BB #EDEBE4}
+.bracket-wrap::-webkit-scrollbar{height:8px}
+.bracket-wrap::-webkit-scrollbar-track{background:#EDEBE4;border-radius:4px}
+.bracket-wrap::-webkit-scrollbar-thumb{background:#C8C5BB;border-radius:4px}
+.bracket-wrap::-webkit-scrollbar-thumb:hover{background:var(--accent)}
+.bracket-fade{position:absolute;top:0;bottom:14px;width:28px;pointer-events:none;
+  z-index:3;opacity:0;transition:opacity .15s ease}
+.bracket-fade-l{left:0;background:linear-gradient(to right,var(--bg),transparent)}
+.bracket-fade-r{right:0;background:linear-gradient(to left,var(--bg),transparent)}
+.bracket-outer.edge-l .bracket-fade-l{opacity:1}
+.bracket-outer.edge-r .bracket-fade-r{opacity:1}
 /* Slot base height: 64px. Total = 8×64=512px. Each round doubles. */
 .bracket-tree{display:flex;align-items:stretch;gap:0;min-width:960px;height:calc(8 * 64px)}
 /* Column widths: R32 wider, inner rounds narrower */
@@ -406,8 +422,13 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
 <!-- TAB: Mata-Mata -->
 <div id="tab-matamata" class="tab-panel">
   <div class="section-label">Chaveamento — Copa do Mundo 2026</div>
-  <div class="bracket-wrap">
-    <div class="bracket-tree" id="bracket-tree"></div>
+  <div class="bracket-scroll-hint">← arraste para o lado para ver o chaveamento completo →</div>
+  <div class="bracket-outer" id="bracket-outer">
+    <div class="bracket-wrap" id="bracket-wrap">
+      <div class="bracket-tree" id="bracket-tree"></div>
+    </div>
+    <div class="bracket-fade bracket-fade-l"></div>
+    <div class="bracket-fade bracket-fade-r"></div>
   </div>
   <div class="third-match-wrap" id="third-place-match"></div>
 </div>
@@ -868,6 +889,9 @@ const BR_QF = [
   {jid:'J100',date:'2026-07-11', home:'ARG',away:'SUI',hs:3,as:1,winner:'ARG', hl:'VJ95', al:'VJ96'},
 ];
 const BR_SF = [
+  // J102 15/jul: ENG x ARG (hoje — times resolvidos automaticamente via
+  // hl/al a partir dos vencedores de J99/J100; atualizar hs/as/winner
+  // quando o jogo terminar)
   {jid:'J102',date:'2026-07-15', home:null,away:null,hs:null,as:null,winner:null, hl:'VJ99', al:'VJ100'},
 ];
 
@@ -1198,18 +1222,51 @@ function bmHtml(m, homeCode, awayCode, homeLbl, awayLbl) {
 }
 
 // ──────────────────────────────────────────────
-// RESOLVE R32 TEAMS (helper, also used in bracket)
+// RESOLVE BRACKET TEAMS (R32 groups OR winner/loser of a previous match)
+// hl/al carry refs like 'VJ99' (vencedor do jogo J99) or 'RU-J101'
+// (perdedor do jogo J101, usado no 3º lugar). Isso permite que a próxima
+// fase apareça automaticamente assim que o jogo anterior é decidido —
+// sem precisar preencher home/away manualmente a cada atualização.
 // ──────────────────────────────────────────────
-function r32Home(m) { return m.home || resolveTeam(m.homePos, null); }
-function r32Away(m) { return m.away || resolveTeam(m.awayPos, null); }
+let _matchIndex = null;
+function getMatchIndex() {
+  if (_matchIndex) return _matchIndex;
+  _matchIndex = {};
+  [...BL_R32, ...BR_R32, ...BL_R16, ...BR_R16, ...BL_QF, ...BR_QF, ...BL_SF, ...BR_SF, B_FINAL]
+    .forEach(m => { _matchIndex[m.jid] = m; });
+  return _matchIndex;
+}
+function resolveBracketRef(ref) {
+  if (!ref) return null;
+  if (ref.startsWith('VJ')) {
+    const m = getMatchIndex()[ref.slice(1)];
+    return (m && m.winner) || null;
+  }
+  if (ref.startsWith('RU-')) {
+    const m = getMatchIndex()[ref.slice(3)];
+    if (!m || !m.winner) return null;
+    return m.winner === m.home ? m.away : m.home;
+  }
+  return null;
+}
+function bracketRefLabel(ref) {
+  if (!ref) return 'A definir';
+  if (ref.startsWith('VJ')) return 'Venc. ' + ref.slice(1);
+  if (ref.startsWith('RU-')) return 'Perd. ' + ref.slice(3);
+  return 'A definir';
+}
+function r32Home(m) { return m.home || resolveTeam(m.homePos, null) || resolveBracketRef(m.hl); }
+function r32Away(m) { return m.away || resolveTeam(m.awayPos, null) || resolveBracketRef(m.al); }
 function r32HomeLbl(m) {
   if (m.homeLabel) return m.homeLabel;
   if (m.homePos) return ['','1º','2º','3º'][m.homePos.r] + ' ' + m.homePos.g;
+  if (m.hl) return bracketRefLabel(m.hl);
   return 'A definir';
 }
 function r32AwayLbl(m) {
   if (m.awayLabel) return m.awayLabel;
   if (m.awayPos) return ['','1º','2º','3º'][m.awayPos.r] + ' ' + m.awayPos.g;
+  if (m.al) return bracketRefLabel(m.al);
   return 'A definir';
 }
 
@@ -1220,14 +1277,14 @@ function renderBracket() {
   Object.keys(GROUPS).forEach(g => { _standings[g] = computeStandings(g); });
 
   // colClass: extra CSS class for width control
-  function renderCol(label, matches, slotClass, conClass, isR32, colClass) {
+  function renderCol(label, matches, slotClass, conClass, colClass) {
     let h = `<div class="bracket-col ${conClass} ${colClass||''}"><div class="bracket-col-hdr">${label}</div><div class="bracket-slots">`;
     matches.forEach((m, mi) => {
       const lc = matches.length > 1 ? (mi % 2 === 0 ? ' line-top' : ' line-bot') : '';
-      const hc = isR32 ? r32Home(m) : m.home;
-      const ac = isR32 ? r32Away(m) : m.away;
-      const hl = isR32 ? r32HomeLbl(m) : (m.hl || 'A definir');
-      const al = isR32 ? r32AwayLbl(m) : (m.al || 'A definir');
+      const hc = r32Home(m);
+      const ac = r32Away(m);
+      const hl = r32HomeLbl(m);
+      const al = r32AwayLbl(m);
       h += `<div class="bracket-slot ${slotClass}${lc}">${bmHtml(m, hc, ac, hl, al)}</div>`;
     });
     return h + '</div></div>';
@@ -1235,29 +1292,45 @@ function renderBracket() {
 
   let html = '';
   // Left side (outer→center)
-  html += renderCol('R32',       BL_R32, 'r32', 'con-right', true,  '');
-  html += renderCol('Oitavas',   BL_R16, 'r16', 'con-right', false, 'rnd-r16');
-  html += renderCol('Quartas',   BL_QF,  'qf',  'con-right', false, 'rnd-qf');
-  html += renderCol('Semifinal', BL_SF,  'sf',  '',          false, 'rnd-sf');
+  html += renderCol('R32',       BL_R32, 'r32', 'con-right', '');
+  html += renderCol('Oitavas',   BL_R16, 'r16', 'con-right', 'rnd-r16');
+  html += renderCol('Quartas',   BL_QF,  'qf',  'con-right', 'rnd-qf');
+  html += renderCol('Semifinal', BL_SF,  'sf',  '',          'rnd-sf');
   // Center: Final
   html += `<div class="bracket-col center-col">
     <div class="bracket-col-hdr">Final</div>
     <div class="bracket-slots">
-      <div class="bracket-slot fn">${bmHtml(B_FINAL, B_FINAL.home, B_FINAL.away, B_FINAL.hl, B_FINAL.al)}</div>
+      <div class="bracket-slot fn">${bmHtml(B_FINAL, r32Home(B_FINAL), r32Away(B_FINAL), r32HomeLbl(B_FINAL), r32AwayLbl(B_FINAL))}</div>
     </div>
   </div>`;
   // Right side (center→outer)
-  html += renderCol('Semifinal', BR_SF,  'sf',  '',          false, 'rnd-sf');
-  html += renderCol('Quartas',   BR_QF,  'qf',  'con-left',  false, 'rnd-qf');
-  html += renderCol('Oitavas',   BR_R16, 'r16', 'con-left',  false, 'rnd-r16');
-  html += renderCol('R32',       BR_R32, 'r32', 'con-left',  true,  '');
+  html += renderCol('Semifinal', BR_SF,  'sf',  '',          'rnd-sf');
+  html += renderCol('Quartas',   BR_QF,  'qf',  'con-left',  'rnd-qf');
+  html += renderCol('Oitavas',   BR_R16, 'r16', 'con-left',  'rnd-r16');
+  html += renderCol('R32',       BR_R32, 'r32', 'con-left',  '');
 
   document.getElementById('bracket-tree').innerHTML = html;
 
   // 3rd place match
   document.getElementById('third-place-match').innerHTML =
-    `<div class="third-match-label">3º Lugar — J103 · 18/jul</div>${bmHtml(B_THIRD, B_THIRD.home, B_THIRD.away, B_THIRD.hl, B_THIRD.al)}`;
+    `<div class="third-match-label">3º Lugar — J103 · 18/jul</div>${bmHtml(B_THIRD, r32Home(B_THIRD), r32Away(B_THIRD), r32HomeLbl(B_THIRD), r32AwayLbl(B_THIRD))}`;
+
+  updateBracketScrollEdges();
 }
+
+// ──────────────────────────────────────────────
+// BRACKET SCROLL EDGE FADES
+// ──────────────────────────────────────────────
+function updateBracketScrollEdges() {
+  const wrap = document.getElementById('bracket-wrap');
+  const outer = document.getElementById('bracket-outer');
+  if (!wrap || !outer) return;
+  const scrollable = wrap.scrollWidth > wrap.clientWidth + 2;
+  outer.classList.toggle('edge-l', scrollable && wrap.scrollLeft > 2);
+  outer.classList.toggle('edge-r', scrollable && wrap.scrollLeft < wrap.scrollWidth - wrap.clientWidth - 2);
+}
+document.getElementById('bracket-wrap').addEventListener('scroll', updateBracketScrollEdges);
+window.addEventListener('resize', updateBracketScrollEdges);
 
 // ──────────────────────────────────────────────
 // TABS
@@ -1268,6 +1341,7 @@ document.querySelectorAll('.tab-btn').forEach(btn=>{
     document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+    if (btn.dataset.tab === 'matamata') requestAnimationFrame(updateBracketScrollEdges);
   });
 });
 
@@ -1360,20 +1434,6 @@ function simKnockoutModel(homeCode, awayCode, mdl) {
   if (r < pr.pH) return homeCode;
   if (r < pr.pH + pr.pA) return awayCode;
   return Math.random() < pr.pH/(pr.pH+pr.pA) ? homeCode : awayCode;
-}
-
-// Índice de todas as partidas do mata-mata (R32→Final) por jid, para
-// resolver o campeão a partir do chaveamento REAL — não um chaveamento
-// simplificado reconstruído a partir da fase de grupos. Partidas já
-// disputadas (m.winner definido) contam como fixas; o restante é simulado
-// pelo modelo, propagando o vencedor através dos rótulos hl/al ("VJ<jid>").
-let _matchIndex = null;
-function getMatchIndex() {
-  if (_matchIndex) return _matchIndex;
-  _matchIndex = {};
-  [...BL_R32, ...BR_R32, ...BL_R16, ...BR_R16, ...BL_QF, ...BR_QF, ...BL_SF, ...BR_SF, B_FINAL]
-    .forEach(m => { _matchIndex[m.jid] = m; });
-  return _matchIndex;
 }
 
 function resolveKnockoutWinner(jid, mdl, cache) {
