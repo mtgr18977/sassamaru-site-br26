@@ -371,7 +371,7 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
     </div>
   </div>
   <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-    <span class="pill live">● Ao vivo</span>
+    <span class="pill accent">🏆 Espanha campeã</span>
     <span class="pill">48 seleções · 12 grupos</span>
     <a href="index.html" class="back-link">← Voltar</a>
   </div>
@@ -523,7 +523,7 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
 
 <footer>
   <span>Copa do Mundo 2026 — EUA, Canadá e México · 11 jun – 19 jul</span>
-  <span>Dados atualizados em 16/07/2026</span>
+  <span>Dados atualizados em 20/07/2026</span>
 </footer>
 
 </div><!-- .page -->
@@ -893,8 +893,10 @@ const BR_SF = [
   {jid:'J102',date:'2026-07-15', home:'ENG',away:'ARG',hs:1,as:2,winner:'ARG', hl:'VJ99', al:'VJ100'},
 ];
 
-const B_FINAL = {jid:'J104',date:'2026-07-19',home:null,away:null,hs:null,as:null,winner:null, hl:'VJ101', al:'VJ102'};
-const B_THIRD = {jid:'J103',date:'2026-07-18',home:null,away:null,hs:null,as:null,winner:null, hl:'RU-J101', al:'RU-J102'};
+// J104 19/jul: ESP 1–0 ARG (prorrogação) — Espanha campeã da Copa do Mundo 2026
+const B_FINAL = {jid:'J104',date:'2026-07-19',home:'ESP',away:'ARG',hs:1,as:0,winner:'ESP', hl:'VJ101', al:'VJ102'};
+// J103 18/jul: FRA 4–6 ENG
+const B_THIRD = {jid:'J103',date:'2026-07-18',home:'FRA',away:'ENG',hs:4,as:6,winner:'ENG', hl:'RU-J101', al:'RU-J102'};
 
 // ──────────────────────────────────────────────
 // STANDINGS COMPUTATION
@@ -1373,12 +1375,13 @@ const TEAM_MODEL_NAMES = {
 };
 
 // Snapshot manual de eloratings.net (nomes do dataset) — "Ratings and
-// Statistics as of Tuesday July 14 2026". O site não oferece API pública,
-// então isso é um retrato fixo, não uma leitura ao vivo. Times fora desta
-// lista continuam usando o Elo calculado internamente pelo modelo (a
-// partir do histórico 2010+) como fallback.
+// Statistics as of Sunday July 19 2026" (já reflete a final ESP 1-0 ARG).
+// O site não oferece API pública, então isso é um retrato fixo, não uma
+// leitura ao vivo. Times fora desta lista continuam usando o Elo
+// calculado internamente pelo modelo (a partir do histórico 2010+) como
+// fallback.
 const ELO_REAL_OVERRIDE = {
-  'Spain':2232, 'Argentina':2177, 'France':2121, 'England':2097,
+  'Spain':2259, 'Argentina':2173, 'England':2125, 'France':2070,
   'Colombia':2003, 'Portugal':1995, 'Brazil':1993, 'Netherlands':1971,
   'Norway':1951, 'Belgium':1948, 'Switzerland':1928, 'Mexico':1913,
   'Germany':1908, 'Morocco':1901, 'Japan':1888, 'Croatia':1882,
@@ -1687,7 +1690,7 @@ async function calcConfronto() {
       </div>
       <div style="margin-top:12px;font-size:10.5px;color:var(--muted);font-family:var(--mono)">
         Modelo: Dixon-Coles Poisson + Elo · Dataset: Mart Jürisoo (1872–2026) · Overround 6%
-        · Elo ajustado com eloratings.net (14/jul/2026) para 21 seleções top; demais usam Elo interno
+        · Elo ajustado com eloratings.net (19/jul/2026) para 21 seleções top; demais usam Elo interno
       </div>`;
 
     document.getElementById('confronto-result').innerHTML=html;
