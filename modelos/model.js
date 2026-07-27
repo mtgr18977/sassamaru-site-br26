@@ -487,10 +487,12 @@
    * re-indexa as temporadas a partir de 0 no subconjunto, então aplicar o
    * corte duas vezes descartaria todos os jogos.
    */
-  function buildModel(rawRows, opts = {}) {
-    const trainFromSeason = opts.trainFromSeason ?? CONFIG.TRAIN_FROM_SEASON;
-
-    // ── 1. Parse e normalização ──
+  /**
+   * Parse + normalização + remoção do bloco duplicado + atribuição de
+   * temporada/rodada. Compartilhado por buildModel e computeSeasonState para
+   * que os dois enxerguem exatamente os mesmos jogos.
+   */
+  function parseRows(rawRows) {
     const parsed = [];
     for (const r of rawRows) {
       const home = normalizeTeam(r[CONFIG.HOME_TEAM_COL]);
@@ -520,15 +522,21 @@
       );
     }
 
-    // ── 2. Remove bloco 2025 duplicado ──
     const removedCount = removeDuplicateBlock(parsed);
 
-    // ── 3. Detecta temporadas ──
     const seasons = detectSeasons(parsed);
     if (seasons.length === 0) {
       throw new Error("Nenhuma temporada detectada. Verifique se o CSV contém rodada 1.");
     }
     assignSeasonAndRound(parsed, seasons);
+
+    return { parsed, seasons, removedCount };
+  }
+
+  function buildModel(rawRows, opts = {}) {
+    const trainFromSeason = opts.trainFromSeason ?? CONFIG.TRAIN_FROM_SEASON;
+
+    const { parsed, seasons, removedCount } = parseRows(rawRows);
 
     const valid = parsed.filter(p => p.season >= 0 && p.season >= trainFromSeason);
 
@@ -760,6 +768,82 @@
   }
 
   // ────────────────────────────────────────────────
+  //  Estado da temporada corrente
+  // ────────────────────────────────────────────────
+
+  /**
+   * Classificação atual e jogos que faltam da última temporada do CSV.
+   *
+   * Existe porque simular uma temporada "virgem" de 380 jogos a partir de zero
+   * ponto ignora tudo o que já aconteceu: um time a 23 pontos do líder com 18
+   * jogos restantes aparecia com chance de título de time de meio de tabela.
+   * A simulação tem que partir da tabela real e sortear só o que falta.
+   *
+   * Assume returno duplo (todo par se enfrenta em casa e fora), que é o
+   * formato do Brasileirão.
+   *
+   * @param {object[]} rawRows – linhas do CSV (saída do PapaParse)
+   * @returns {{season:number, roundsPlayed:number, teams:string[],
+   *            standings:Map, remaining:Array<[string,string]>, excluded:Array}}
+   */
+  function computeSeasonState(rawRows) {
+    const { parsed } = parseRows(rawRows);
+
+    let season = -1;
+    for (const p of parsed) if (p.season > season) season = p.season;
+    const games = parsed.filter(p => p.season === season);
+
+    const played = new Map();   // "casa|fora" já disputado
+    const tally  = new Map();
+    const get = (t) => {
+      if (!tally.has(t)) tally.set(t, { pts: 0, gd: 0, gf: 0, ga: 0, played: 0, w: 0, d: 0, l: 0 });
+      return tally.get(t);
+    };
+
+    let roundsPlayed = 0;
+    for (const g of games) {
+      roundsPlayed = Math.max(roundsPlayed, g.round);
+      played.set(`${g.home}|${g.away}`, true);
+      const H = get(g.home), A = get(g.away);
+      H.played++; A.played++;
+      H.gf += g.hg; H.ga += g.ag; H.gd += g.hg - g.ag;
+      A.gf += g.ag; A.ga += g.hg; A.gd += g.ag - g.hg;
+      if (g.hg > g.ag)      { H.pts += 3; H.w++; A.l++; }
+      else if (g.hg < g.ag) { A.pts += 3; A.w++; H.l++; }
+      else                  { H.pts++; A.pts++; H.d++; A.d++; }
+    }
+
+    // Uma linha errada no CSV (time trocado) cria um "21º time" com 1 jogo e
+    // contamina a tabela. Mantém só quem tem participação compatível com a
+    // temporada, e devolve os excluídos para a UI poder avisar.
+    let maxPlayed = 0;
+    for (const s of tally.values()) maxPlayed = Math.max(maxPlayed, s.played);
+    const minPlayed = Math.max(3, Math.floor(maxPlayed * 0.5));
+
+    const teams = [], excluded = [];
+    for (const [t, s] of tally.entries()) {
+      if (s.played >= minPlayed) teams.push(t);
+      else excluded.push({ team: t, played: s.played });
+    }
+    teams.sort((a, b) => {
+      const A = tally.get(a), B = tally.get(b);
+      return B.pts - A.pts || B.gd - A.gd || B.gf - A.gf || a.localeCompare(b, "pt");
+    });
+
+    const standings = new Map(teams.map(t => [t, tally.get(t)]));
+
+    const remaining = [];
+    for (const h of teams) {
+      for (const a of teams) {
+        if (h === a) continue;
+        if (!played.has(`${h}|${a}`)) remaining.push([h, a]);
+      }
+    }
+
+    return { season, roundsPlayed, teams, standings, remaining, excluded };
+  }
+
+  // ────────────────────────────────────────────────
   //  Métricas de avaliação
   // ────────────────────────────────────────────────
 
@@ -954,6 +1038,8 @@
     oddsFromProbsOverround,
     applyDixonColes,
     removeDuplicateBlock,
+    parseRows,
+    computeSeasonState,
     fitDixonColes,
     createScorer,
     buildModel,

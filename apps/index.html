@@ -10169,7 +10169,7 @@ athletico-pr x botafogo</textarea>
 
 <script>
 const Model = window.BenchModel;
-const { CONFIG, buildModel, predictMatch, normalizeTeam } = Model;
+const { CONFIG, buildModel, predictMatch, normalizeTeam, computeSeasonState } = Model;
 let MODEL = null;
 
 /** ===================== UI helpers ===================== */
@@ -10725,31 +10725,21 @@ const mcResult = $("mcResult");
 const mcStatus = $("mcStatus");
 const mcNote   = $("mcNote");
 
+// Delega para o helper do modelo: mesma detecção de temporada usada no ajuste,
+// e ele ainda descarta time com jogos de menos (linha errada no CSV criava um
+// 21º clube na tabela).
+let _seasonState = null;
 function computeCurrentStandings(rawParsed) {
-  // Find start of current season: last contiguous cluster of rodata=1 rows
-  let seasonStart = -1;
-  for (let i = rawParsed.length - 1; i >= 0; i--) {
-    const rod = parseFloat(rawParsed[i][CONFIG.DATE_COL]);
-    if (rod === 1) { seasonStart = i; }
-    else if (seasonStart >= 0 && rod > 0) break;
+  try {
+    _seasonState = computeSeasonState(rawParsed);
+  } catch (e) {
+    console.warn("computeSeasonState falhou:", e.message);
+    return {};
   }
-  if (seasonStart < 0) return {};
   const stnd = {};
-  for (let i = seasonStart; i < rawParsed.length; i++) {
-    const row = rawParsed[i];
-    if (!(parseFloat(row[CONFIG.DATE_COL]) > 0)) continue;
-    const home = normalizeTeam(row[CONFIG.HOME_TEAM_COL]);
-    const away = normalizeTeam(row[CONFIG.AWAY_TEAM_COL]);
-    const hg   = parseInt(row[CONFIG.HOME_GOALS_COL]);
-    const ag   = parseInt(row[CONFIG.AWAY_GOALS_COL]);
-    if (!home || !away || isNaN(hg) || isNaN(ag)) continue;
-    if (!stnd[home]) stnd[home] = { pts: 0, gd: 0, gf: 0 };
-    if (!stnd[away]) stnd[away] = { pts: 0, gd: 0, gf: 0 };
-    if (hg > ag)      stnd[home].pts += 3;
-    else if (hg < ag) stnd[away].pts += 3;
-    else { stnd[home].pts++; stnd[away].pts++; }
-    stnd[home].gd += hg - ag; stnd[away].gd += ag - hg;
-    stnd[home].gf += hg;      stnd[away].gf += ag;
+  for (const t of _seasonState.teams) {
+    const s = _seasonState.standings.get(t);
+    stnd[t] = { pts: s.pts, gd: s.gd, gf: s.gf };
   }
   return stnd;
 }
@@ -11040,6 +11030,24 @@ async function loadCSV(){
   btBtn.disabled  = false;
   mcBtn.disabled  = false;
   populateCmpSelects();
+
+  // Pré-preenche os jogos restantes da temporada: são ~186 confrontos, digitar
+  // à mão é inviável, e deixar em branco fazia o Monte Carlo recusar rodar.
+  try {
+    const st = computeSeasonState(parsed);
+    const mcF = $("mcFixtures");
+    if (mcF && !mcF.value.trim() && st.remaining.length) {
+      mcF.value = st.remaining.map(([h, a]) => `${displayName(h)} x ${displayName(a)}`).join("\n");
+      const lbl = document.querySelector('label[for="mcFixtures"]');
+      if (lbl) lbl.textContent =
+        `Jogos restantes — ${st.remaining.length} confrontos após a rodada ${st.roundsPlayed} (edite se quiser)`;
+    }
+    if (st.excluded.length) {
+      console.warn("Times ignorados na tabela (poucos jogos — provável linha errada no CSV):", st.excluded);
+    }
+  } catch (e) {
+    console.warn("Não foi possível pré-preencher os jogos restantes:", e.message);
+  }
   runValidation();
   setModelPill(`Modelo pronto • ${MODEL.teamCount} times`, "");
   metaEl.textContent = `dataset: ${MODEL.parsedCount} jogos • ${MODEL.seasonCount} temporadas • build: ${(t1-t0).toFixed(0)} ms`;

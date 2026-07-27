@@ -66,8 +66,8 @@
 - [x] **Web Worker para o Monte Carlo**
   Já implementado em `apps/index.html` (worker criado via blob). 5 000 simulações rodam em ~0.1 s.
 
-- [ ] **Monte Carlo do bench a partir do estado real da temporada**
-  `simulacoes/bench-brasileirao2026.html` simula sempre uma temporada virgem de 380 jogos com um calendário sintético, ignorando os jogos de 2026 já disputados. O `apps/index.html` já parte da tabela real — falta portar isso.
+- [x] **Monte Carlo a partir do estado real da temporada**
+  `simulacoes/bench-brasileirao2026.html` simulava sempre uma temporada virgem de 380 jogos com calendário sintético, ignorando os jogos já disputados — o Internacional, 16º e a 23 pontos do líder, aparecia com 3-4% de chance de título. Agora `computeSeasonState()` (em `modelos/model.js`) devolve a classificação atual e os jogos que faltam, e a simulação parte daí: Inter vai a 0% de título e 12% de Z4. O `apps/index.html` usa o mesmo helper e pré-preenche os jogos restantes.
 
 - [ ] **Compressão do CSV embutido**  
   O CSV do Brasileirão ocupa ~400 KB e o de seleções ~3.7 MB inline no HTML. Comprimir com pako (gzip via JS) reduziria o tamanho dos arquivos em ~70% e aceleraria o carregamento inicial.
@@ -81,8 +81,13 @@
 ## Dívida técnica conhecida
 
 - **`apps/index.html` está com o CSV embutido desatualizado** em relação a
-  `simulacoes/bench-brasileirao2026.html` e a `datasets/` (3 934 vs 3 994 jogos).
-  Os três precisam ser atualizados juntos a cada rodada.
+  `simulacoes/bench-brasileirao2026.html` e a `datasets/` (3 934 vs 3 994 jogos,
+  rodada 14 vs 20). Os três precisam ser atualizados juntos a cada rodada.
+- **Linha provavelmente errada no CSV:** na rodada 7 da temporada 2026 consta
+  `Mirassol x Fortaleza`, mas o Fortaleza não aparece em nenhum outro jogo da
+  temporada e o Coritiba é o único ausente daquela rodada (19 jogos contra 20
+  dos demais). Quase certamente deveria ser `Mirassol x Coritiba`. O modelo
+  ignora o time com jogos de menos e avisa na tela, mas o dado segue errado.
 - **`simulacoes/bench-copa2026.html` e `apps/bench-selecoes.html` ainda carregam
   cópias inline do modelo de seleções.** Mesma unificação já feita no modelo de
   clubes deveria ser aplicada a eles.

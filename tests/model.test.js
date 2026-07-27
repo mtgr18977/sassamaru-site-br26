@@ -19,6 +19,7 @@ const {
   oddsFromProbsOverround,
   applyDixonColes,
   removeDuplicateBlock,
+  computeSeasonState,
   fitDixonColes,
   createScorer,
   buildModel,
@@ -48,21 +49,28 @@ function makeRow(round, home, away, hg, ag) {
 }
 
 /**
- * Gera uma temporada de returno duplo com `teams` times.
- * scoreFn(home, away) → [gh, ga]. A rodada 1 sempre tem >= 5 jogos,
- * o mínimo para detectSeasons reconhecer o início de temporada.
+ * Gera um returno duplo completo (método do círculo) com `teams` times —
+ * número par de times. Cada par se enfrenta exatamente uma vez em casa e uma
+ * fora: n·(n−1) jogos em 2·(n−1) rodadas.
+ * scoreFn(home, away) → [gh, ga]. A rodada 1 tem n/2 jogos, o que precisa
+ * ser >= CONFIG.ROUND1_CLUSTER_MIN para detectSeasons achar o início.
  */
 function makeSeason(teams, scoreFn) {
+  const n = teams.length;
+  if (n % 2 !== 0) throw new Error("makeSeason precisa de um número par de times");
+  const fixed = teams[0];
+  const rot = teams.slice(1);          // n-1 times girando
   const rows = [];
   let round = 0;
   for (let leg = 0; leg < 2; leg++) {
-    for (let i = 0; i < teams.length; i++) {
+    for (let r = 0; r < n - 1; r++) {
       round++;
-      for (let j = 0; j < teams.length / 2; j++) {
-        const a = teams[(i + j) % teams.length];
-        const b = teams[(i + teams.length - 1 - j) % teams.length];
-        if (a === b) continue;
-        const [home, away] = leg === 0 ? [a, b] : [b, a];
+      const pairs = [[fixed, rot[r]]];
+      for (let i = 1; i < n / 2; i++) {
+        pairs.push([rot[(r + i) % (n - 1)], rot[(r - i + (n - 1)) % (n - 1)]]);
+      }
+      for (const [x, y] of pairs) {
+        const [home, away] = leg === 0 ? [x, y] : [y, x];
         const [gh, ga] = scoreFn(home, away);
         rows.push(makeRow(round, home, away, gh, ga));
       }
@@ -441,6 +449,90 @@ test("predictMatch: odds são consistentes com as probabilidades", () => {
   const p = predictMatch("alfa", "bravo", model);
   const implied = 1 / p.oh + 1 / p.od + 1 / p.oa;
   assert.ok(Math.abs(implied - (1 + CONFIG.OVERROUND)) < 1e-9);
+});
+
+// ═══════════════════════ computeSeasonState ═══════════════════════════════
+test("computeSeasonState: tabela e jogos restantes de temporada completa", () => {
+  const rows = makeSeason(TEAMS, () => [1, 0]);   // mandante sempre vence
+  const st = computeSeasonState(rows);
+  assert.strictEqual(st.teams.length, TEAMS.length);
+  assert.strictEqual(st.remaining.length, 0, "temporada completa não tem jogos restantes");
+  assert.strictEqual(st.excluded.length, 0);
+  // returno duplo: cada time joga 2×(n-1)
+  for (const t of TEAMS) {
+    assert.strictEqual(st.standings.get(t).played, 2 * (TEAMS.length - 1));
+  }
+});
+
+test("computeSeasonState: pontos conferem com os resultados", () => {
+  const rows = makeSeason(TEAMS, () => [1, 0]);
+  const st = computeSeasonState(rows);
+  // todo mundo vence em casa e perde fora → n-1 vitórias, n-1 derrotas
+  for (const t of TEAMS) {
+    const s = st.standings.get(t);
+    assert.strictEqual(s.w, TEAMS.length - 1);
+    assert.strictEqual(s.l, TEAMS.length - 1);
+    assert.strictEqual(s.pts, 3 * (TEAMS.length - 1));
+    assert.strictEqual(s.gd, 0);
+  }
+});
+
+test("computeSeasonState: temporada parcial devolve os jogos que faltam", () => {
+  // temporada anterior completa + temporada corrente pela metade
+  const past = makeSeason(TEAMS, () => [3, 0]);
+  const full = makeSeason(TEAMS, () => [2, 1]);
+  const partial = full.slice(0, 40);
+  const st = computeSeasonState(past.concat(partial));
+
+  const totalPairs = TEAMS.length * (TEAMS.length - 1);
+  assert.strictEqual(st.remaining.length + partial.length, totalPairs,
+    `jogados ${partial.length} + restantes ${st.remaining.length} != ${totalPairs}`);
+
+  // nenhum confronto restante pode já ter sido disputado nesta temporada
+  const played = new Set(partial.map(r => `${r[CONFIG.HOME_TEAM_COL]}|${r[CONFIG.AWAY_TEAM_COL]}`));
+  for (const [h, a] of st.remaining) {
+    assert.ok(!played.has(`${h}|${a}`), `${h} x ${a} já havia sido jogado`);
+  }
+  // e a tabela só conta a temporada corrente (2-1, não o 3-0 do passado)
+  let totalGf = 0;
+  for (const t of st.teams) totalGf += st.standings.get(t).gf;
+  assert.strictEqual(totalGf, partial.length * 3, "gols da temporada anterior vazaram");
+});
+
+test("computeSeasonState: usa apenas a última temporada", () => {
+  const s1 = makeSeason(TEAMS, () => [3, 0]);
+  const s2 = makeSeason(TEAMS, () => [0, 0]);
+  const st = computeSeasonState(s1.concat(s2));
+  // a última temporada é toda de 0-0 → todo mundo com só empates
+  for (const t of TEAMS) {
+    const s = st.standings.get(t);
+    assert.strictEqual(s.w, 0, "não deveria haver vitórias da temporada anterior");
+    assert.strictEqual(s.gf, 0, "gols da temporada anterior vazaram");
+  }
+});
+
+test("computeSeasonState: ignora time com pouquíssimos jogos (linha errada no CSV)", () => {
+  // Caso real: uma linha do CSV trocou o time e criou um 21º clube com 1 jogo.
+  const rows = makeSeason(TEAMS, () => [1, 1]);
+  rows.push(makeRow(7, "clube fantasma", TEAMS[0], 0, 1));
+  const st = computeSeasonState(rows);
+  assert.ok(!st.teams.includes("clube fantasma"), "time espúrio entrou na tabela");
+  assert.strictEqual(st.teams.length, TEAMS.length);
+  assert.strictEqual(st.excluded.length, 1);
+  assert.strictEqual(st.excluded[0].team, "clube fantasma");
+  assert.strictEqual(st.excluded[0].played, 1);
+});
+
+test("computeSeasonState: ordena a tabela por pontos", () => {
+  const rows = makeSeason(TEAMS, (h) => (h === "alfa" ? [5, 0] : [1, 1]));
+  const st = computeSeasonState(rows);
+  assert.strictEqual(st.teams[0], "alfa", "quem mais venceu deveria liderar");
+  for (let i = 1; i < st.teams.length; i++) {
+    const prev = st.standings.get(st.teams[i - 1]);
+    const cur  = st.standings.get(st.teams[i]);
+    assert.ok(prev.pts > cur.pts || (prev.pts === cur.pts && prev.gd >= cur.gd),
+      "tabela fora de ordem");
+  }
 });
 
 // ═══════════════════════════ createScorer ══════════════════════════════════

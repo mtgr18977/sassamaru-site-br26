@@ -147,6 +147,7 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
   <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end">
     <span class="pill" id="hdr-jogos">—</span>
     <span class="pill" id="hdr-temporadas">—</span>
+    <span class="pill" id="hdr-estado">—</span>
     <span class="pill accent" id="hdr-sims">—</span>
   </div>
 </header>
@@ -161,7 +162,8 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
 <div id="main" style="display:none">
 
   <div class="controls">
-    <button class="btn" id="btn-run">▶ Simular temporada</button>
+    <div id="data-warning" style="display:none;width:100%;margin-bottom:10px;padding:8px 12px;border-radius:6px;background:rgba(220,160,0,.12);border:1px solid rgba(220,160,0,.35);font-size:12px;line-height:1.5;"></div>
+    <button class="btn" id="btn-run">▶ Simular resto da temporada</button>
     <select class="n-select" id="n-sims">
       <option value="1000">1 000 simulações</option>
       <option value="5000" selected>5 000 simulações</option>
@@ -206,7 +208,7 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
 <footer>
   <span>Bench Brasileirão 2026 v1.0</span>
   <span>Dataset: campeonatobrasileirolimpo.csv (2003–2026)</span>
-  <span>20 times · 380 partidas por temporada simulada</span>
+  <span id="footer-fixtures">simula os jogos restantes a partir da classificação real</span>
   <span id="footer-rho"></span>
 </footer>
 </div>
@@ -9584,7 +9586,7 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
 //  2026 Brasileirão — 20 teams (normalised)
 // ════════════════════════════════════════════════
 const BM = window.BenchModel;
-const {CONFIG, buildModel, predictMatch, normalizeTeam} = BM;
+const {CONFIG, buildModel, predictMatch, normalizeTeam, computeSeasonState} = BM;
 
 const TEAMS_2026_RAW = [
   'Atletico Mineiro','Palmeiras','Internacional','Athletico Paranaense',
@@ -9593,7 +9595,14 @@ const TEAMS_2026_RAW = [
   'Chapecoense','Santos','Sao Paulo','Flamengo',
   'Mirassol','Vasco','Botafogo','Cruzeiro',
 ];
-const TEAMS = TEAMS_2026_RAW.map(normalizeTeam);
+// Lista de fallback. Os times de verdade vêm de computeSeasonState() assim que
+// o CSV é lido — se uma equipe for rebaixada/promovida, o CSV manda, não isto.
+let TEAMS = TEAMS_2026_RAW.map(normalizeTeam);
+
+// Estado real da temporada: classificação atual e jogos que faltam.
+let SEASON_STATE = null;
+let REMAINING    = [];
+let FIXTURE_CDF  = [];
 
 const TEAM_COLORS = {
   'flamengo':             ['#c8001e','#fff'],
@@ -9640,69 +9649,59 @@ function avatar(t){
 //  Round-robin schedule generation
 //  Uses Berger tables (round-robin)
 // ════════════════════════════════════════════════
-function generateSchedule(teams){
-  const n = teams.length; // 20
-  const rounds = [];
-  // Standard round-robin via rotation algorithm
-  const fixed = teams[0];
-  const rotating = teams.slice(1);
-  for(let r=0; r<n-1; r++){
-    const round = [];
-    const rot = [...rotating];
-    // Rotate by r
-    const idx = r % rot.length;
-    const arr = [...rot.slice(rot.length - idx), ...rot.slice(0, rot.length - idx)];
-    // Pair fixed with arr[0], then arr[1] with arr[n-2], arr[2] with arr[n-3]...
-    if(r % 2 === 0) round.push([fixed, arr[0]]);
-    else            round.push([arr[0], fixed]);
-    for(let i=1; i<Math.ceil(arr.length/2); i++){
-      const h = arr[i], a = arr[arr.length - i];
-      round.push(i%2===0?[h,a]:[a,h]);
-    }
-    rounds.push(round);
-  }
-  // Second half: swap home/away
-  const firstHalf = rounds.slice();
-  for(const r of firstHalf){
-    rounds.push(r.map(([h,a])=>[a,h]));
-  }
-  return rounds; // 38 rounds, 10 matches each
-}
 
-const SCHEDULE = generateSchedule(TEAMS);
 
 // ════════════════════════════════════════════════
 //  Monte Carlo — one full season
 // ════════════════════════════════════════════════
-function simulateSeason(model){
-  const pts={}, gd={}, gf={};
-  for(const t of TEAMS){ pts[t]=0; gd[t]=0; gf[t]=0; }
-
-  for(const round of SCHEDULE){
-    for(const [home, away] of round){
-      // Poisson draw via score matrix
-      const p = predictMatch(home, away, model);
-      const sa = p.scoreAdj;
-      const r = Math.random();
-      let cum = 0;
-      let hg = 0, ag = 0;
-      for(const [k, prob] of sa.entries()){
-        cum += prob;
-        if(r < cum){ [hg, ag] = k.split(',').map(Number); break; }
-      }
-      pts[home] += hg>ag?3:(hg===ag?1:0);
-      pts[away] += ag>hg?3:(ag===hg?1:0);
-      gd[home]  += hg-ag; gd[away] += ag-hg;
-      gf[home]  += hg;    gf[away] += ag;
+// Pré-calcula a distribuição de placares de cada jogo restante UMA vez.
+// λ é fixo durante a simulação, então chamar predictMatch dentro do laço
+// (186 jogos × N simulações) só repetia o mesmo cálculo milhões de vezes.
+function buildFixtureCDF(model){
+  FIXTURE_CDF = REMAINING.map(([home, away]) => {
+    const sa = predictMatch(home, away, model).scoreAdj;
+    const n = sa.size;
+    const cum = new Float64Array(n);
+    const hgs = new Uint8Array(n);
+    const ags = new Uint8Array(n);
+    let acc = 0, i = 0;
+    for(const [k, prob] of sa.entries()){
+      acc += prob;
+      cum[i] = acc;
+      const c = k.indexOf(',');
+      hgs[i] = +k.slice(0, c);
+      ags[i] = +k.slice(c + 1);
+      i++;
     }
+    // garante que o último acumulado seja exatamente 1 (evita cair no 0-0 por
+    // erro de ponto flutuante quando r fica acima do último cum)
+    cum[n - 1] = 1;
+    return { home, away, cum, hgs, ags, n };
+  });
+}
+
+// Simula APENAS os jogos que faltam, partindo da classificação real.
+function simulateSeason(){
+  const pts={}, gd={}, gf={};
+  for(const t of TEAMS){
+    const st = SEASON_STATE.standings.get(t) || {pts:0, gd:0, gf:0};
+    pts[t]=st.pts; gd[t]=st.gd; gf[t]=st.gf;
   }
 
-  // Sort standings
-  const standings = TEAMS
+  for(const f of FIXTURE_CDF){
+    const r = Math.random();
+    let i = 0;
+    while(i < f.n - 1 && r >= f.cum[i]) i++;
+    const hg = f.hgs[i], ag = f.ags[i];
+    pts[f.home] += hg>ag?3:(hg===ag?1:0);
+    pts[f.away] += ag>hg?3:(ag===hg?1:0);
+    gd[f.home]  += hg-ag; gd[f.away] += ag-hg;
+    gf[f.home]  += hg;    gf[f.away] += ag;
+  }
+
+  return TEAMS
     .map(t=>({t, pts:pts[t], gd:gd[t], gf:gf[t]}))
     .sort((a,b)=>b.pts-a.pts||b.gd-a.gd||b.gf-a.gf);
-
-  return standings;
 }
 
 // ════════════════════════════════════════════════
@@ -9717,15 +9716,18 @@ async function runMC(model, N, onProgress){
   const relCount     = new Map(); // 17-20
   const posHist      = new Map(); // position → count per team
 
+  const nT = TEAMS.length;
   for(const t of TEAMS){
     champCount.set(t,0); posSum.set(t,0); ptsSum.set(t,0);
     libCount.set(t,0); sulCount.set(t,0); relCount.set(t,0);
-    posHist.set(t, new Array(20).fill(0));
+    posHist.set(t, new Array(nT).fill(0));
   }
+
+  buildFixtureCDF(model);
 
   const BATCH = 50;
   for(let i=0; i<N; i++){
-    const standings = simulateSeason(model);
+    const standings = simulateSeason();
     standings.forEach(({t, pts}, pos) => {
       ptsSum.set(t, ptsSum.get(t)+pts);
       posSum.set(t, posSum.get(t)+pos);
@@ -9733,7 +9735,7 @@ async function runMC(model, N, onProgress){
       if(pos===0)             champCount.set(t, champCount.get(t)+1);
       if(pos<5)               libCount.set(t, libCount.get(t)+1);
       if(pos>=5 && pos<11)    sulCount.set(t, sulCount.get(t)+1);
-      if(pos>=16)             relCount.set(t, relCount.get(t)+1);
+      if(pos>=nT-4)           relCount.set(t, relCount.get(t)+1);
     });
     if(i%BATCH===BATCH-1){ onProgress(i+1,N); await new Promise(r=>setTimeout(r,0)); }
   }
@@ -9844,12 +9846,40 @@ async function init(){
     await new Promise(r=>setTimeout(r,20));
 
     MODEL = buildModel(result.data);
+
+    // Classificação atual + jogos restantes. A simulação parte daqui, não de
+    // uma temporada zerada.
+    SEASON_STATE = computeSeasonState(result.data);
+    if(SEASON_STATE.teams.length >= 4){
+      TEAMS = SEASON_STATE.teams;
+      REMAINING = SEASON_STATE.remaining;
+    } else {
+      // temporada ainda não começou: cai para o returno duplo completo
+      REMAINING = [];
+      for(const h of TEAMS) for(const a of TEAMS) if(h!==a) REMAINING.push([h,a]);
+    }
     document.getElementById('progress-fill').style.width='100%';
 
     // Update header
     document.getElementById('hdr-jogos').textContent = MODEL.parsedCount.toLocaleString('pt-BR')+' jogos';
     document.getElementById('hdr-temporadas').textContent = MODEL.seasonCount+' temporadas';
     document.getElementById('footer-rho').textContent = `ρ MLE = ${MODEL.dc.rho.toFixed(4)}`;
+
+    const elState = document.getElementById('hdr-estado');
+    if(elState){
+      elState.textContent = `rodada ${SEASON_STATE.roundsPlayed} · ${REMAINING.length} jogos restantes`;
+    }
+    if(SEASON_STATE.excluded.length){
+      console.warn('Times ignorados na tabela (poucos jogos — provável linha errada no CSV):',
+                   SEASON_STATE.excluded);
+      const elWarn = document.getElementById('data-warning');
+      if(elWarn){
+        elWarn.style.display='';
+        elWarn.textContent = 'Aviso: ' + SEASON_STATE.excluded
+          .map(e=>`"${e.team}" aparece em apenas ${e.played} jogo(s) da temporada e foi ignorado`)
+          .join(' · ');
+      }
+    }
 
     await new Promise(r=>setTimeout(r,200));
     document.getElementById('loading').style.display='none';

@@ -69,6 +69,14 @@ The CSV carries a duplicated 2025 block that `removeDuplicateBlock()` strips at 
 `datasets/campeonato-brasileiro-full_ate_2025.csv` is a richer, unused variant that still has
 real dates, plus arena, coach and state columns.
 
+### Season simulation
+
+`computeSeasonState(rawRows)` returns the current table plus the fixtures still to be played.
+Monte Carlo simulations must start from it — simulating a virgin 380-match season ignores the
+points already on the board and produces nonsense (a team 23 points off the lead showed a 3-4%
+title chance). It also drops teams with implausibly few games, which is how a bad CSV row
+became a 21st club in the table.
+
 ### PWA
 
 `service-worker.js` uses cache-first for same-origin assets and stale-while-revalidate for CDN resources (fonts, JS libs). `manifest.json` defines two app shortcuts (Brasileirão and Copa 2026).
