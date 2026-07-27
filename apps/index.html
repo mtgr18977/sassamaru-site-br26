@@ -19,885 +19,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-  <script>
-/* eslint-disable no-var */
-(() => {
-  const CONFIG = {
-    CSV_PATH: "./campeonatobrasileirolimpo.csv",
-
-    // ── Column mapping ──
-    DATE_COL:       "rodata",          // round number (float), NOT a date
-    HOME_TEAM_COL:  "mandante",
-    AWAY_TEAM_COL:  "visitante",
-    HOME_GOALS_COL: "mandante_Placar",
-    AWAY_GOALS_COL: "visitante_Placar",
-
-    // ── Temporal weights (expressed in ROUNDS, not days) ──
-    HALF_LIFE_ELO_ROUNDS:     76,      // ~2 seasons of 38 rounds
-    HALF_LIFE_POISSON_ROUNDS: 152,     // ~4 seasons
-    HALF_LIFE_FORM_ROUNDS:    19,      // ~half a season
-
-    // ── Minimum weights ──
-    MIN_W_ELO:  0.15,
-    MIN_W_POI:  0.30,
-    MIN_W_FORM: 0.40,
-
-    // ── Elo settings ──
-    ELO_INITIAL:        1500,
-    ELO_K_BASE:         30,
-    SEASON_RESET_ALPHA: 0.20,
-    ELO_GAMMA:          0.08,
-    ELO_LAMBDA_CLAMP:   0.18,
-
-    // ── Poisson / Dixon–Coles ──
-    POISSON_MAX_GOALS: 8,
-    DC_RHO:            -0.10,
-
-    // ── Recent form ──
-    FORM_MATCHES:    5,
-    FORM_FACTOR_MIN: 0.75,
-    FORM_FACTOR_MAX: 1.25,
-
-    // ── Odds ──
-    OVERROUND: 0.06,
-
-    // ── Season detection ──
-    ROUND1_CLUSTER_MIN: 5,   // minimum consecutive round-1 games to detect a new season
-
-    // ── Rest factor (descanso entre jogos) ──
-    // Ajusta λ de acordo com quantas rodadas o time descansou antes da partida.
-    // Baseline = 1 rodada de intervalo (ritmo normal do campeonato).
-    // Fórmula: factor = clamp(1 + REST_COEF * (gap - REST_ROUNDS_BASELINE), min, max)
-    REST_ROUNDS_BASELINE: 1,    // gap "neutro" (sem ajuste)
-    REST_COEF:            0.03, // +3 % de λ por rodada extra de descanso
-    REST_FACTOR_MIN:      0.92, // piso: penalidade máxima de 8 %
-    REST_FACTOR_MAX:      1.06, // teto: bônus máximo de 6 %
-
-    // ── Backtest ──
-    BACKTEST_SEASONS: 6,  // quantas temporadas finais usar como teste
-
-    // ── Corte de dados históricos ──
-    // Apenas temporadas >= este índice são usadas no treino.
-    // 0 = todos os dados (2003+). 12 = a partir de 2015 (índice 0 = 2003).
-    // O modelo de produção e o backtest respeitam este valor.
-    TRAIN_FROM_SEASON: 12,  // 2003 + 12 = 2015
-  };
-
-  // ────────────────────────────────────────────────
-  //  Team name normalisation (comprehensive aliases)
-  // ────────────────────────────────────────────────
-  function normalizeTeam(name) {
-    if (name === null || name === undefined) return "";
-    let s = String(name).trim().toLowerCase();
-    // strip diacritics
-    s = s.normalize("NFKD").replace(/[\u0300-\u036f]/g, "");
-    // normalise separators and whitespace
-    s = s.replace(/-/g, " ");
-    s = s.replace(/\s+/g, " ").trim();
-
-    const aliases = new Map([
-      // Atletico Mineiro variants
-      ["atletico mg",          "atletico mineiro"],
-      ["atletico mineiro mg",  "atletico mineiro"],
-      // Athletico Paranaense variants
-      ["athletico pr",         "athletico paranaense"],
-      ["athetico parananese",  "athletico paranaense"],
-      // Botafogo variants
-      ["botafogo rj",          "botafogo"],
-      ["botafogo fr",          "botafogo"],
-      // Ceara variants
-      ["ceara sc",             "ceara"],
-      // Fluminense variants
-      ["fluminense fc",        "fluminense"],
-      // Fortaleza variants
-      ["fortaleza esporte clube", "fortaleza"],
-      // Gremio variants (with accent stripped)
-      ["gremio",               "gremio"],   // already normalised, but explicit
-      // Internacional variants
-      ["sc internacional",     "internacional"],
-      // Juventude variants
-      ["ec juventude",         "juventude"],
-      // Mirassol variants
-      ["mirassol futebol clube", "mirassol"],
-      // Red Bull Bragantino variants
-      ["red bull bragantino sp", "bragantino"],
-      // Santos variants
-      ["santos fc",            "santos"],
-      // Sao Paulo variants (accent stripped → "sao paulo")
-      ["sao paulo",            "sao paulo"],
-      // Sport variants
-      ["sport recife",         "sport"],
-      // Vasco variants
-      ["vasco da gama",        "vasco"],
-      // Vitoria variants (accent stripped → "vitoria")
-      ["vitoria",              "vitoria"],
-      // Gremio Prudente (separate club, but alias for clarity)
-      ["gremio prudente",      "gremio prudente"],
-    ]);
-
-    return aliases.get(s) || s;
-  }
-
-  // ────────────────────────────────────────────────
-  //  Season detection from round structure
-  // ────────────────────────────────────────────────
-
-  /**
-   * Detects season boundaries by finding clusters of round-1 games.
-   * Returns an array of { seasonIndex, startIdx, endIdx, year }.
-   * Each game row receives .season and .round fields.
-   */
-  function detectSeasons(rows) {
-    const n = rows.length;
-    const seasons = [];
-    let i = 0;
-
-    while (i < n) {
-      const rod = rows[i]._rod;
-
-      if (rod === 1) {
-        // Found a round-1 game — check if it's a cluster (season start)
-        let clusterEnd = i;
-        while (clusterEnd < n && rows[clusterEnd]._rod === 1) {
-          clusterEnd++;
-        }
-        const clusterSize = clusterEnd - i;
-
-        if (clusterSize >= CONFIG.ROUND1_CLUSTER_MIN) {
-          // This is a genuine season start
-          const seasonStart = i;
-
-          // Find end: scan until next round-1 cluster or end of data
-          let j = clusterEnd;
-          while (j < n) {
-            if (rows[j]._rod === 1) {
-              // peek ahead for cluster
-              let peek = j;
-              let onesCount = 0;
-              while (peek < n && peek < j + 15) {
-                if (rows[peek]._rod === 1) onesCount++;
-                peek++;
-              }
-              if (onesCount >= CONFIG.ROUND1_CLUSTER_MIN) break;
-            }
-            j++;
-          }
-
-          seasons.push({
-            seasonIndex: seasons.length,
-            startIdx: seasonStart,
-            endIdx: j - 1,
-            gameCount: j - seasonStart,
-          });
-          i = j;
-        } else {
-          i = clusterEnd;
-        }
-      } else {
-        // Rows before the first detected season (shouldn't happen with clean data)
-        // or rows that belong to the current season — handled below
-        i++;
-      }
-    }
-
-    return seasons;
-  }
-
-  /**
-   * Assign .season and .round to each parsed game.
-   * For rows with empty rodata, infer round from position within the season
-   * (groups of N games per round, where N = gameCount / maxRound).
-   */
-  function assignSeasonAndRound(rows, seasons) {
-    // Build a lookup: rowIndex → seasonIndex
-    const seasonMap = new Map();
-    for (const s of seasons) {
-      for (let i = s.startIdx; i <= s.endIdx; i++) {
-        seasonMap.set(i, s.seasonIndex);
-      }
-    }
-
-    for (let i = 0; i < rows.length; i++) {
-      const si = seasonMap.get(i);
-      if (si === undefined) {
-        // Row not assigned to any season (edge case)
-        rows[i].season = -1;
-        rows[i].round = 0;
-        continue;
-      }
-
-      rows[i].season = si;
-
-      if (rows[i]._rod > 0) {
-        rows[i].round = rows[i]._rod;
-      } else {
-        // Infer round from position within season
-        const s = seasons[si];
-        const posInSeason = i - s.startIdx;
-        // Estimate games per round from the season's total and known max round
-        // Most seasons have 10 games per round (20 teams / 2)
-        const gamesPerRound = 10;
-        rows[i].round = Math.floor(posInSeason / gamesPerRound) + 1;
-      }
-    }
-  }
-
-  // ────────────────────────────────────────────────
-  //  Temporal weight (round-based)
-  // ────────────────────────────────────────────────
-
-  /**
-   * Compute the age of a match in "rounds" relative to the reference point.
-   * Uses a linear scale: age = (refSeason - matchSeason) * roundsPerSeason + (refRound - matchRound)
-   */
-  function matchAgeInRounds(matchSeason, matchRound, refSeason, refRound, roundsPerSeason) {
-    return (refSeason - matchSeason) * roundsPerSeason + (refRound - matchRound);
-  }
-
-  function temporalWeight(ageInRounds, halfLifeRounds, minW) {
-    if (ageInRounds <= 0) return 1.0;
-    const w = Math.pow(0.5, ageInRounds / halfLifeRounds);
-    return Math.max(minW, w);
-  }
-
-  // ────────────────────────────────────────────────
-  //  Math utilities
-  // ────────────────────────────────────────────────
-
-  function clamp(val, min, max) {
-    return Math.max(min, Math.min(max, val));
-  }
-
-  // Pre-compute log-factorials to avoid overflow with large λ
-  const LOG_FACT_CACHE = [0]; // log(0!) = 0
-  function logFactorial(n) {
-    while (LOG_FACT_CACHE.length <= n) {
-      const k = LOG_FACT_CACHE.length;
-      LOG_FACT_CACHE.push(LOG_FACT_CACHE[k - 1] + Math.log(k));
-    }
-    return LOG_FACT_CACHE[n];
-  }
-
-  function poissonProb(lambda, k) {
-    if (lambda <= 0) return k === 0 ? 1 : 0;
-    // Use log-space to avoid overflow: P(k) = exp(k*ln(λ) - λ - ln(k!))
-    return Math.exp(k * Math.log(lambda) - lambda - logFactorial(k));
-  }
-
-  function oddsFromProbsOverround(ph, pd, pa, overround) {
-    const eps = 1e-12;
-    const safePh = Math.max(eps, ph);
-    const safePd = Math.max(eps, pd);
-    const safePa = Math.max(eps, pa);
-    const scale = 1 + overround;
-    return {
-      oh: 1 / (safePh * scale),
-      od: 1 / (safePd * scale),
-      oa: 1 / (safePa * scale),
-    };
-  }
-
-  function applyDixonColes(scoreProbs, rho) {
-    const adj = new Map(scoreProbs);
-
-    function mult(gH, gA, m) {
-      const key = `${gH},${gA}`;
-      adj.set(key, (adj.get(key) || 0) * m);
-    }
-
-    mult(0, 0, 1 - rho);
-    mult(1, 1, 1 - rho);
-    mult(1, 0, 1 + rho);
-    mult(0, 1, 1 + rho);
-
-    let sum = 0;
-    for (const p of adj.values()) sum += p;
-    if (sum <= 0) return scoreProbs;
-
-    for (const [k, p] of adj.entries()) {
-      adj.set(k, p / sum);
-    }
-    return adj;
-  }
-
-  // ────────────────────────────────────────────────
-  //  Handle duplicate 2025 data
-  // ────────────────────────────────────────────────
-
-  /**
-   * The CSV contains two overlapping 2025 blocks:
-   *   - Block B: 380 games with empty rodata and full team names (e.g. "Fortaleza Esporte Clube")
-   *   - Block A: 19 games with rodata 1-2 and standard names
-   * 
-   * Strategy: keep Block A (partial, with rounds) and discard Block B (no rounds, duplicate names).
-   * Block B is detected as any contiguous stretch of empty-rodata rows >= 100.
-   */
-  function removeDuplicateBlock(rows) {
-    let blockStart = -1;
-    let blockEnd = -1;
-    let runStart = -1;
-
-    for (let i = 0; i < rows.length; i++) {
-      if (!rows[i]._rod) {
-        if (runStart === -1) runStart = i;
-      } else {
-        if (runStart !== -1) {
-          const runLen = i - runStart;
-          if (runLen >= 100) {
-            blockStart = runStart;
-            blockEnd = i;
-          }
-          runStart = -1;
-        }
-      }
-    }
-    // Check if run extends to end
-    if (runStart !== -1) {
-      const runLen = rows.length - runStart;
-      if (runLen >= 100) {
-        blockStart = runStart;
-        blockEnd = rows.length;
-      }
-    }
-
-    if (blockStart >= 0) {
-      const removed = blockEnd - blockStart;
-      rows.splice(blockStart, removed);
-      return removed;
-    }
-    return 0;
-  }
-
-  // ────────────────────────────────────────────────
-  //  Build model
-  // ────────────────────────────────────────────────
-
-  function buildModel(rawRows) {
-    // ── Step 1: Parse and normalise ──
-    const parsed = [];
-    for (const r of rawRows) {
-      const home = normalizeTeam(r[CONFIG.HOME_TEAM_COL]);
-      const away = normalizeTeam(r[CONFIG.AWAY_TEAM_COL]);
-      const hg = Number(r[CONFIG.HOME_GOALS_COL]);
-      const ag = Number(r[CONFIG.AWAY_GOALS_COL]);
-      const rodStr = String(r[CONFIG.DATE_COL] || "").trim();
-      const rod = rodStr ? parseFloat(rodStr) : 0;
-
-      if (!home || !away) continue;
-      if (!Number.isFinite(hg) || !Number.isFinite(ag)) continue;
-
-      parsed.push({
-        home,
-        away,
-        hg: hg | 0,
-        ag: ag | 0,
-        _rod: Number.isFinite(rod) ? rod : 0,
-        // .season and .round will be assigned below
-        season: -1,
-        round: 0,
-      });
-    }
-
-    if (parsed.length < 50) {
-      throw new Error(
-        "Dataset insuficiente após limpeza. Verifique nomes das colunas e formato dos dados."
-      );
-    }
-
-    // ── Step 2: Remove duplicate 2025 block ──
-    const removedCount = removeDuplicateBlock(parsed);
-
-    // ── Step 3: Detect seasons ──
-    const seasons = detectSeasons(parsed);
-    if (seasons.length === 0) {
-      throw new Error("Nenhuma temporada detectada. Verifique se o CSV contém rodada 1.");
-    }
-    assignSeasonAndRound(parsed, seasons);
-
-    // Filter out unassigned rows + apply training window cutoff
-    const valid = parsed.filter(p =>
-      p.season >= 0 && p.season >= CONFIG.TRAIN_FROM_SEASON
-    );
-
-    // ── Step 4: Determine reference point (latest game) ──
-    let refSeason = 0;
-    let refRound = 0;
-    for (const p of valid) {
-      if (p.season > refSeason || (p.season === refSeason && p.round > refRound)) {
-        refSeason = p.season;
-        refRound = p.round;
-      }
-    }
-
-    // Estimate rounds per season (most seasons have 38 rounds)
-    const roundsPerSeason = 38;
-
-    // ── Step 5: Compute temporal weights ──
-    for (const p of valid) {
-      const age = matchAgeInRounds(p.season, p.round, refSeason, refRound, roundsPerSeason);
-      p.wElo = temporalWeight(age, CONFIG.HALF_LIFE_ELO_ROUNDS, CONFIG.MIN_W_ELO);
-      p.wPoi = temporalWeight(age, CONFIG.HALF_LIFE_POISSON_ROUNDS, CONFIG.MIN_W_POI);
-    }
-
-    // ── Step 6: League averages (weighted) ──
-    let leagueHomeGoalsW = 0;
-    let leagueAwayGoalsW = 0;
-    let leagueW = 0;
-    const team = new Map();
-
-    function getTeam(t) {
-      if (!team.has(t)) {
-        team.set(t, {
-          homeGFw: 0, homeGAw: 0, homeW: 0,
-          awayGFw: 0, awayGAw: 0, awayW: 0,
-        });
-      }
-      return team.get(t);
-    }
-
-    for (const p of valid) {
-      const w = p.wPoi;
-      leagueHomeGoalsW += p.hg * w;
-      leagueAwayGoalsW += p.ag * w;
-      leagueW += w;
-
-      const th = getTeam(p.home);
-      th.homeGFw += p.hg * w;
-      th.homeGAw += p.ag * w;
-      th.homeW += w;
-
-      const ta = getTeam(p.away);
-      ta.awayGFw += p.ag * w;
-      ta.awayGAw += p.hg * w;
-      ta.awayW += w;
-    }
-
-    const leagueHomeAvg = leagueW > 0 ? leagueHomeGoalsW / leagueW : 1.0;
-    const leagueAwayAvg = leagueW > 0 ? leagueAwayGoalsW / leagueW : 1.0;
-    const leagueGoalsPerTeam = (leagueHomeAvg + leagueAwayAvg) / 2;
-
-    // ── Step 7: Attack/defence forces ──
-    const forces = new Map();
-    for (const [t, st] of team.entries()) {
-      const homeGF = st.homeW > 0 ? st.homeGFw / st.homeW : NaN;
-      const homeGA = st.homeW > 0 ? st.homeGAw / st.homeW : NaN;
-      const awayGF = st.awayW > 0 ? st.awayGFw / st.awayW : NaN;
-      const awayGA = st.awayW > 0 ? st.awayGAw / st.awayW : NaN;
-
-      const atkH = Number.isFinite(homeGF) && leagueHomeAvg > 0 ? homeGF / leagueHomeAvg : 1.0;
-      const defH = Number.isFinite(homeGA) && leagueAwayAvg > 0 ? homeGA / leagueAwayAvg : 1.0;
-      const atkA = Number.isFinite(awayGF) && leagueAwayAvg > 0 ? awayGF / leagueAwayAvg : 1.0;
-      const defA = Number.isFinite(awayGA) && leagueHomeAvg > 0 ? awayGA / leagueHomeAvg : 1.0;
-
-      forces.set(t, { atkH, defH, atkA, defA });
-    }
-
-    // ── Step 7b: Per-team home advantage ──
-    const homeAdv = new Map();
-    for (const [t, st] of team.entries()) {
-      if (st.homeW > 10 && st.awayW > 10) {
-        const hRate = (st.homeGFw / st.homeW) / Math.max(0.01, leagueHomeAvg);
-        const aRate = (st.awayGFw / st.awayW) / Math.max(0.01, leagueAwayAvg);
-        homeAdv.set(t, clamp(hRate / Math.max(0.1, aRate), 0.85, 1.15));
-      }
-    }
-
-    // ── Step 8: Recent form (weighted by round age) ──
-    const recentMatches = new Map();
-    function pushMatch(t, gf, ga, season, round) {
-      if (!recentMatches.has(t)) recentMatches.set(t, []);
-      recentMatches.get(t).push({ gf, ga, season, round });
-    }
-    for (const p of valid) {
-      pushMatch(p.home, p.hg, p.ag, p.season, p.round);
-      pushMatch(p.away, p.ag, p.hg, p.season, p.round);
-    }
-
-    // ── Step 8b: Last played round per team (para cálculo de descanso) ──
-    // Aproveita recentMatches antes de ordenar; a ordenação é feita abaixo no loop de forma.
-    const lastRound = new Map(); // team → { season, round }
-
-    const form = new Map();
-    for (const [t, list] of recentMatches.entries()) {
-      // Sort by season then round
-      list.sort((a, b) => a.season !== b.season ? a.season - b.season : a.round - b.round);
-      // Último jogo disputado por este time
-      const last = list[list.length - 1];
-      lastRound.set(t, { season: last.season, round: last.round });
-      const recent = list.slice(-CONFIG.FORM_MATCHES);
-      let gf = 0;
-      let ga = 0;
-      let wsum = 0;
-      for (const m of recent) {
-        const age = matchAgeInRounds(m.season, m.round, refSeason, refRound, roundsPerSeason);
-        const w = temporalWeight(age, CONFIG.HALF_LIFE_FORM_ROUNDS, CONFIG.MIN_W_FORM);
-        gf += m.gf * w;
-        ga += m.ga * w;
-        wsum += w;
-      }
-      if (wsum > 0) {
-        form.set(t, { gf: gf / wsum, ga: ga / wsum });
-      }
-    }
-
-    // ── Step 9: Elo ratings with season resets ──
-    // Sort all games chronologically
-    valid.sort((a, b) => a.season !== b.season ? a.season - b.season : a.round - b.round);
-
-    const elo = new Map();
-    let currentSeason = null;
-
-    function seasonReset() {
-      for (const [t, r] of elo.entries()) {
-        elo.set(
-          t,
-          r * (1 - CONFIG.SEASON_RESET_ALPHA) +
-            CONFIG.ELO_INITIAL * CONFIG.SEASON_RESET_ALPHA
-        );
-      }
-    }
-
-    function getElo(t) {
-      if (!elo.has(t)) elo.set(t, CONFIG.ELO_INITIAL);
-      return elo.get(t);
-    }
-
-    for (const p of valid) {
-      if (currentSeason === null) {
-        currentSeason = p.season;
-      } else if (p.season !== currentSeason) {
-        seasonReset();
-        currentSeason = p.season;
-      }
-
-      const rc = getElo(p.home);
-      const rv = getElo(p.away);
-
-      let result = 0.5;
-      if (p.hg > p.ag) result = 1.0;
-      else if (p.hg < p.ag) result = 0.0;
-
-      const expC = 1 / (1 + Math.pow(10, (rv - rc) / 400));
-      const diff = Math.abs(p.hg - p.ag);
-      const kBase = CONFIG.ELO_K_BASE * (1 + 0.5 * Math.max(0, diff - 1));
-      const k = kBase * p.wElo;
-
-      const newC = rc + k * (result - expC);
-      const newV = rv + k * ((1 - result) - (1 - expC));
-
-      elo.set(p.home, newC);
-      elo.set(p.away, newV);
-    }
-
-    // ── Step 10: Build team list for warnings ──
-    const teamNames = new Set(forces.keys());
-
-    return {
-      refSeason,
-      refRound,
-      roundsPerSeason,
-      seasonCount: seasons.length,
-      leagueHomeAvg,
-      leagueAwayAvg,
-      leagueGoalsPerTeam,
-      forces,
-      homeAdv,
-      elo,
-      form,
-      lastRound,
-      teamNames,
-      parsedCount: valid.length,
-      teamCount: forces.size,
-      removedDuplicates: removedCount,
-    };
-  }
-
-  // ────────────────────────────────────────────────
-  //  Predict match
-  // ────────────────────────────────────────────────
-
-  function predictMatch(homeRaw, awayRaw, model, opts = {}) {
-    const home = normalizeTeam(homeRaw);
-    const away = normalizeTeam(awayRaw);
-
-    // Warnings for unknown teams
-    const warnings = [];
-    if (!model.teamNames.has(home)) warnings.push(`"${homeRaw}" não encontrado no dataset`);
-    if (!model.teamNames.has(away)) warnings.push(`"${awayRaw}" não encontrado no dataset`);
-
-    const fH = model.forces.get(home) || { atkH: 1, defH: 1, atkA: 1, defA: 1 };
-    const fA = model.forces.get(away) || { atkH: 1, defH: 1, atkA: 1, defA: 1 };
-
-    const teamHomeAdv = model.homeAdv.get(home) ?? 1;
-    const lambdaH = fH.atkH * fA.defA * model.leagueHomeAvg * teamHomeAdv;
-    const lambdaA = fA.atkA * fH.defH * model.leagueAwayAvg;
-
-    const avgGoals = model.leagueGoalsPerTeam || 1;
-    const formH = model.form.get(home) || { gf: avgGoals, ga: avgGoals };
-    const formA = model.form.get(away) || { gf: avgGoals, ga: avgGoals };
-
-    const atkHForm = clamp(formH.gf / avgGoals, CONFIG.FORM_FACTOR_MIN, CONFIG.FORM_FACTOR_MAX);
-    const defHForm = clamp(formH.ga / avgGoals, CONFIG.FORM_FACTOR_MIN, CONFIG.FORM_FACTOR_MAX);
-    const atkAForm = clamp(formA.gf / avgGoals, CONFIG.FORM_FACTOR_MIN, CONFIG.FORM_FACTOR_MAX);
-    const defAForm = clamp(formA.ga / avgGoals, CONFIG.FORM_FACTOR_MIN, CONFIG.FORM_FACTOR_MAX);
-
-    let lamH = lambdaH * atkHForm * defAForm;
-    let lamA = lambdaA * atkAForm * defHForm;
-
-    const rH = model.elo.get(home) ?? CONFIG.ELO_INITIAL;
-    const rA = model.elo.get(away) ?? CONFIG.ELO_INITIAL;
-    const eloDiff = rH - rA;
-
-    let adj = (eloDiff / 400) * CONFIG.ELO_GAMMA;
-    adj = Math.max(-CONFIG.ELO_LAMBDA_CLAMP, Math.min(CONFIG.ELO_LAMBDA_CLAMP, adj));
-
-    lamH *= Math.exp(adj);
-    lamA *= Math.exp(-adj);
-
-    // ── Fator de descanso ──
-    // opts.upcomingRound / opts.upcomingSeason definem a rodada prevista.
-    // Se não fornecidos, nenhum ajuste é aplicado (factor = 1.0).
-    let restFactorH = 1.0;
-    let restFactorA = 1.0;
-    let restGapH = null;
-    let restGapA = null;
-
-    const { upcomingRound, upcomingSeason } = opts;
-    if (Number.isFinite(upcomingRound) && Number.isFinite(upcomingSeason) && model.lastRound) {
-      const lh = model.lastRound.get(home);
-      const la = model.lastRound.get(away);
-      if (lh) {
-        restGapH = matchAgeInRounds(lh.season, lh.round, upcomingSeason, upcomingRound, model.roundsPerSeason);
-        restFactorH = clamp(
-          1 + CONFIG.REST_COEF * (restGapH - CONFIG.REST_ROUNDS_BASELINE),
-          CONFIG.REST_FACTOR_MIN,
-          CONFIG.REST_FACTOR_MAX
-        );
-        lamH *= restFactorH;
-      }
-      if (la) {
-        restGapA = matchAgeInRounds(la.season, la.round, upcomingSeason, upcomingRound, model.roundsPerSeason);
-        restFactorA = clamp(
-          1 + CONFIG.REST_COEF * (restGapA - CONFIG.REST_ROUNDS_BASELINE),
-          CONFIG.REST_FACTOR_MIN,
-          CONFIG.REST_FACTOR_MAX
-        );
-        lamA *= restFactorA;
-      }
-    }
-
-    const score = new Map();
-    for (let gh = 0; gh <= CONFIG.POISSON_MAX_GOALS; gh += 1) {
-      for (let ga = 0; ga <= CONFIG.POISSON_MAX_GOALS; ga += 1) {
-        const p = poissonProb(lamH, gh) * poissonProb(lamA, ga);
-        score.set(`${gh},${ga}`, p);
-      }
-    }
-
-    const scoreAdj = applyDixonColes(score, CONFIG.DC_RHO);
-
-    let pH = 0;
-    let pD = 0;
-    let pA = 0;
-    let bestP = -1;
-    let bestGH = 0;
-    let bestGA = 0;
-    for (const [k, p] of scoreAdj.entries()) {
-      const [gh, ga] = k.split(",").map(Number);
-      if (gh > ga) pH += p;
-      else if (gh === ga) pD += p;
-      else pA += p;
-      if (p > bestP) { bestP = p; bestGH = gh; bestGA = ga; }
-    }
-    const tot = pH + pD + pA || 1;
-    pH /= tot;
-    pD /= tot;
-    pA /= tot;
-
-    const odds = oddsFromProbsOverround(pH, pD, pA, CONFIG.OVERROUND);
-
-    let pick = "Empate";
-    const max = Math.max(pH, pD, pA);
-    if (max === pH) pick = "Mandante";
-    else if (max === pA) pick = "Visitante";
-
-    return {
-      home,
-      away,
-      lamH,
-      lamA,
-      pH,
-      pD,
-      pA,
-      oh: odds.oh,
-      od: odds.od,
-      oa: odds.oa,
-      pick,
-      bestScore:  `${bestGH}–${bestGA}`,
-      bestScoreP: bestP,
-      scoreAdj,
-      maxGoals:   CONFIG.POISSON_MAX_GOALS,
-      restFactorH,
-      restFactorA,
-      restGapH,
-      restGapA,
-      warnings,
-    };
-  }
-
-  // ────────────────────────────────────────────────
-  //  Walk-forward backtest
-  // ────────────────────────────────────────────────
-
-  /**
-   * Walk-forward backtest:
-   *   Para cada uma das últimas CONFIG.BACKTEST_SEASONS temporadas,
-   *   treina em todas as temporadas anteriores e prediz os jogos da temporada atual.
-   *   Retorna métricas por temporada + bins de calibração agregados.
-   *
-   * @param {object[]} rawRows  – saída do PapaParse (mesma usada em buildModel)
-   * @param {function} onProgress – callback(done, total) chamado entre builds
-   */
-  async function runBacktest(rawRows, onProgress) {
-    // ── 1. Parse rápido para atribuir temporadas (sem construir modelo completo) ──
-    const qp = [];
-    for (const r of rawRows) {
-      const home = normalizeTeam(r[CONFIG.HOME_TEAM_COL]);
-      const away = normalizeTeam(r[CONFIG.AWAY_TEAM_COL]);
-      const hg   = Number(r[CONFIG.HOME_GOALS_COL]);
-      const ag   = Number(r[CONFIG.AWAY_GOALS_COL]);
-      const rod  = parseFloat(String(r[CONFIG.DATE_COL] || '').trim()) || 0;
-      if (!home || !away || !Number.isFinite(hg) || !Number.isFinite(ag)) continue;
-      qp.push({ home, away, hg: hg|0, ag: ag|0, _rod: Number.isFinite(rod)?rod:0, season:-1, round:0 });
-    }
-    removeDuplicateBlock(qp);
-    const seasons = detectSeasons(qp);
-    assignSeasonAndRound(qp, seasons);
-    const valid = qp.filter(p => p.season >= 0);
-
-    const N = seasons.length;
-    const numTest  = Math.min(CONFIG.BACKTEST_SEASONS, N - 2);
-    const firstTest = N - numTest;
-    // Ancora o último índice ao ano atual, independente de quantas temporadas
-    // foram detectadas (evita off-by-one quando uma temporada histórica falha na detecção)
-    const currentYear = new Date().getFullYear();
-    const yearOf = (si) => currentYear - (N - 1 - si);
-
-    const seasonResults = [];
-    // Calibração agregada: 10 bins × 3 outcomes (H, D, A)
-    const calBins = Array.from({length:10}, () => ({predSum:0, actualSum:0, n:0}));
-
-    for (let si = firstTest; si < N; si++) {
-      const trainGames = valid.filter(p =>
-        p.season < si && p.season >= CONFIG.TRAIN_FROM_SEASON
-      );
-      const testGames  = valid.filter(p => p.season === si);
-      if (trainGames.length < 100 || testGames.length === 0) continue;
-
-      // Converte para fake rawRows (nomes já normalizados → buildModel é idempotente)
-      const fakeRows = trainGames.map(g => ({
-        [CONFIG.DATE_COL]:       String(g.round),   // usar round atribuído (≥1), não _rod (pode ser 0)
-        [CONFIG.HOME_TEAM_COL]:  g.home,
-        [CONFIG.AWAY_TEAM_COL]:  g.away,
-        [CONFIG.HOME_GOALS_COL]: String(g.hg),
-        [CONFIG.AWAY_GOALS_COL]: String(g.ag),
-      }));
-
-      // Yield ao browser entre builds (~100–300 ms cada)
-      await new Promise(res => setTimeout(res, 0));
-      if (onProgress) onProgress(si - firstTest, numTest);
-
-      const m = buildModel(fakeRows);
-
-      let brierSum = 0, llSum = 0, correct = 0, roiSum = 0;
-      const sBins = Array.from({length:10}, () => ({predSum:0, actualSum:0, n:0}));
-
-      for (const g of testGames) {
-        const pred   = predictMatch(g.home, g.away, m);
-        const result = g.hg > g.ag ? 'H' : g.hg < g.ag ? 'A' : 'D';
-        const pActual = result==='H' ? pred.pH : result==='D' ? pred.pD : pred.pA;
-        const pick    = pred.pick==='Mandante' ? 'H' : pred.pick==='Visitante' ? 'A' : 'D';
-
-        // Brier (multi-class, range 0–2)
-        brierSum += (pred.pH-(result==='H'?1:0))**2
-                  + (pred.pD-(result==='D'?1:0))**2
-                  + (pred.pA-(result==='A'?1:0))**2;
-
-        // Log-loss
-        llSum += -Math.log(Math.max(1e-7, pActual));
-
-        // Acurácia 1X2
-        if (pick === result) correct++;
-
-        // ROI vs odds justas do modelo (sem overround)
-        const pPick   = pick==='H' ? pred.pH : pick==='D' ? pred.pD : pred.pA;
-        const fairOdd = 1 / Math.max(1e-7, pPick);
-        roiSum += (pick === result) ? (fairOdd - 1) : -1;
-
-        // Calibração: todos os 3 outcomes por jogo
-        for (const [p, hit] of [
-          [pred.pH, result==='H'],
-          [pred.pD, result==='D'],
-          [pred.pA, result==='A'],
-        ]) {
-          const b = Math.min(9, Math.floor(p * 10));
-          sBins[b].predSum   += p;
-          sBins[b].actualSum += hit ? 1 : 0;
-          sBins[b].n++;
-          calBins[b].predSum   += p;
-          calBins[b].actualSum += hit ? 1 : 0;
-          calBins[b].n++;
-        }
-      }
-
-      const n = testGames.length;
-      seasonResults.push({
-        seasonIdx : si,
-        year      : yearOf(si),
-        n,
-        brier     : brierSum / n,
-        logLoss   : llSum / n,
-        accuracy  : correct / n,
-        roi       : roiSum / n * 100,
-        calBins   : sBins,
-      });
-    }
-
-    if (onProgress) onProgress(numTest, numTest);
-    return { seasonResults, calBins, numTest };
-  }
-
-  // ────────────────────────────────────────────────
-  //  Exports
-  // ────────────────────────────────────────────────
-
-  const exported = {
-    CONFIG,
-    normalizeTeam,
-    detectSeasons,
-    assignSeasonAndRound,
-    matchAgeInRounds,
-    temporalWeight,
-    clamp,
-    poissonProb,
-    logFactorial,
-    oddsFromProbsOverround,
-    applyDixonColes,
-    removeDuplicateBlock,
-    buildModel,
-    predictMatch,
-    runBacktest,
-  };
-
-  if (typeof window !== "undefined") {
-    window.BenchModel = exported;
-  }
-  if (typeof module !== "undefined" && module.exports) {
-    module.exports = exported;
-  }
-})();
-
-</script>
+  <script src="../modelos/model.js"></script>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -10858,7 +9980,7 @@
         <div class="brand-mark">B∑</div>
         <div class="brand-text">
           <h1>Bench Rodada</h1>
-          <p>Poisson · Elo · Dixon-Coles · Forma · Descanso</p>
+          <p>Poisson · Elo · Dixon-Coles · MLE</p>
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
@@ -11034,13 +10156,11 @@ athletico-pr x botafogo</textarea>
               <th class="num">Odd E</th>
               <th class="num">Odd V</th>
               <th class="num">Placar</th>
-              <th class="num" title="Descanso">Desc. M</th>
-              <th class="num" title="Descanso">Desc. V</th>
               <th>Palpite</th>
             </tr>
           </thead>
           <tbody id="outBody">
-            <tr><td colspan="11" class="small">Carregue o modelo e clique em "Rodar simulação".</td></tr>
+            <tr><td colspan="9" class="small">Carregue o modelo e clique em "Rodar simulação".</td></tr>
           </tbody>
         </table>
       </div>
@@ -11128,13 +10248,6 @@ function probBar(pH, pD, pA){
     +'</div></div>';
 }
 
-function restBadge(gap, factor){
-  if (gap === null || gap === undefined) return '<span style="color:var(--muted)">—</span>';
-  const delta = factor - 1;
-  const sign  = delta > 0.005 ? '+' : (delta < -0.005 ? '' : '±');
-  const color = delta > 0.005 ? '#1A4731' : (delta < -0.005 ? '#991B1B' : 'var(--muted)');
-  return `<span style="color:${color};font-size:0.78rem;" title="Gap: ${gap}r | Fator: ${(factor*100).toFixed(1)}%">${gap}r ${sign}${(delta*100).toFixed(0)}%</span>`;
-}
 
 function buildDetailPanel(r, colSpan){
   const MAX = r.maxGoals ?? 8;
@@ -11194,7 +10307,7 @@ function buildDetailPanel(r, colSpan){
 
 function renderRows(rows){
   outBody.innerHTML = "";
-  const COL_COUNT = 11;
+  const COL_COUNT = 9;
   for (const r of rows){
     const tagClass = r.pick==="Mandante" ? "home" : (r.pick==="Empate" ? "draw" : "away");
     const pickOdd  = r.pick==="Mandante" ? r.oh : (r.pick==="Empate" ? r.od : r.oa);
@@ -11212,8 +10325,6 @@ function renderRows(rows){
       +'<td class="num">'+formatOdd(r.od)+'</td>'
       +'<td class="num">'+formatOdd(r.oa)+'</td>'
       +'<td class="num mono">'+scoreLabel+scorePct+'</td>'
-      +'<td class="num">'+restBadge(r.restGapH, r.restFactorH)+'</td>'
-      +'<td class="num">'+restBadge(r.restGapA, r.restFactorA)+'</td>'
       +'<td><span class="tag '+tagClass+'">'+r.pick+' <span class="odd-inline">'+formatOdd(pickOdd)+'</span></span></td>';
     const detailHtml = buildDetailPanel(r, COL_COUNT);
     const detailEl = document.createElement("tbody");
@@ -11332,8 +10443,11 @@ let _rawParsed = null; // guardado no loadCSV para o backtest reusar
 btBtn.addEventListener("click", async () => {
   if (!MODEL || !_rawParsed) return;
 
-  // Aplicar corte de treino escolhido pelo usuário
+  // Corte de treino escolhido pelo usuário. Aplicado só durante o backtest e
+  // restaurado no finally — antes ele ficava valendo para o modelo de
+  // produção pelo resto da sessão.
   const fromSeason = parseInt($("btFromYear").value, 10) || 0;
+  const _savedTrainFrom = CONFIG.TRAIN_FROM_SEASON;
   CONFIG.TRAIN_FROM_SEASON = fromSeason;
   const fromYear = 2003 + fromSeason;
   $("btFromNote").textContent = fromSeason === 0
@@ -11362,6 +10476,7 @@ btBtn.addEventListener("click", async () => {
   } catch(e) {
     btResult.innerHTML = `<span class="bad">Erro: ${e.message}</span>`;
   } finally {
+    CONFIG.TRAIN_FROM_SEASON = _savedTrainFrom;
     btBtn.disabled = false;
     btBtn.textContent = "Backtest Histórico";
   }
@@ -11371,9 +10486,9 @@ btExportBtn.addEventListener("click", () => {
   const rows = btExportBtn._btData;
   if (!rows || !rows.length) return;
 
-  const header = "temporada,jogos,brier,acuracia_pct,log_loss,roi_pct";
+  const header = "temporada,jogos,brier,acuracia_pct,log_loss,rps";
   const lines = rows.map(r =>
-    `${r.year},${r.n},${r.brier.toFixed(6)},${(r.accuracy*100).toFixed(2)},${r.logLoss.toFixed(6)},${r.roi.toFixed(2)}`
+    `${r.year},${r.n},${r.brier.toFixed(6)},${(r.accuracy*100).toFixed(2)},${r.logLoss.toFixed(6)},${r.rps.toFixed(6)}`
   );
   const csv = [header, ...lines].join("\n");
 
@@ -11427,13 +10542,13 @@ function renderBacktest({ seasonResults, calBins }) {
   const avgBrier    = avg(r => r.brier);
   const avgAcc      = avg(r => r.accuracy);
   const avgLL       = avg(r => r.logLoss);
-  const avgRoi      = avg(r => r.roi);
+  const avgRps      = avg(r => r.rps);
 
   // ── Classe de cor por métrica ──
   function brierCls(v)   { return v < 0.58 ? "bt-good" : v < 0.63 ? "bt-neutral" : "bt-bad"; }
   function accCls(v)     { return v > 0.52 ? "bt-good" : v > 0.47 ? "bt-neutral" : "bt-bad"; }
   function llCls(v)      { return v < 1.02 ? "bt-good" : v < 1.08 ? "bt-neutral" : "bt-bad"; }
-  function roiCls(v)     { return v > 2    ? "bt-good" : v > -2   ? "bt-neutral" : "bt-bad"; }
+  function rpsCls(v)     { return v < 0.210 ? "bt-good" : v < 0.222 ? "bt-neutral" : "bt-bad"; }
   function brierToPrec(v){ return (1 - v / 2) * 100; }
   function precCls(v)    { return v > 70 ? "bt-good" : v >= 67 ? "bt-neutral" : "bt-bad"; }
   const PREC_TOOLTIP = "Precisão equivalente de DeFinetti: (1 − Brier/2) × 100. Baseline ingênuo = 66,7% (chutar 33,3% em todos os resultados).";
@@ -11446,7 +10561,7 @@ function renderBacktest({ seasonResults, calBins }) {
       <td class="${brierCls(r.brier)}" title="${PREC_TOOLTIP}">${r.brier.toFixed(4)}<span class="bt-td-prec ${precCls(brierToPrec(r.brier))}">${brierToPrec(r.brier).toFixed(1)}%</span></td>
       <td class="${accCls(r.accuracy)}">${(r.accuracy*100).toFixed(1)}%</td>
       <td class="${llCls(r.logLoss)}">${r.logLoss.toFixed(4)}</td>
-      <td class="${roiCls(r.roi)}">${r.roi >= 0 ? '+' : ''}${r.roi.toFixed(1)}%</td>
+      <td class="${rpsCls(r.rps)}">${r.rps.toFixed(4)}</td>
     </tr>`).join("");
 
   const avgRow = `
@@ -11456,7 +10571,7 @@ function renderBacktest({ seasonResults, calBins }) {
       <td class="${brierCls(avgBrier)}" title="${PREC_TOOLTIP}">${avgBrier.toFixed(4)}<span class="bt-td-prec ${precCls(brierToPrec(avgBrier))}">${brierToPrec(avgBrier).toFixed(1)}%</span></td>
       <td class="${accCls(avgAcc)}">${(avgAcc*100).toFixed(1)}%</td>
       <td class="${llCls(avgLL)}">${avgLL.toFixed(4)}</td>
-      <td class="${roiCls(avgRoi)}">${avgRoi >= 0 ? '+' : ''}${avgRoi.toFixed(1)}%</td>
+      <td class="${rpsCls(avgRps)}">${avgRps.toFixed(4)}</td>
     </tr>`;
 
   const table = `
@@ -11467,11 +10582,11 @@ function renderBacktest({ seasonResults, calBins }) {
         <th title="Brier score multi-classe (0–2). Menor = melhor. Linha secundária: precisão equivalente de DeFinetti (66,7% = baseline ingênuo).">Brier ↓ / Prec.</th>
         <th title="% de palpites 1X2 corretos">Acurácia ↑</th>
         <th title="Log-loss. Menor = melhor.">Log-loss ↓</th>
-        <th title="ROI simulado apostando 1u no palpite favorito a odds justas do próprio modelo. Referência interna — não reflete odds de mercado.">ROI* ↑</th>
+        <th title="Ranked Probability Score: métrica própria para desfechos ordenados (Mandante &lt; Empate &lt; Visitante). Pune menos o erro 'por pouco'. Menor = melhor.">RPS ↓</th>
       </tr></thead>
       <tbody>${rows}${avgRow}</tbody>
     </table>
-    <p class="bt-note">* ROI calculado contra as odds justas do próprio modelo (1/p), sem overround. Mede consistência interna — não equivale a ROI real de apostas.</p>`;
+    <p class="bt-note">Referência: prever sempre a taxa-base fixa (47% / 27% / 26%) dá log-loss ≈ 1,058 e RPS ≈ 0,221. O modelo precisa ficar abaixo disso para ter valor preditivo.</p>`;
 
   // ── Calibration plot ──
   const calSvg = buildCalibrationPlot(calBins);
@@ -11488,7 +10603,7 @@ function renderBacktest({ seasonResults, calBins }) {
         <div class="bt-prec-row" title="${PREC_TOOLTIP}"><span class="bt-prec-lbl">↳ Precisão equiv.</span><span class="bt-prec-val ${precCls(brierToPrec(avgBrier))}">${brierToPrec(avgBrier).toFixed(1)}%</span></div>
         <div class="bt-stat-row"><span class="bt-stat-lbl">Acurácia 1X2</span><span class="bt-stat-val ${accCls(avgAcc)}">${(avgAcc*100).toFixed(1)}%</span></div>
         <div class="bt-stat-row"><span class="bt-stat-lbl">Log-loss</span><span class="bt-stat-val ${llCls(avgLL)}">${avgLL.toFixed(4)}</span></div>
-        <div class="bt-stat-row"><span class="bt-stat-lbl">ROI médio*</span><span class="bt-stat-val ${roiCls(avgRoi)}">${avgRoi >= 0 ? '+' : ''}${avgRoi.toFixed(1)}%</span></div>
+        <div class="bt-stat-row"><span class="bt-stat-lbl">RPS</span><span class="bt-stat-val ${rpsCls(avgRps)}">${avgRps.toFixed(4)}</span></div>
         <div class="bt-note">Melhor Brier: ${bestBrier.year} (${bestBrier.brier.toFixed(4)}) · Melhor acurácia: ${bestAcc.year} (${(bestAcc.accuracy*100).toFixed(1)}%)</div>
       </div>
       <div class="bt-card">
@@ -11556,7 +10671,7 @@ function buildCalibrationPlot(bins) {
 
 const MC_WORKER_CODE = `
 self.onmessage = function(e) {
-  const { fixtures, standings, forces, homeAdv, leagueHomeAvg, leagueAwayAvg, n } = e.data;
+  const { fixtures, standings, forces, homeBase, awayBase, n } = e.data;
   function poissonSample(lam) {
     if (lam <= 0) return 0;
     const L = Math.exp(-lam);
@@ -11573,9 +10688,8 @@ self.onmessage = function(e) {
     for (const [home, away] of fixtures) {
       const fH = forces[home] || { atkH: 1, defH: 1, atkA: 1, defA: 1 };
       const fA = forces[away] || { atkH: 1, defH: 1, atkA: 1, defA: 1 };
-      const hadv = homeAdv[home] || 1;
-      const lH = Math.max(0.1, fH.atkH * fA.defA * leagueHomeAvg * hadv);
-      const lA = Math.max(0.1, fA.atkA * fH.defH * leagueAwayAvg);
+      const lH = Math.max(0.1, fH.atkH * fA.defA * homeBase);
+      const lA = Math.max(0.1, fA.atkA * fH.defH * awayBase);
       const gh = poissonSample(lH);
       const ga = poissonSample(lA);
       if (gh > ga)      pts[home] = (pts[home] || 0) + 3;
@@ -11661,9 +10775,8 @@ mcBtn.addEventListener("click", () => {
   $("mcProgressFill").style.width = "0%";
   mcStatus.innerHTML = `Rodando <b>${n.toLocaleString("pt-BR")}</b> simulações em segundo plano…`;
 
-  const forces = {}, homeAdv = {};
+  const forces = {};
   MODEL.forces.forEach((v, k) => forces[k] = v);
-  MODEL.homeAdv.forEach((v, k) => homeAdv[k] = v);
 
   const t0 = performance.now();
   const worker = new Worker(_mcWorkerUrl);
@@ -11683,8 +10796,8 @@ mcBtn.addEventListener("click", () => {
     mcBtn.textContent = "Simular Campeonato";
     mcStatus.innerHTML = `<span class="bad">Erro: ${err.message}</span>`;
   };
-  worker.postMessage({ fixtures, standings, forces, homeAdv,
-    leagueHomeAvg: MODEL.leagueHomeAvg, leagueAwayAvg: MODEL.leagueAwayAvg, n });
+  worker.postMessage({ fixtures, standings, forces,
+    homeBase: MODEL.homeBase, awayBase: MODEL.awayBase, n });
 });
 
 function renderMonteCarlo(results, standings) {
@@ -11759,9 +10872,16 @@ function renderCompare(tA, tB){
   const fA=MODEL.forces.get(tA)||{atkH:1,defH:1,atkA:1,defA:1};
   const fB=MODEL.forces.get(tB)||{atkH:1,defH:1,atkA:1,defA:1};
   const eloA=MODEL.elo.get(tA)??1500, eloB=MODEL.elo.get(tB)??1500;
-  const fmA=MODEL.form.get(tA)||{gf:lgpt,ga:lgpt}, fmB=MODEL.form.get(tB)||{gf:lgpt,ga:lgpt};
   const recA=(window.__BENCH_RECENT__||new Map()).get(tA)||[];
   const recB=(window.__BENCH_RECENT__||new Map()).get(tB)||[];
+  // Média dos últimos jogos — indicador visual apenas. O modelo NÃO usa forma
+  // recente: no backtest walk-forward ela piorava o log-loss.
+  function avgLast(list){
+    const l=list.slice(-5);
+    if(!l.length) return {gf:lgpt,ga:lgpt};
+    return {gf:l.reduce((s,m)=>s+m.gf,0)/l.length, ga:l.reduce((s,m)=>s+m.ga,0)/l.length};
+  }
+  const fmA=avgLast(recA), fmB=avgLast(recB);
   function formPills(list){
     if(!list.length) return '<span style="color:var(--muted);font-size:11px;">sem dados</span>';
     return list.slice(-5).map(m=>{
@@ -11773,17 +10893,15 @@ function renderCompare(tA, tB){
   function barPct(val,max){ return Math.min(100,Math.round(val/max*100)); }
   function sideCard(team,f,elo,fm,rec){
     const MAX=1.6;
-    const defHBar=barPct(Math.max(0,MAX-f.defH),MAX), defABar=barPct(Math.max(0,MAX-f.defA),MAX);
+    const defBar=barPct(Math.max(0,MAX-f.defH),MAX);
     const gfDiff=fm.gf-lgpt, gaDiff=fm.ga-lgpt;
     const atkDesc=gfDiff>0.2?`Ataque em alta — GF ${fm.gf.toFixed(2)} (liga ${lgpt.toFixed(2)})`:gfDiff<-0.2?`Ataque abaixo da média — GF ${fm.gf.toFixed(2)} (liga ${lgpt.toFixed(2)})`:`Ataque na média da liga`;
     const defDesc=gaDiff>0.2?`Defesa vulnerável — GA ${fm.ga.toFixed(2)} (liga ${lgpt.toFixed(2)})`:gaDiff<-0.2?`Defesa sólida — GA ${fm.ga.toFixed(2)} (liga ${lgpt.toFixed(2)})`:`Defesa dentro da média`;
     return `<div class="cmp-card"><div class="cmp-head"><span class="cmp-team">${displayName(team)}</span><span class="elo-pill ${eloClass(elo)}">Elo ${Math.round(elo)}</span></div>
-      <div class="cmp-section">Força histórica (Poisson)</div>
-      <div class="bar-row"><span class="bar-lbl">Ataque casa</span><div class="bar-bg"><div class="bar-fill bar-atk" style="width:${barPct(f.atkH,MAX)}%"></div></div><span class="bar-val">${f.atkH.toFixed(2)}</span></div>
-      <div class="bar-row"><span class="bar-lbl">Solidez def. casa</span><div class="bar-bg"><div class="bar-fill bar-def" style="width:${defHBar}%"></div></div><span class="bar-val">${f.defH.toFixed(2)}</span></div>
-      <div class="bar-row"><span class="bar-lbl">Ataque fora</span><div class="bar-bg"><div class="bar-fill bar-atk" style="width:${barPct(f.atkA,MAX)}%"></div></div><span class="bar-val">${f.atkA.toFixed(2)}</span></div>
-      <div class="bar-row"><span class="bar-lbl">Solidez def. fora</span><div class="bar-bg"><div class="bar-fill bar-def" style="width:${defABar}%"></div></div><span class="bar-val">${f.defA.toFixed(2)}</span></div>
-      <div class="cmp-section">Forma recente (últimos 5)</div>
+      <div class="cmp-section">Força estimada (MLE Dixon-Coles)</div>
+      <div class="bar-row"><span class="bar-lbl">Ataque α</span><div class="bar-bg"><div class="bar-fill bar-atk" style="width:${barPct(f.atkH,MAX)}%"></div></div><span class="bar-val">${f.atkH.toFixed(2)}</span></div>
+      <div class="bar-row"><span class="bar-lbl">Solidez def. β</span><div class="bar-bg"><div class="bar-fill bar-def" style="width:${defBar}%"></div></div><span class="bar-val">${f.defH.toFixed(2)}</span></div>
+      <div class="cmp-section">Últimos 5 jogos (não entra no modelo)</div>
       <div class="form-pills">${formPills(rec)}</div>
       <div class="form-avg"><span>GF: <b>${fm.gf.toFixed(2)}</b></span><span>GA: <b>${fm.ga.toFixed(2)}</b></span><span style="color:rgba(255,255,255,.25)">liga ${lgpt.toFixed(2)}</span></div>
       <div class="insight-box" style="border-color:#7aa2ff">${atkDesc}. ${defDesc}.</div>
@@ -11792,19 +10910,17 @@ function renderCompare(tA, tB){
   function hi(vA,vB,lowerBetter){ const aW=lowerBetter?vA<vB:vA>vB; const bW=lowerBetter?vB<vA:vB>vA; return [aW?"val-better":bW?"val-worse":"", bW?"val-better":aW?"val-worse":""]; }
   const rows=[
     ["Elo",eloA.toFixed(0),eloB.toFixed(0),false],
-    ["Ataque casa (atkH)",fA.atkH.toFixed(3),fB.atkH.toFixed(3),false],
-    ["Defesa casa (defH ↓)",fA.defH.toFixed(3),fB.defH.toFixed(3),true],
-    ["Ataque fora (atkA)",fA.atkA.toFixed(3),fB.atkA.toFixed(3),false],
-    ["Defesa fora (defA ↓)",fA.defA.toFixed(3),fB.defA.toFixed(3),true],
-    ["Forma: GF médio",fmA.gf.toFixed(2),fmB.gf.toFixed(2),false],
-    ["Forma: GA médio",fmA.ga.toFixed(2),fmB.ga.toFixed(2),true],
+    ["Ataque α",fA.atkH.toFixed(3),fB.atkH.toFixed(3),false],
+    ["Defesa β (↓ melhor)",fA.defH.toFixed(3),fB.defH.toFixed(3),true],
+    ["Últimos 5: GF médio",fmA.gf.toFixed(2),fmB.gf.toFixed(2),false],
+    ["Últimos 5: GA médio",fmA.ga.toFixed(2),fmB.ga.toFixed(2),true],
   ];
   const tableRows=rows.map(([lbl,vA,vB,lb])=>{const[cA,cB]=hi(parseFloat(vA),parseFloat(vB),lb);return `<tr><td>${lbl}</td><td class="${cA}">${vA}</td><td class="${cB}">${vB}</td></tr>`;}).join("");
   cmpResult.innerHTML=`<div class="cmp-grid">${sideCard(tA,fA,eloA,fmA,recA)}${sideCard(tB,fB,eloB,fmB,recB)}</div>
     <div class="cmp-card" style="margin-top:14px;">
       <div class="cmp-section">Comparação direta</div>
       <table class="cmp-table"><thead><tr><th>Indicador</th><th>${displayName(tA)}</th><th>${displayName(tB)}</th></tr></thead><tbody>${tableRows}</tbody></table>
-      <p class="small" style="margin-top:8px;">defH / defA: quanto menor, menos gols sofridos em proporção à liga (melhor). Elo ≥ 1560 = elite · Elo ≤ 1460 = abaixo da média.</p>
+      <p class="small" style="margin-top:8px;">β: quanto menor, menos gols sofridos em proporção à liga (melhor). Os últimos 5 jogos são exibidos como contexto — o modelo não os usa como fator. Elo ≥ 1560 = elite · Elo ≤ 1460 = abaixo da média.</p>
     </div>`;
   cmpMeta.textContent=`${displayName(tA)} vs ${displayName(tB)}`;
 }
@@ -11835,23 +10951,13 @@ function renderConfig(){
     { title: 'Poisson', items: [
       row('Half-life',            CONFIG.HALF_LIFE_POISSON_ROUNDS + ' rodadas'),
       row('Peso mínimo',          CONFIG.MIN_W_POI),
-      row('Média casa (liga)',     '—'),
-      row('Média fora (liga)',     '—'),
-    ]},
-    { title: 'Forma Recente', items: [
-      row('Janela',               CONFIG.FORM_MATCHES + ' jogos'),
-      row('Half-life',            CONFIG.HALF_LIFE_FORM_ROUNDS + ' rodadas'),
-      row('Peso mínimo',          CONFIG.MIN_W_FORM),
-      row('Clamp fator',          CONFIG.FORM_FACTOR_MIN + ' – ' + CONFIG.FORM_FACTOR_MAX),
+      row('α·β·γ·μ casa',          MODEL ? MODEL.homeBase.toFixed(3) : '—'),
+      row('α·β·μ fora',            MODEL ? MODEL.awayBase.toFixed(3) : '—'),
+      row('Iterações MLE',        CONFIG.MLE_ITERATIONS),
     ]},
     { title: 'Dixon–Coles & Odds', items: [
-      row('ρ (rho)',              CONFIG.DC_RHO),
+      row('ρ (estimado)',         MODEL ? MODEL.dc.rho.toFixed(4) : '—'),
       row('Overround',            (CONFIG.OVERROUND*100).toFixed(1) + '%'),
-    ]},
-    { title: 'Descanso', items: [
-      row('Gap neutro',           CONFIG.REST_ROUNDS_BASELINE + ' rodada'),
-      row('Coef. por rodada',     '±' + (CONFIG.REST_COEF*100).toFixed(0) + '%'),
-      row('Clamp fator',          CONFIG.REST_FACTOR_MIN + ' – ' + CONFIG.REST_FACTOR_MAX),
     ]},
     { title: 'Backtest', items: [
       row('Temporadas de teste',  CONFIG.BACKTEST_SEASONS),
@@ -11871,8 +10977,8 @@ function renderConfig(){
     'Pesos temporais em rodadas — sem depender de datas.',
     'Home advantage entra apenas no Poisson (evita dupla contagem com Elo).',
     'Elo ajusta λ via <code style="font-size:9px;color:rgba(255,255,255,.6)">exp(±γ·ΔElo/400)</code> com clamp.',
-    'Forma recente ajusta λ multiplicativamente com base nos últimos 5 jogos.',
-    'Descanso: ±3 % de λ por rodada extra acima do gap neutro de 1r.',
+    'Ataque α e defesa β vêm de um MLE conjunto (Adam + gradientes analíticos).',
+    'Sem fator de forma nem de descanso: ambos pioravam o log-loss no backtest.',
     'Dixon–Coles corrige sub-representação dos placares 0–0, 1–0, 0–1 e 1–1.',
     'Odds = probabilidade × (1 + overround) — somente para referência.',
   ];

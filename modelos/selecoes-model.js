@@ -138,11 +138,14 @@
     //   τ(0,1) = 1 + lamH*rho
     //   τ(1,0) = 1 + lamA*rho
     //   τ(1,1) = 1 - rho
+    // τ só é positivo para ρ dentro de uma faixa que depende de λ
+    // (|ρ| <= min(1/λH, 1/λA, 1/(λH·λA))). Fora dela o τ analítico fica
+    // negativo e geraria probabilidade negativa — daí o piso.
     const applyTau = (gh, ga, tau) => {
       const key = `${gh},${ga}`;
       const cur = adj.get(key);
       if (cur == null) return;
-      adj.set(key, cur * tau);
+      adj.set(key, cur * Math.max(1e-12, tau));
     };
 
     applyTau(0, 0, 1 - lamH * lamA * rho);

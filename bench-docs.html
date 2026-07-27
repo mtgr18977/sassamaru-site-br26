@@ -477,9 +477,9 @@ footer {
         <li><a href="#s3-1">Pesos temporais</a></li>
         <li><a href="#s3-2">Regressão de Poisson</a></li>
         <li><a href="#s3-3">Ratings Elo</a></li>
-        <li><a href="#s3-4">Forma recente</a></li>
+        <li><a href="#s3-4">Forma recente (removida)</a></li>
         <li><a href="#s3-5">Correção Dixon-Coles</a></li>
-        <li><a href="#s3-6">Fator de descanso</a></li>
+        <li><a href="#s3-6">Fator de descanso (removido)</a></li>
         <li><a href="#s3-7">Campo neutro</a></li>
       </ul>
     </li>
@@ -564,9 +564,7 @@ footer {
       <span class="pipe-arrow">→</span>
       <span class="pipe-step">3. Elo (ajuste λ)</span>
       <span class="pipe-arrow">→</span>
-      <span class="pipe-step">4. Forma (ajuste λ)</span>
-      <span class="pipe-arrow">→</span>
-      <span class="pipe-step">5. Dixon-Coles</span>
+      <span class="pipe-step">4. Dixon-Coles</span>
       <span class="pipe-arrow">→</span>
       <span class="pipe-step">P(H/D/A)</span>
     </div>
@@ -587,11 +585,11 @@ footer {
     <tbody>
       <tr><td>Elo</td><td>76 rodadas (~2 temporadas)</td><td>730 dias (~2 anos)</td><td>0.10</td></tr>
       <tr><td>Poisson (λ)</td><td>152 rodadas (~4 temporadas)</td><td>1 460 dias (~4 anos)</td><td>0.25</td></tr>
-      <tr><td>Forma recente</td><td>19 rodadas (~½ temporada)</td><td>120 dias (~4 meses)</td><td>0.35</td></tr>
+      <tr><td>Forma recente</td><td><em>não usado</em> (ver 3.4)</td><td>120 dias (~4 meses)</td><td>0.35</td></tr>
     </tbody>
   </table>
 
-  <p>A intuição por trás dos diferentes half-lives: a <strong>força de ataque e defesa</strong> (Poisson) muda devagar — um time bom geralmente permanece bom por anos. A <strong>força relativa</strong> (Elo) muda um pouco mais rápido. A <strong>forma</strong> é por definição transitória — o que importa são os últimos meses, não os últimos anos.</p>
+  <p>A intuição por trás dos diferentes half-lives: a <strong>força de ataque e defesa</strong> (Poisson) muda devagar — um time bom geralmente permanece bom por anos. A <strong>força relativa</strong> (Elo) muda um pouco mais rápido.</p>
 
   <!-- 3.2 -->
   <h3 id="s3-2">3.2 Regressão de Poisson</h3>
@@ -628,17 +626,23 @@ footer {
   </div>
 
   <!-- 3.4 -->
-  <h3 id="s3-4">3.4 Forma recente</h3>
+  <h3 id="s3-4">3.4 Forma recente — por que foi removida</h3>
 
-  <p>A forma recente captura a tendência de curto prazo de um time — um time que está em crise tende a continuar sofrendo gols, independentemente da sua força histórica.</p>
+  <p>O modelo do Brasileirão aplicava um fator de forma: as médias de gols marcados e sofridos nos últimos 5 jogos viravam multiplicadores de λ, limitados a ±25%. A ideia é intuitiva — um time em crise tende a continuar mal — mas o backtest walk-forward mostrou que ela <strong>piorava</strong> as previsões.</p>
 
-  <p>Para cada time, os últimos <code style="font-family:var(--mono);font-size:12px">FORM_N</code> jogos são usados para calcular médias ponderadas de gols marcados (GF) e sofridos (GA), com o peso temporal de forma (half-life curto):</p>
+  <p>Medido sobre as três últimas temporadas, retirando apenas o fator de forma e mantendo todo o resto igual:</p>
 
-<div class="formula-block"><div class="formula-eq"><span class="eq-line eq-main">form_GF(t) = Σ(gols_marcados_i × w_form_i) / Σ(w_form_i)</span><span class="eq-line eq-sub">form_GA(t) = Σ(gols_sofridos_i  × w_form_i) / Σ(w_form_i)</span></div><div class="formula-vars"><div class="formula-var"><span class="formula-var-name">i</span><span class="formula-var-desc">Índice dos últimos FORM_N jogos do time</span></div><div class="formula-var"><span class="formula-var-name">w_form_i</span><span class="formula-var-desc">Peso temporal de forma: 0.5 ^ (age_i / HL_FORM), mínimo MIN_W_FORM</span></div></div></div>
+  <table class="param-table">
+    <thead><tr><th>Configuração</th><th>Log-loss ↓</th><th>RPS ↓</th><th>Acurácia ↑</th></tr></thead>
+    <tbody>
+      <tr><td>Com fator de forma</td><td>1.0975</td><td>0.2229</td><td>46.6%</td></tr>
+      <tr><td>Sem fator de forma</td><td><strong>1.0584</strong></td><td><strong>0.2134</strong></td><td><strong>49.2%</strong></td></tr>
+    </tbody>
+  </table>
 
-  <p>Esses valores são convertidos em fatores relativos à média da liga e aplicados a λ:</p>
+  <p>O motivo é estatístico. A média de 5 amostras de uma Poisson(1.3) tem desvio-padrão de aproximadamente 0.51, então a razão <code style="font-family:var(--mono);font-size:12px">form_GF / média_liga</code> tem desvio-padrão de cerca de 0.39 — bem maior do que a largura do próprio clamp. O fator passava quase todo o tempo saturado em 0.75 ou 1.25, respondendo a ruído amostral e não a sinal. Pior: esses mesmos 5 jogos já são os de maior peso na estimação de α e β, então a informação era contada duas vezes.</p>
 
-<div class="formula-block"><div class="formula-eq"><span class="eq-line eq-sub">fator_atk_H = clamp( form_GF(mandante) / média_liga,  0.75,  1.25 )</span><span class="eq-line eq-sub">fator_def_A = clamp( form_GA(visitante) / média_liga,  0.75,  1.25 )</span><span class="eq-line"></span><span class="eq-line eq-main">λ_H = λ_H_base × fator_atk_H × fator_def_A</span><span class="eq-line eq-sub">λ_A = λ_A_base × fator_atk_A × fator_def_H</span></div><div class="formula-note">FORM_MIN = 0.75 · FORM_MAX = 1.25 — clamp evita over-fitting a sequências curtas de resultados.</div></div>
+  <p>Um fator de forma melhor construído — baseado no <em>resíduo</em> (gols observados menos gols previstos pelo modelo) e ajustado pela força do adversário — pode ter valor. Enquanto não passar pelo backtest, o modelo não usa forma recente.</p>
 
   <!-- 3.5 -->
   <h3 id="s3-5">3.5 Correção Dixon-Coles</h3>
@@ -647,18 +651,22 @@ footer {
 
 <div class="formula-block"><div class="formula-eq"><span class="eq-line eq-main">P(g_H, g_A) ∝ Poisson(λ_H, g_H) × Poisson(λ_A, g_A) × τ(g_H, g_A)</span><span class="eq-line"></span><span class="eq-line eq-sub">         ⎧ 1 − λ_H·λ_A·ρ    se g_H=0, g_A=0</span><span class="eq-line eq-sub">         ⎪ 1 + λ_A·ρ         se g_H=1, g_A=0</span><span class="eq-line eq-sub">τ(g,g) = ⎨ 1 + λ_H·ρ         se g_H=0, g_A=1</span><span class="eq-line eq-sub">         ⎪ 1 − ρ             se g_H=1, g_A=1</span><span class="eq-line eq-sub">         ⎩ 1                 caso contrário</span></div><div class="formula-vars"><div class="formula-var"><span class="formula-var-name">ρ</span><span class="formula-var-desc">Estimado via MLE — tipicamente entre −0.05 e −0.15 para o Brasileirão</span></div><div class="formula-var"><span class="formula-var-name">ρ &lt; 0</span><span class="formula-var-desc">Aumenta P(0-0) e P(1-1) · reduz P(1-0) e P(0-1)</span></div></div></div>
 
-  <p>O valor de ρ é estimado por <strong>máxima verossimilhança (MLE)</strong> via busca em grade de -0.50 a +0.50 em passos de 0.01, maximizando a log-verossimilhança do conjunto de treinamento. O valor empírico encontrado para o Brasileirão é aproximadamente <strong>ρ ≈ −0.01</strong> — significativamente menos negativo do que o −0.10 assumido inicialmente, o que demonstra a importância de estimar o parâmetro em vez de fixá-lo por hipótese.</p>
+  <p>O valor de ρ é estimado por <strong>máxima verossimilhança</strong>. No modelo de seleções isso é feito por busca em grade de −0.50 a +0.50 em passos de 0.01; no modelo do Brasileirão, ρ entra no vetor de parâmetros e é estimado junto com α, β, γ e μ pelo mesmo gradiente.</p>
+
+  <p>O valor empírico encontrado para o Brasileirão fica <strong>próximo de zero</strong> — bem menos negativo do que o −0.10 que já foi assumido por hipótese. Ou seja: nos dados do Brasileirão a correção de Dixon-Coles é quase inerte, e forçar ρ = −0.10 estava distorcendo os placares baixos sem ganho de acurácia. É um bom exemplo de por que estimar vale mais do que arbitrar.</p>
+
+  <p><strong>O τ usado na previsão é o mesmo τ que a verossimilhança maximiza.</strong> Isso parece óbvio, mas por um tempo não foi verdade: o ajuste usava <code style="font-family:var(--mono);font-size:12px">τ(0,0) = 1 − λ_H·λ_A·ρ</code> enquanto a previsão aplicava <code style="font-family:var(--mono);font-size:12px">1 − ρ</code>, sem os λ — três das quatro células com a forma funcional errada.</p>
 
   <div class="callout warn">
     <strong>Normalização:</strong> Após aplicar a correção, a matriz de placares é renormalizada para que a soma de todas as probabilidades seja 1.0. Isso é necessário porque τ pode distorcer ligeiramente a soma total.
   </div>
 
   <!-- 3.6 -->
-  <h3 id="s3-6">3.6 Fator de descanso (Brasileirão)</h3>
+  <h3 id="s3-6">3.6 Fator de descanso — por que foi removido</h3>
 
-  <p>No Brasileirão, times com mais rodadas de descanso desde o último jogo jogam melhor. O modelo aplica um ajuste em λ baseado no gap (em rodadas) desde a última partida disputada:</p>
+  <p>O modelo ajustava λ em função de quantas rodadas o time havia descansado desde o jogo anterior (+3% por rodada extra, limitado a −8%/+6%). No backtest, ligar esse fator piorava o log-loss de 1.0975 para 1.0995.</p>
 
-<div class="formula-block"><div class="formula-eq"><span class="eq-line eq-main">rest_factor = clamp( 1 + REST_COEF × (gap − REST_BASELINE),  REST_MIN,  REST_MAX )</span></div><div class="formula-vars"><div class="formula-var"><span class="formula-var-name">gap</span><span class="formula-var-desc">Número de rodadas desde o último jogo do time</span></div><div class="formula-var"><span class="formula-var-name">REST_BASELINE</span><span class="formula-var-desc">1 rodada — gap neutro, sem ajuste</span></div><div class="formula-var"><span class="formula-var-name">REST_COEF</span><span class="formula-var-desc">0.03 → +3% de λ por rodada extra de descanso</span></div><div class="formula-var"><span class="formula-var-name">REST_MIN</span><span class="formula-var-desc">0.92 → penalidade máxima de 8%</span></div><div class="formula-var"><span class="formula-var-name">REST_MAX</span><span class="formula-var-desc">1.06 → bônus máximo de 6%</span></div></div></div>
+  <p>Além de não ajudar, a construção era frágil: o descanso era inferido apenas pelo intervalo entre <strong>rodadas do Brasileirão</strong>. Um time que jogou Libertadores ou Copa do Brasil no meio de semana aparecia para o modelo como descansado — justamente o caso em que o efeito real deveria ser o oposto. Modelar isso direito exige o calendário de outras competições, que não está no dataset.</p>
 
   <!-- 3.7 -->
   <h3 id="s3-7">3.7 Campo neutro (seleções)</h3>
@@ -775,8 +783,8 @@ footer {
       </tr>
       <tr>
         <td>Fator descanso</td>
-        <td style="font-family:var(--sans);font-size:12px">Sim</td>
-        <td style="font-family:var(--sans);font-size:12px">Não (MC)</td>
+        <td style="font-family:var(--sans);font-size:12px">Não (removido)</td>
+        <td style="font-family:var(--sans);font-size:12px">Não</td>
         <td style="font-family:var(--sans);font-size:12px">Não</td>
         <td style="font-family:var(--sans);font-size:12px">Não</td>
       </tr>
@@ -837,7 +845,7 @@ footer {
       <span class="todo-tag done">Modelo</span>
       <div class="todo-text">
         <strong>Dixon-Coles completo com iteração MLE</strong>
-        <small>Implementado em <code style="font-family:var(--mono);font-size:11px">modelos/model.js</code>: todos os parâmetros (α ataque, β defesa, γ home advantage, μ base, ρ) estimados conjuntamente via gradiente analítico da log-verossimilhança com 400 iterações Adam e penalidades de identificabilidade.</small>
+        <small>Implementado em <code style="font-family:var(--mono);font-size:11px">modelos/model.js</code> e usado em produção pelas duas páginas do Brasileirão: todos os parâmetros (α ataque, β defesa, γ home advantage, μ base, ρ) estimados conjuntamente via gradiente analítico da log-verossimilhança com 400 iterações Adam e penalidades de identificabilidade.</small>
       </div>
     </li>
     <li>
