@@ -106,6 +106,65 @@ const icon512 = fs.statSync(path.join(ROOT, 'icons/icon-512.png'));
 assert(icon192.size > 500, `icon-192.png is non-trivial (${icon192.size} bytes)`);
 assert(icon512.size > 500, `icon-512.png is non-trivial (${icon512.size} bytes)`);
 
+// ── Service worker caching strategy ───────────────────────────────────────────
+//
+// Regressão real: o SW era cache-first para TODO recurso same-origin. Quando
+// modelos/model.js mudou sem bump do CACHE_VERSION, o navegador manteve o JS
+// antigo em cache enquanto o HTML vinha novo da rede, e a página quebrou com
+// "computeSeasonState is not a function". Código da aplicação tem que ser
+// network-first para que HTML e JS nunca fiquem em versões diferentes.
+section('Service worker caching strategy');
+
+const swSrc = fs.readFileSync(path.join(ROOT, 'service-worker.js'), 'utf8');
+
+// Carrega o SW num sandbox e recupera a função de decisão de rota.
+let swApi = null;
+try {
+  const listeners = {};
+  const fakeSelf = {
+    addEventListener: (evt, fn) => { listeners[evt] = fn; },
+    skipWaiting: () => {},
+    clients: { claim: () => {} },
+    location: { origin: 'https://example.test' },
+  };
+  const factory = new Function(
+    'self', 'caches', 'fetch', 'Response', 'URL',
+    swSrc + '\n;return { isAppCode, CACHE_NAME, PRECACHE_ASSETS, listeners: arguments[0] };'
+  );
+  swApi = factory(fakeSelf, { open: async () => ({}), match: async () => null },
+                  async () => ({ ok: true, clone: () => ({}) }), function Response() {}, URL);
+  assert(true, 'service-worker.js carrega num sandbox');
+} catch (e) {
+  assert(false, `service-worker.js carrega num sandbox (${e.message})`);
+}
+
+if (swApi) {
+  const decide = (pathname, mode) =>
+    swApi.isAppCode(new URL('https://example.test' + pathname), { mode: mode || 'no-cors' });
+
+  // código e documentos → network-first
+  assert(decide('/modelos/model.js'), 'modelos/model.js usa network-first');
+  assert(decide('/modelos/selecoes-model.js'), 'selecoes-model.js usa network-first');
+  assert(decide('/apps/index.html'), 'apps/index.html usa network-first');
+  assert(decide('/manifest.json'), 'manifest.json usa network-first');
+  assert(decide('/', 'navigate'), 'navegação na raiz usa network-first');
+  assert(decide('/qualquer/coisa', 'navigate'), 'qualquer navegação usa network-first');
+
+  // assets estáticos seguem cache-first (velocidade + offline)
+  assert(!decide('/icons/icon-192.png'), 'icon-192.png segue cache-first');
+  assert(!decide('/icons/icon.svg'), 'icon.svg segue cache-first');
+
+  assert(swApi.PRECACHE_ASSETS.includes('./modelos/model.js'),
+    'modelos/model.js está no precache');
+  assert(/^br26-v\d+$/.test(swApi.CACHE_NAME),
+    `CACHE_NAME tem versão (${swApi.CACHE_NAME})`);
+}
+
+assert(/async function networkFirst\(/.test(swSrc),
+  'service-worker.js implementa networkFirst');
+assert(/async function cacheFirst\(/.test(swSrc),
+  'service-worker.js mantém cacheFirst para assets');
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 console.log(`\n${'─'.repeat(50)}`);
 console.log(`PWA tests: ${passed} passed, ${failed} failed`);

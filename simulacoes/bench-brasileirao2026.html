@@ -9586,6 +9586,24 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
 //  2026 Brasileirão — 20 teams (normalised)
 // ════════════════════════════════════════════════
 const BM = window.BenchModel;
+
+// Guarda de versão. Se o navegador servir um modelos/model.js mais antigo que
+// esta página, é melhor dizer o que fazer do que estourar um
+// "X is not a function" no meio da inicialização.
+(() => {
+  const required = ['buildModel', 'predictMatch', 'normalizeTeam', 'computeSeasonState'];
+  const missing = !BM ? required : required.filter(f => typeof BM[f] !== 'function');
+  if (!missing.length) return;
+  const t = document.getElementById('loading-title');
+  const sub = document.getElementById('loading-sub');
+  if (t) t.textContent = 'Cópia em cache desatualizada';
+  if (sub) sub.innerHTML =
+    'O navegador está usando uma versão antiga de <code>modelos/model.js</code> ' +
+    '(faltando: ' + missing.join(', ') + ').<br>' +
+    'Recarregue com <b>Ctrl+Shift+R</b> (ou <b>Cmd+Shift+R</b> no Mac).';
+  throw new Error('modelos/model.js desatualizado — faltam: ' + missing.join(', '));
+})();
+
 const {CONFIG, buildModel, predictMatch, normalizeTeam, computeSeasonState} = BM;
 
 const TEAMS_2026_RAW = [
