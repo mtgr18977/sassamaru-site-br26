@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-globals */
 'use strict';
 
-const CACHE_VERSION = 'v1';
+const CACHE_VERSION = 'v3';
 const CACHE_NAME = `br26-${CACHE_VERSION}`;
 
 // Assets to pre-cache on install
@@ -11,6 +11,8 @@ const PRECACHE_ASSETS = [
   './apps/bench-selecoes.html',
   './simulacoes/bench-copa2026.html',
   './simulacoes/bench-brasileirao2026.html',
+  './modelos/model.js',
+  './modelos/selecoes-model.js',
   './manifest.json',
   './icons/icon-192.png',
   './icons/icon-512.png',
@@ -24,6 +26,23 @@ const CDN_HOSTS = [
   'cdn.jsdelivr.net',
 ];
 
+// Documentos e código da aplicação usam network-first; o resto (ícones,
+// imagens, fontes locais) segue cache-first.
+//
+// Por que não cache-first para tudo: as páginas e modelos/model.js precisam
+// estar na MESMA versão. Com cache-first, uma alteração em model.js sem bump
+// manual do CACHE_VERSION deixava o JS preso na versão antiga enquanto o HTML
+// vinha novo da rede — a página chamava uma função que a cópia em cache não
+// tinha ("computeSeasonState is not a function"). Manter o código em
+// network-first faz a consistência não depender de ninguém lembrar do bump.
+const NETWORK_FIRST_RE = /\.(?:html|js|json)$/i;
+
+function isAppCode(url, request) {
+  return request.mode === 'navigate'
+    || url.pathname.endsWith('/')
+    || NETWORK_FIRST_RE.test(url.pathname);
+}
+
 // ── Install ──────────────────────────────────────────────────────────────────
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -35,16 +54,19 @@ self.addEventListener('install', (event) => {
 
 // ── Activate ─────────────────────────────────────────────────────────────────
 self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(
-        keys
-          .filter((key) => key.startsWith('br26-') && key !== CACHE_NAME)
-          .map((key) => caches.delete(key))
-      )
-    )
-  );
-  self.clients.claim();
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    const stale = keys.filter((key) => key.startsWith('br26-') && key !== CACHE_NAME);
+    await Promise.all(stale.map((key) => caches.delete(key)));
+    await self.clients.claim();
+
+    // Deliberadamente NÃO recarregamos as abas daqui. Chamar client.navigate()
+    // no activate parecia atraente para consertar a aba já aberta, mas na
+    // prática entra em laço de reload. Como o código passou a ser network-first,
+    // basta a próxima navegação normal para HTML e JS voltarem a ficar na mesma
+    // versão; e a guarda de versão nas páginas explica o que fazer se alguém
+    // pegar a carga intermediária.
+  })());
 });
 
 // ── Fetch ─────────────────────────────────────────────────────────────────────
@@ -60,9 +82,14 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Same-origin resources: cache-first, fallback to network
+  // Same-origin: código e documentos em network-first (consistência de
+  // versão), demais assets em cache-first (velocidade).
   if (url.origin === self.location.origin) {
-    event.respondWith(cacheFirst(event.request));
+    if (isAppCode(url, event.request)) {
+      event.respondWith(networkFirst(event.request));
+    } else {
+      event.respondWith(cacheFirst(event.request));
+    }
     return;
   }
 });
@@ -80,18 +107,51 @@ async function cacheFirst(request) {
     }
     return response;
   } catch {
-    // Return a minimal offline page if we have nothing cached
-    return new Response(
-      '<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Offline — BR26</title>' +
-      '<meta name="viewport" content="width=device-width,initial-scale=1">' +
-      '<style>body{font-family:sans-serif;display:flex;align-items:center;justify-content:center;' +
-      'height:100vh;margin:0;background:#F7F6F2;color:#1A4731}' +
-      '.box{text-align:center;padding:2rem}h1{font-size:2rem;margin-bottom:.5rem}p{color:#555}</style>' +
-      '</head><body><div class="box"><h1>⚽ BR26</h1>' +
-      '<p>Você está offline. Abra o app novamente quando tiver conexão.</p></div></body></html>',
-      { headers: { 'Content-Type': 'text/html; charset=utf-8' } }
-    );
+    return offlineFallback();
   }
+}
+
+// Network-first: busca na rede e atualiza o cache; cai para o cache só quando
+// a rede falha (offline). Garante que HTML e JS nunca fiquem em versões
+// diferentes enquanto houver conexão.
+//
+// `cache: 'no-cache'` é essencial e não é detalhe: um fetch comum consulta o
+// cache HTTP do próprio navegador, que pode devolver o arquivo antigo sem nem
+// perguntar ao servidor (com heurística de frescor, quando a resposta não traz
+// Cache-Control). Sem isto, "network-first" continuava servindo JS velho e o
+// bug do "computeSeasonState is not a function" sobrevivia — foi o que um teste
+// com o service worker ativo mostrou.
+//
+// 'no-cache' e não 'reload': os dois ignoram o cache na leitura, mas 'no-cache'
+// revalida com o servidor e aceita 304, enquanto 'reload' baixa o corpo inteiro
+// toda vez. Estas páginas carregam o CSV embutido (de 400 KB a 3,7 MB), então a
+// diferença aparece na conta de dados de quem usa no celular.
+async function networkFirst(request) {
+  try {
+    const response = await fetch(request, { cache: 'no-cache' });
+    if (response.ok) {
+      const cache = await caches.open(CACHE_NAME);
+      cache.put(request, response.clone());
+    }
+    return response;
+  } catch {
+    const cached = await caches.match(request);
+    if (cached) return cached;
+    return offlineFallback();
+  }
+}
+
+function offlineFallback() {
+  return new Response(
+    '<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Offline — BR26</title>' +
+    '<meta name="viewport" content="width=device-width,initial-scale=1">' +
+    '<style>body{font-family:sans-serif;display:flex;align-items:center;justify-content:center;' +
+    'height:100vh;margin:0;background:#F7F6F2;color:#1A4731}' +
+    '.box{text-align:center;padding:2rem}h1{font-size:2rem;margin-bottom:.5rem}p{color:#555}</style>' +
+    '</head><body><div class="box"><h1>⚽ BR26</h1>' +
+    '<p>Você está offline. Abra o app novamente quando tiver conexão.</p></div></body></html>',
+    { headers: { 'Content-Type': 'text/html; charset=utf-8' } }
+  );
 }
 
 async function staleWhileRevalidate(request) {

@@ -106,6 +106,109 @@ const icon512 = fs.statSync(path.join(ROOT, 'icons/icon-512.png'));
 assert(icon192.size > 500, `icon-192.png is non-trivial (${icon192.size} bytes)`);
 assert(icon512.size > 500, `icon-512.png is non-trivial (${icon512.size} bytes)`);
 
+// ── Service worker caching strategy ───────────────────────────────────────────
+//
+// Regressão real: o SW era cache-first para TODO recurso same-origin. Quando
+// modelos/model.js mudou sem bump do CACHE_VERSION, o navegador manteve o JS
+// antigo em cache enquanto o HTML vinha novo da rede, e a página quebrou com
+// "computeSeasonState is not a function". Código da aplicação tem que ser
+// network-first para que HTML e JS nunca fiquem em versões diferentes.
+section('Service worker caching strategy');
+
+const swSrc = fs.readFileSync(path.join(ROOT, 'service-worker.js'), 'utf8');
+
+// Carrega o SW num sandbox e recupera a função de decisão de rota.
+let swApi = null;
+try {
+  const listeners = {};
+  const fakeSelf = {
+    addEventListener: (evt, fn) => { listeners[evt] = fn; },
+    skipWaiting: () => {},
+    clients: { claim: () => {} },
+    location: { origin: 'https://example.test' },
+  };
+  const factory = new Function(
+    'self', 'caches', 'fetch', 'Response', 'URL',
+    swSrc + '\n;return { isAppCode, CACHE_NAME, PRECACHE_ASSETS, listeners: arguments[0] };'
+  );
+  swApi = factory(fakeSelf, { open: async () => ({}), match: async () => null },
+                  async () => ({ ok: true, clone: () => ({}) }), function Response() {}, URL);
+  assert(true, 'service-worker.js carrega num sandbox');
+} catch (e) {
+  assert(false, `service-worker.js carrega num sandbox (${e.message})`);
+}
+
+if (swApi) {
+  const decide = (pathname, mode) =>
+    swApi.isAppCode(new URL('https://example.test' + pathname), { mode: mode || 'no-cors' });
+
+  // código e documentos → network-first
+  assert(decide('/modelos/model.js'), 'modelos/model.js usa network-first');
+  assert(decide('/modelos/selecoes-model.js'), 'selecoes-model.js usa network-first');
+  assert(decide('/apps/index.html'), 'apps/index.html usa network-first');
+  assert(decide('/manifest.json'), 'manifest.json usa network-first');
+  assert(decide('/', 'navigate'), 'navegação na raiz usa network-first');
+  assert(decide('/qualquer/coisa', 'navigate'), 'qualquer navegação usa network-first');
+
+  // assets estáticos seguem cache-first (velocidade + offline)
+  assert(!decide('/icons/icon-192.png'), 'icon-192.png segue cache-first');
+  assert(!decide('/icons/icon.svg'), 'icon.svg segue cache-first');
+
+  assert(swApi.PRECACHE_ASSETS.includes('./modelos/model.js'),
+    'modelos/model.js está no precache');
+  assert(/^br26-v\d+$/.test(swApi.CACHE_NAME),
+    `CACHE_NAME tem versão (${swApi.CACHE_NAME})`);
+}
+
+assert(/async function networkFirst\(/.test(swSrc),
+  'service-worker.js implementa networkFirst');
+
+// Detalhe que já passou batido: sem forçar a revalidação, o fetch do
+// networkFirst consulta o cache HTTP do navegador e pode devolver o arquivo
+// antigo sem perguntar ao servidor — "network-first" no nome e cache-first no
+// efeito. Um teste com o service worker ativo mostrou o JS velho sendo servido
+// mesmo depois da estratégia mudar.
+assert(/fetch\(request, \{ cache: 'no-cache' \}\)/.test(swSrc),
+  "networkFirst força revalidação com cache: 'no-cache'");
+// compara sobre o código sem comentários — o comentário acima cita
+// client.navigate() justamente para explicar por que não se usa
+const swCode = swSrc.replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
+assert(!/client\.navigate\(/.test(swCode),
+  'activate não recarrega abas à força (causava laço de reload)');
+assert(/async function cacheFirst\(/.test(swSrc),
+  'service-worker.js mantém cacheFirst para assets');
+
+// ── Cabeçalhos de cache (_headers) ────────────────────────────────────────────
+//
+// Terceira camada contra o bug de versões dessincronizadas: quando a guarda de
+// versão se cura, ela remove o service worker, e a partir daí só os cabeçalhos
+// do servidor evitam que o navegador segure o JS antigo.
+section('Cache headers (_headers)');
+
+const headersPath = path.join(ROOT, '_headers');
+assert(fs.existsSync(headersPath), '_headers existe');
+
+if (fs.existsSync(headersPath)) {
+  const regras = {};
+  let atual = null;
+  for (const linha of fs.readFileSync(headersPath, 'utf8').split('\n')) {
+    if (!linha.trim() || linha.trimStart().startsWith('#')) continue;
+    if (!/^\s/.test(linha)) { atual = linha.trim(); regras[atual] = []; }
+    else if (atual) regras[atual].push(linha.trim());
+  }
+
+  const revalida = (rota) =>
+    Array.isArray(regras[rota]) &&
+    regras[rota].some((h) => /cache-control:.*must-revalidate/i.test(h)) &&
+    regras[rota].some((h) => /cache-control:.*max-age=0/i.test(h));
+
+  assert(revalida('/*.html'), 'HTML revalida (max-age=0, must-revalidate)');
+  assert(revalida('/modelos/*'), 'modelos/* revalida — precisa acompanhar o HTML');
+  assert(revalida('/service-worker.js'), 'service-worker.js revalida');
+  assert(Object.keys(regras).every((r) => r.startsWith('/')),
+    'todas as rotas do _headers começam com /');
+}
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 console.log(`\n${'─'.repeat(50)}`);
 console.log(`PWA tests: ${passed} passed, ${failed} failed`);
