@@ -178,6 +178,37 @@ assert(!/client\.navigate\(/.test(swCode),
 assert(/async function cacheFirst\(/.test(swSrc),
   'service-worker.js mantém cacheFirst para assets');
 
+// ── Cabeçalhos de cache (_headers) ────────────────────────────────────────────
+//
+// Terceira camada contra o bug de versões dessincronizadas: quando a guarda de
+// versão se cura, ela remove o service worker, e a partir daí só os cabeçalhos
+// do servidor evitam que o navegador segure o JS antigo.
+section('Cache headers (_headers)');
+
+const headersPath = path.join(ROOT, '_headers');
+assert(fs.existsSync(headersPath), '_headers existe');
+
+if (fs.existsSync(headersPath)) {
+  const regras = {};
+  let atual = null;
+  for (const linha of fs.readFileSync(headersPath, 'utf8').split('\n')) {
+    if (!linha.trim() || linha.trimStart().startsWith('#')) continue;
+    if (!/^\s/.test(linha)) { atual = linha.trim(); regras[atual] = []; }
+    else if (atual) regras[atual].push(linha.trim());
+  }
+
+  const revalida = (rota) =>
+    Array.isArray(regras[rota]) &&
+    regras[rota].some((h) => /cache-control:.*must-revalidate/i.test(h)) &&
+    regras[rota].some((h) => /cache-control:.*max-age=0/i.test(h));
+
+  assert(revalida('/*.html'), 'HTML revalida (max-age=0, must-revalidate)');
+  assert(revalida('/modelos/*'), 'modelos/* revalida — precisa acompanhar o HTML');
+  assert(revalida('/service-worker.js'), 'service-worker.js revalida');
+  assert(Object.keys(regras).every((r) => r.startsWith('/')),
+    'todas as rotas do _headers começam com /');
+}
+
 // ── Summary ───────────────────────────────────────────────────────────────────
 console.log(`\n${'─'.repeat(50)}`);
 console.log(`PWA tests: ${passed} passed, ${failed} failed`);

@@ -1,0 +1,32 @@
+# Cabeçalhos HTTP (formato Netlify).
+#
+# Terceira camada de proteção contra o bug de versões dessincronizadas que
+# quebrou a página com "computeSeasonState is not a function". As outras duas
+# são o service worker (network-first com revalidação forçada) e a guarda de
+# versão nas páginas.
+#
+# Esta camada existe porque a guarda, ao se curar, REMOVE o service worker —
+# e a partir daí só os cabeçalhos do servidor decidem se o navegador segura o
+# arquivo antigo. As páginas HTML e modelos/model.js precisam estar sempre na
+# mesma versão, então nenhum dos dois pode ficar em cache sem revalidar.
+#
+# must-revalidate não significa baixar tudo de novo: o navegador manda uma
+# requisição condicional e o servidor responde 304 quando nada mudou, então o
+# custo é um round-trip, não o corpo inteiro (relevante aqui, porque as páginas
+# carregam o CSV embutido — de 400 KB a 3,7 MB).
+
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/modelos/*
+  Cache-Control: public, max-age=0, must-revalidate
+
+/service-worker.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+/manifest.json
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Ícones podem ficar em cache: mudam junto com um rename, não em silêncio.
+/icons/*
+  Cache-Control: public, max-age=604800
