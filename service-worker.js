@@ -54,16 +54,19 @@ self.addEventListener('install', (event) => {
 
 // ── Activate ─────────────────────────────────────────────────────────────────
 self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(
-        keys
-          .filter((key) => key.startsWith('br26-') && key !== CACHE_NAME)
-          .map((key) => caches.delete(key))
-      )
-    )
-  );
-  self.clients.claim();
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    const stale = keys.filter((key) => key.startsWith('br26-') && key !== CACHE_NAME);
+    await Promise.all(stale.map((key) => caches.delete(key)));
+    await self.clients.claim();
+
+    // Deliberadamente NÃO recarregamos as abas daqui. Chamar client.navigate()
+    // no activate parecia atraente para consertar a aba já aberta, mas na
+    // prática entra em laço de reload. Como o código passou a ser network-first,
+    // basta a próxima navegação normal para HTML e JS voltarem a ficar na mesma
+    // versão; e a guarda de versão nas páginas explica o que fazer se alguém
+    // pegar a carga intermediária.
+  })());
 });
 
 // ── Fetch ─────────────────────────────────────────────────────────────────────
@@ -111,9 +114,21 @@ async function cacheFirst(request) {
 // Network-first: busca na rede e atualiza o cache; cai para o cache só quando
 // a rede falha (offline). Garante que HTML e JS nunca fiquem em versões
 // diferentes enquanto houver conexão.
+//
+// `cache: 'no-cache'` é essencial e não é detalhe: um fetch comum consulta o
+// cache HTTP do próprio navegador, que pode devolver o arquivo antigo sem nem
+// perguntar ao servidor (com heurística de frescor, quando a resposta não traz
+// Cache-Control). Sem isto, "network-first" continuava servindo JS velho e o
+// bug do "computeSeasonState is not a function" sobrevivia — foi o que um teste
+// com o service worker ativo mostrou.
+//
+// 'no-cache' e não 'reload': os dois ignoram o cache na leitura, mas 'no-cache'
+// revalida com o servidor e aceita 304, enquanto 'reload' baixa o corpo inteiro
+// toda vez. Estas páginas carregam o CSV embutido (de 400 KB a 3,7 MB), então a
+// diferença aparece na conta de dados de quem usa no celular.
 async function networkFirst(request) {
   try {
-    const response = await fetch(request);
+    const response = await fetch(request, { cache: 'no-cache' });
     if (response.ok) {
       const cache = await caches.open(CACHE_NAME);
       cache.put(request, response.clone());

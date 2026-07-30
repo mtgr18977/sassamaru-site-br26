@@ -162,6 +162,19 @@ if (swApi) {
 
 assert(/async function networkFirst\(/.test(swSrc),
   'service-worker.js implementa networkFirst');
+
+// Detalhe que já passou batido: sem forçar a revalidação, o fetch do
+// networkFirst consulta o cache HTTP do navegador e pode devolver o arquivo
+// antigo sem perguntar ao servidor — "network-first" no nome e cache-first no
+// efeito. Um teste com o service worker ativo mostrou o JS velho sendo servido
+// mesmo depois da estratégia mudar.
+assert(/fetch\(request, \{ cache: 'no-cache' \}\)/.test(swSrc),
+  "networkFirst força revalidação com cache: 'no-cache'");
+// compara sobre o código sem comentários — o comentário acima cita
+// client.navigate() justamente para explicar por que não se usa
+const swCode = swSrc.replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
+assert(!/client\.navigate\(/.test(swCode),
+  'activate não recarrega abas à força (causava laço de reload)');
 assert(/async function cacheFirst\(/.test(swSrc),
   'service-worker.js mantém cacheFirst para assets');
 

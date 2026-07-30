@@ -10170,22 +10170,54 @@ athletico-pr x botafogo</textarea>
 <script>
 const Model = window.BenchModel;
 
-// Guarda de versão — ver comentário equivalente em bench-brasileirao2026.html.
+// Guarda de versão + auto-cura — ver o comentário equivalente, mais detalhado,
+// em simulacoes/bench-brasileirao2026.html.
+const _SYNC_FLAG = 'br26-cache-reset';
 (() => {
   const required = ['buildModel', 'predictMatch', 'normalizeTeam', 'computeSeasonState', 'runBacktest'];
   const missing = !Model ? required : required.filter(f => typeof Model[f] !== 'function');
-  if (!missing.length) return;
-  const msg = 'O navegador está usando uma versão antiga de modelos/model.js (faltando: '
-    + missing.join(', ') + '). Recarregue com Ctrl+Shift+R.';
-  document.addEventListener('DOMContentLoaded', () => {
-    const el = document.getElementById('status') || document.body;
-    const box = document.createElement('div');
-    box.style.cssText = 'margin:16px;padding:12px 16px;border-radius:8px;'
-      + 'background:#FEF2F2;border:1px solid #FCA5A5;color:#991B1B;font:14px/1.5 sans-serif';
-    box.textContent = msg;
-    el.prepend ? el.prepend(box) : el.appendChild(box);
-  });
-  throw new Error(msg);
+
+  if (!missing.length) {
+    try { sessionStorage.removeItem(_SYNC_FLAG); } catch (e) { /* modo restrito */ }
+    return;
+  }
+
+  let jaTentou = false;
+  try { jaTentou = sessionStorage.getItem(_SYNC_FLAG) === '1'; } catch (e) { /* modo restrito */ }
+
+  const aviso = (texto) => {
+    const pinta = () => {
+      const box = document.createElement('div');
+      box.style.cssText = 'margin:16px;padding:12px 16px;border-radius:8px;'
+        + 'background:#FEF2F2;border:1px solid #FCA5A5;color:#991B1B;font:14px/1.5 sans-serif';
+      box.textContent = texto;
+      document.body.prepend(box);
+    };
+    if (document.body) pinta();
+    else document.addEventListener('DOMContentLoaded', pinta);
+  };
+
+  if (!jaTentou) {
+    try { sessionStorage.setItem(_SYNC_FLAG, '1'); } catch (e) { /* modo restrito */ }
+    aviso('Descartando a versão em cache e recarregando…');
+    (async () => {
+      try {
+        if ('serviceWorker' in navigator) {
+          const regs = await navigator.serviceWorker.getRegistrations();
+          await Promise.all(regs.map(r => r.unregister()));
+        }
+        if (window.caches) {
+          const keys = await caches.keys();
+          await Promise.all(keys.map(k => caches.delete(k)));
+        }
+      } catch (e) { /* segue para o reload de qualquer forma */ }
+      location.reload();
+    })();
+  } else {
+    aviso('O navegador insiste em uma versão antiga de modelos/model.js (faltando: '
+      + missing.join(', ') + '). Abra o site em uma aba anônima ou limpe os dados do site.');
+  }
+  throw new Error('modelos/model.js desatualizado — faltam: ' + missing.join(', '));
 })();
 const { CONFIG, buildModel, predictMatch, normalizeTeam, computeSeasonState } = Model;
 let MODEL = null;

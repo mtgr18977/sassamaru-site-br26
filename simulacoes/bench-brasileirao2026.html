@@ -9587,20 +9587,57 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
 // ════════════════════════════════════════════════
 const BM = window.BenchModel;
 
-// Guarda de versão. Se o navegador servir um modelos/model.js mais antigo que
-// esta página, é melhor dizer o que fazer do que estourar um
-// "X is not a function" no meio da inicialização.
+// Guarda de versão + auto-cura.
+//
+// Se o navegador servir um modelos/model.js mais antigo que esta página, as duas
+// ficam fora de sincronia e a inicialização estoura com "X is not a function".
+// Em vez de pedir Ctrl+Shift+R — que é justamente o conselho errado, porque o
+// hard reload ignora o service worker para o documento mas NÃO para o
+// <script src>, recriando a mistura — a página limpa os caches, remove o
+// service worker e recarrega uma única vez (controlado por sessionStorage, para
+// não entrar em laço).
+const _SYNC_FLAG = 'br26-cache-reset';
 (() => {
   const required = ['buildModel', 'predictMatch', 'normalizeTeam', 'computeSeasonState'];
   const missing = !BM ? required : required.filter(f => typeof BM[f] !== 'function');
-  if (!missing.length) return;
-  const t = document.getElementById('loading-title');
-  const sub = document.getElementById('loading-sub');
-  if (t) t.textContent = 'Cópia em cache desatualizada';
-  if (sub) sub.innerHTML =
-    'O navegador está usando uma versão antiga de <code>modelos/model.js</code> ' +
-    '(faltando: ' + missing.join(', ') + ').<br>' +
-    'Recarregue com <b>Ctrl+Shift+R</b> (ou <b>Cmd+Shift+R</b> no Mac).';
+
+  const show = (titulo, sub) => {
+    const t = document.getElementById('loading-title');
+    const s = document.getElementById('loading-sub');
+    if (t) t.textContent = titulo;
+    if (s) s.innerHTML = sub;
+  };
+
+  if (!missing.length) {
+    try { sessionStorage.removeItem(_SYNC_FLAG); } catch (e) { /* modo restrito */ }
+    return;
+  }
+
+  let jaTentou = false;
+  try { jaTentou = sessionStorage.getItem(_SYNC_FLAG) === '1'; } catch (e) { /* modo restrito */ }
+
+  if (!jaTentou) {
+    try { sessionStorage.setItem(_SYNC_FLAG, '1'); } catch (e) { /* modo restrito */ }
+    show('Atualizando…', 'Descartando a versão em cache e recarregando.');
+    (async () => {
+      try {
+        if ('serviceWorker' in navigator) {
+          const regs = await navigator.serviceWorker.getRegistrations();
+          await Promise.all(regs.map(r => r.unregister()));
+        }
+        if (window.caches) {
+          const keys = await caches.keys();
+          await Promise.all(keys.map(k => caches.delete(k)));
+        }
+      } catch (e) { /* segue para o reload de qualquer forma */ }
+      location.reload();
+    })();
+  } else {
+    show('Cópia em cache desatualizada',
+      'O navegador insiste em uma versão antiga de <code>modelos/model.js</code> ' +
+      '(faltando: ' + missing.join(', ') + ').<br>' +
+      'Abra o site em uma aba anônima ou limpe os dados do site nas configurações do navegador.');
+  }
   throw new Error('modelos/model.js desatualizado — faltam: ' + missing.join(', '));
 })();
 
