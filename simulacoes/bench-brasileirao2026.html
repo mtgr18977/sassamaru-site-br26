@@ -120,6 +120,27 @@ td.c{text-align:center}
 .pb-fill{height:100%;border-radius:2px}
 .pb-pct{font-family:var(--mono);font-size:10.5px;color:var(--muted);min-width:32px;text-align:right}
 
+/* Detalhe por time (clique na linha) */
+tbody tr.team-row{cursor:pointer}
+tr.detail-row>td{padding:0}
+tr.detail-row>td,tr.detail-row:hover>td{background:#FBFAF7}
+.detail-box{padding:12px 14px}
+.detail-head{font-size:11px;font-family:var(--mono);color:var(--muted);margin-bottom:10px}
+.dstat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:8px;margin-bottom:10px}
+.dstat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:8px 10px}
+.dstat-lbl{font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:2px;white-space:nowrap}
+.dstat-val{font-family:var(--mono);font-size:16px;font-weight:500;line-height:1.2}
+.dstat-x{font-size:10px;color:var(--muted);margin-left:1px}
+.dstat-pct{font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+.dstat.gold .dstat-val{color:var(--gold)}
+.dstat.lib .dstat-val{color:var(--lib)}
+.dstat.sul .dstat-val{color:var(--sul)}
+.dstat.rel .dstat-val{color:var(--rel)}
+.detail-cur{font-size:11.5px;color:var(--muted)}
+.detail-cur b{color:var(--text);font-weight:600}
+.podium-card{cursor:pointer}
+.table-hint{font-size:11px;color:var(--muted);font-family:var(--mono);margin-left:auto}
+
 /* Zone legend */
 .legend{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:20px;font-size:11.5px}
 .legend-item{display:flex;align-items:center;gap:6px}
@@ -188,6 +209,7 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
       <div class="legend-item"><div class="legend-dot" style="background:#10B981"></div>Libertadores (preliminar)</div>
       <div class="legend-item"><div class="legend-dot" style="background:var(--sul)"></div>Sul-Americana</div>
       <div class="legend-item"><div class="legend-dot" style="background:var(--rel)"></div>Rebaixamento</div>
+      <span class="table-hint">clique num clube para abrir os detalhes</span>
     </div>
     <div class="table-wrap">
       <table id="main-table">
@@ -9853,12 +9875,20 @@ function renderPodium(stats){
     .sort((a,b)=>b.cp-a.cp).slice(0,6);
 
   document.getElementById('podium').innerHTML = sorted.map((x,i)=>`
-    <div class="podium-card p${i+1}">
+    <div class="podium-card p${i+1}" data-team="${x.t}" title="Clique para ver os detalhes">
       <div class="podium-rank">${['Favorito','2º','3º','4º','5º','6º'][i]}</div>
       <div class="podium-team">${avatar(x.t)} ${dn(x.t)}</div>
       <div class="podium-pct">${fmtPct(x.cp)}</div>
       <div class="podium-sub">chance de título</div>
     </div>`).join('');
+  wireCardClicks('podium');
+}
+
+// Clique num card (título ou rebaixamento) abre o detalhe do clube na tabela.
+function wireCardClicks(id){
+  document.querySelectorAll(`#${id} .podium-card`).forEach(card=>{
+    card.addEventListener('click', ()=>toggleTeamDetail(card.dataset.team, true));
+  });
 }
 
 // Card espelho do pódio: os 4 últimos da tabela ATUAL sempre aparecem;
@@ -9871,12 +9901,13 @@ function renderRelegation(stats){
     .sort((a,b)=>b.rp-a.rp);
 
   document.getElementById('rel-podium').innerHTML = rows.map(x=>`
-    <div class="podium-card relz">
+    <div class="podium-card relz" data-team="${x.t}" title="Clique para ver os detalhes">
       <div class="podium-rank">${x.pos}º hoje${inZ4.has(x.t)?' · no Z4':''}</div>
       <div class="podium-team">${avatar(x.t)} ${dn(x.t)}</div>
       <div class="podium-pct">${fmtPct(x.rp)}</div>
       <div class="podium-sub">risco de rebaixamento</div>
     </div>`).join('');
+  wireCardClicks('rel-podium');
 }
 
 function posColor(i){
@@ -9884,6 +9915,77 @@ function posColor(i){
   if(i<11) return 'var(--sul)';
   if(i>=16) return 'var(--rel)';
   return '#C9C6BC';
+}
+
+function sumRange(hist, a, b){
+  let s = 0;
+  for(let i = Math.max(0,a); i <= b && i < hist.length; i++) s += hist[i];
+  return s;
+}
+
+// Painel aberto ao clicar num clube: contagens absolutas (de N simulações,
+// em quantas o time terminou campeão / G4 / G6 / Z4) + projeções derivadas
+// do histograma de posições e a campanha real até aqui.
+function detailHTML(row, N){
+  const h = row.hist, nT = h.length;
+  const fmtN = n => n.toLocaleString('pt-BR');
+  const champ = h[0];
+  const g4   = sumRange(h, 0, 3);
+  const g6   = sumRange(h, 0, 5);
+  const sula = sumRange(h, 5, 10);
+  const z4   = sumRange(h, nT-4, nT-1);
+
+  let best = -1, worst = -1, mode = 0;
+  for(let i = 0; i < nT; i++){
+    if(h[i] > 0){ if(best < 0) best = i; worst = i; }
+    if(h[i] > h[mode]) mode = i;
+  }
+
+  const cell = (lbl, cnt, cls) => `<div class="dstat ${cls}">
+      <div class="dstat-lbl">${lbl}</div>
+      <div class="dstat-val">${fmtN(cnt)}<span class="dstat-x">×</span></div>
+      <div class="dstat-pct">${fmtPct(cnt/N)}</div>
+    </div>`;
+  const info = (lbl, val, sub) => `<div class="dstat">
+      <div class="dstat-lbl">${lbl}</div>
+      <div class="dstat-val">${val}</div>
+      <div class="dstat-pct">${sub||'&nbsp;'}</div>
+    </div>`;
+
+  const curPos = TEAMS.indexOf(row.t) + 1;
+  const st = SEASON_STATE && SEASON_STATE.standings.get(row.t);
+  const cur = st
+    ? `<b>${curPos}º</b> com <b>${st.pts} pts</b> em ${st.played} jogos · ${st.w}V ${st.d}E ${st.l}D · gols ${st.gf}:${st.ga} (${st.gd>=0?'+':''}${st.gd})`
+    : '—';
+
+  return `<div class="detail-box">
+    <div class="detail-head">em ${fmtN(N)} temporadas simuladas, ${dn(row.t)} terminou…</div>
+    <div class="dstat-grid">
+      ${cell('🏆 Campeão', champ, 'gold')}
+      ${cell('G4 (top 4)', g4, 'lib')}
+      ${cell('G6 (top 6)', g6, 'lib')}
+      ${cell('Sul-Americana 6º–11º', sula, 'sul')}
+      ${cell('Z4 — rebaixado', z4, 'rel')}
+    </div>
+    <div class="dstat-grid">
+      ${info('Pontos médios', row.avgPts.toFixed(1))}
+      ${info('Posição média', (row.avgPos+1).toFixed(1)+'º')}
+      ${info('Posição mais provável', (mode+1)+'º', fmtPct(h[mode]/N)+' das simulações')}
+      ${info('Melhor posição', best>=0 ? (best+1)+'º' : '—', best>=0 ? fmtN(h[best])+'×' : '')}
+      ${info('Pior posição', worst>=0 ? (worst+1)+'º' : '—', worst>=0 ? fmtN(h[worst])+'×' : '')}
+    </div>
+    <div class="detail-cur">Campanha real até aqui: ${cur}</div>
+  </div>`;
+}
+
+function toggleTeamDetail(team, forceOpen){
+  const tbody = document.getElementById('main-tbody');
+  const det = tbody.querySelector(`tr.detail-row[data-team="${CSS.escape(team)}"]`);
+  if(!det) return;
+  const isOpen = det.style.display !== 'none';
+  if(forceOpen && isOpen){ det.scrollIntoView({behavior:'smooth', block:'center'}); return; }
+  det.style.display = isOpen && !forceOpen ? 'none' : '';
+  if(det.style.display === '' && forceOpen) det.scrollIntoView({behavior:'smooth', block:'center'});
 }
 
 function renderTable(stats){
@@ -9923,7 +10025,7 @@ function renderTable(stats){
       </div>`;
     }).join('');
 
-    return `<tr>
+    return `<tr class="team-row" data-team="${row.t}" title="Clique para ver os detalhes">
       <td><span class="pos-badge ${posClass}">${pos}</span></td>
       <td><div class="team-cell">${avatar(row.t)}<span style="font-weight:500;font-size:13px">${dn(row.t)}</span></div></td>
       <td class="r">${row.avgPts.toFixed(1)}</td>
@@ -9932,8 +10034,15 @@ function renderTable(stats){
       <td class="c">${miniBar(row.sul,'var(--sul)')}</td>
       <td class="c">${miniBar(row.rel,'var(--rel)')}</td>
       <td><div style="display:flex;gap:1px;align-items:flex-end;padding:2px 0">${distBars}</div></td>
+    </tr>
+    <tr class="detail-row" data-team="${row.t}" style="display:none">
+      <td colspan="8">${detailHTML(row, N)}</td>
     </tr>`;
   }).join('');
+
+  tbody.querySelectorAll('tr.team-row').forEach(tr=>{
+    tr.addEventListener('click', ()=>toggleTeamDetail(tr.dataset.team));
+  });
 }
 
 // ════════════════════════════════════════════════
