@@ -76,6 +76,8 @@ header{display:flex;align-items:center;justify-content:space-between;
 .podium-card.p1::before{background:#D4AF37}
 .podium-card.p2::before{background:#A8A9AD}
 .podium-card.p3::before{background:#CD7F32}
+.podium-card.relz::before{background:var(--rel)}
+.podium-card.relz .podium-pct{color:var(--rel)}
 .podium-rank{font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:500;color:var(--muted);margin-bottom:3px}
 .podium-team{font-size:13.5px;font-weight:600;margin-bottom:2px;line-height:1.2;display:flex;align-items:center;gap:6px}
 .podium-pct{font-family:var(--mono);font-size:22px;font-weight:300;color:var(--text);line-height:1}
@@ -176,6 +178,9 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
 
     <div class="section-title">Campeão — probabilidade</div>
     <div class="podium" id="podium"></div>
+
+    <div class="section-title">Rebaixamento — risco</div>
+    <div class="podium" id="rel-podium"></div>
 
     <div class="section-title">Classificação final projetada</div>
     <div class="legend">
@@ -9856,6 +9861,24 @@ function renderPodium(stats){
     </div>`).join('');
 }
 
+// Card espelho do pódio: os 4 últimos da tabela ATUAL sempre aparecem;
+// qualquer outro clube entra se o risco simulado passar de 1%.
+function renderRelegation(stats){
+  const inZ4 = new Set(TEAMS.slice(-4));
+  const rows = TEAMS
+    .map((t,i)=>({t, pos:i+1, rp:p(stats.relCount.get(t),stats.N)}))
+    .filter(x=>inZ4.has(x.t) || x.rp > 0.01)
+    .sort((a,b)=>b.rp-a.rp);
+
+  document.getElementById('rel-podium').innerHTML = rows.map(x=>`
+    <div class="podium-card relz">
+      <div class="podium-rank">${x.pos}º hoje${inZ4.has(x.t)?' · no Z4':''}</div>
+      <div class="podium-team">${avatar(x.t)} ${dn(x.t)}</div>
+      <div class="podium-pct">${fmtPct(x.rp)}</div>
+      <div class="podium-sub">risco de rebaixamento</div>
+    </div>`).join('');
+}
+
 function posColor(i){
   if(i<5)  return 'var(--lib)';
   if(i<11) return 'var(--sul)';
@@ -9995,6 +10018,7 @@ document.getElementById('btn-run').addEventListener('click', async()=>{
     document.getElementById('sim-meta').textContent = `${N.toLocaleString('pt-BR')} temporadas · ${elapsed}s`;
 
     renderPodium(stats);
+    renderRelegation(stats);
     renderTable(stats);
 
     document.getElementById('results').style.display='';
