@@ -170,6 +170,7 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
   <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end">
     <span class="pill" id="hdr-jogos">—</span>
     <span class="pill" id="hdr-temporadas">—</span>
+    <span class="pill" id="hdr-janela">—</span>
     <span class="pill" id="hdr-estado">—</span>
     <span class="pill accent" id="hdr-sims">—</span>
   </div>
@@ -187,6 +188,11 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
   <div class="controls">
     <div id="data-warning" style="display:none;width:100%;margin-bottom:10px;padding:8px 12px;border-radius:6px;background:rgba(220,160,0,.12);border:1px solid rgba(220,160,0,.35);font-size:12px;line-height:1.5;"></div>
     <button class="btn" id="btn-run">▶ Simular resto da temporada</button>
+    <select class="n-select" id="n-seasons" title="Janela de temporadas usada para treinar o modelo">
+      <option value="1">Últimas 1 temporada</option>
+      <option value="5" selected>Últimas 5 temporadas (padrão)</option>
+      <option value="10">Últimas 10 temporadas (histórico)</option>
+    </select>
     <select class="n-select" id="n-sims">
       <option value="1000">1 000 simulações</option>
       <option value="5000" selected>5 000 simulações</option>
@@ -9718,7 +9724,7 @@ const _SYNC_FLAG = 'br26-cache-reset';
   throw new Error('modelos/model.js desatualizado — faltam: ' + missing.join(', '));
 })();
 
-const {CONFIG, buildModel, predictMatch, normalizeTeam, computeSeasonState} = BM;
+const {CONFIG, buildModel, predictMatch, normalizeTeam, computeSeasonState, parseRows} = BM;
 
 const TEAMS_2026_RAW = [
   'Atletico Mineiro','Palmeiras','Internacional','Athletico Paranaense',
@@ -10069,6 +10075,29 @@ function renderTable(stats){
 //  Init
 // ════════════════════════════════════════════════
 let MODEL = null;
+let RAW_ROWS = null;
+
+// Reconstrói o modelo usando só as últimas `numSeasons` temporadas do dataset
+// como treino (dropdown #n-seasons). computeSeasonState/REMAINING não mudam:
+// a classificação atual sempre parte da última temporada, independente da
+// janela escolhida para estimar α/β/γ/μ/ρ e o Elo.
+function rebuildModel(numSeasons){
+  const { seasons } = parseRows(RAW_ROWS);
+  const total = seasons.length;
+  const trainFromSeason = Math.max(0, total - numSeasons);
+
+  MODEL = buildModel(RAW_ROWS, { trainFromSeason });
+
+  const currentYear = new Date().getFullYear();
+  const yearOf = (si) => currentYear - (total - 1 - si);
+  const usedSeasons = total - trainFromSeason;
+
+  document.getElementById('hdr-jogos').textContent = MODEL.parsedCount.toLocaleString('pt-BR')+' jogos';
+  document.getElementById('hdr-temporadas').textContent = total+' temporadas no dataset';
+  document.getElementById('hdr-janela').textContent =
+    `treino: ${usedSeasons} temp. (${yearOf(trainFromSeason)}–${yearOf(total-1)})`;
+  document.getElementById('footer-rho').textContent = `ρ MLE = ${MODEL.dc.rho.toFixed(4)}`;
+}
 
 async function init(){
   document.getElementById('progress-fill').style.width='15%';
@@ -10082,7 +10111,9 @@ async function init(){
     document.getElementById('loading-sub').textContent='Estimando parâmetros via decay temporal';
     await new Promise(r=>setTimeout(r,20));
 
-    MODEL = buildModel(result.data);
+    RAW_ROWS = result.data;
+    const numSeasons = parseInt(document.getElementById('n-seasons').value,10) || 5;
+    rebuildModel(numSeasons);
 
     // Classificação atual + jogos restantes. A simulação parte daqui, não de
     // uma temporada zerada.
@@ -10096,11 +10127,6 @@ async function init(){
       for(const h of TEAMS) for(const a of TEAMS) if(h!==a) REMAINING.push([h,a]);
     }
     document.getElementById('progress-fill').style.width='100%';
-
-    // Update header
-    document.getElementById('hdr-jogos').textContent = MODEL.parsedCount.toLocaleString('pt-BR')+' jogos';
-    document.getElementById('hdr-temporadas').textContent = MODEL.seasonCount+' temporadas';
-    document.getElementById('footer-rho').textContent = `ρ MLE = ${MODEL.dc.rho.toFixed(4)}`;
 
     const elState = document.getElementById('hdr-estado');
     if(elState){
@@ -10127,6 +10153,21 @@ async function init(){
     console.error(e);
   }
 }
+
+document.getElementById('n-seasons').addEventListener('change', (e)=>{
+  if(!RAW_ROWS) return;
+  try{
+    rebuildModel(parseInt(e.target.value,10)||5);
+  }catch(err){
+    console.error(err);
+    document.getElementById('sim-meta').textContent = 'Erro: '+err.message;
+    return;
+  }
+  // Resultados da simulação anterior valem para o modelo antigo — escondê-los
+  // evita que o usuário leia números de uma janela de treino diferente.
+  document.getElementById('results').style.display='none';
+  document.getElementById('sim-meta').textContent='';
+});
 
 document.getElementById('btn-run').addEventListener('click', async()=>{
   if(!MODEL) return;
