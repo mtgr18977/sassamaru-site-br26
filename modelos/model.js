@@ -492,7 +492,7 @@
    * temporada/rodada. Compartilhado por buildModel e computeSeasonState para
    * que os dois enxerguem exatamente os mesmos jogos.
    */
-  function parseRows(rawRows) {
+  function parseRawRows(rawRows) {
     const parsed = [];
     for (const r of rawRows) {
       const home = normalizeTeam(r[CONFIG.HOME_TEAM_COL]);
@@ -503,18 +503,23 @@
       const rod = rodStr ? parseFloat(rodStr) : 0;
 
       if (!home || !away) continue;
-      if (!Number.isFinite(hg) || !Number.isFinite(ag)) continue;
+      if (!Number.isInteger(hg) || hg < 0 || !Number.isInteger(ag) || ag < 0) continue;
 
       parsed.push({
         home,
         away,
-        hg: hg | 0,
-        ag: ag | 0,
+        hg,
+        ag,
         _rod: Number.isFinite(rod) ? rod : 0,
         season: -1,
         round: 0,
       });
     }
+    return parsed;
+  }
+
+  function parseRows(rawRows) {
+    const parsed = parseRawRows(rawRows);
 
     if (parsed.length < 50) {
       throw new Error(
@@ -922,16 +927,7 @@
     const shouldYield = opts.yield !== false;
 
     // Parse rápido só para atribuir temporadas
-    const qp = [];
-    for (const r of rawRows) {
-      const home = normalizeTeam(r[CONFIG.HOME_TEAM_COL]);
-      const away = normalizeTeam(r[CONFIG.AWAY_TEAM_COL]);
-      const hg   = Number(r[CONFIG.HOME_GOALS_COL]);
-      const ag   = Number(r[CONFIG.AWAY_GOALS_COL]);
-      const rod  = parseFloat(String(r[CONFIG.DATE_COL] || "").trim()) || 0;
-      if (!home || !away || !Number.isFinite(hg) || !Number.isFinite(ag)) continue;
-      qp.push({ home, away, hg: hg | 0, ag: ag | 0, _rod: Number.isFinite(rod) ? rod : 0, season: -1, round: 0 });
-    }
+    const qp = parseRawRows(rawRows);
     removeDuplicateBlock(qp);
     const seasons = detectSeasons(qp);
     assignSeasonAndRound(qp, seasons);

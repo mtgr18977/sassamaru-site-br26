@@ -19,6 +19,7 @@ const {
   oddsFromProbsOverround,
   applyDixonColes,
   removeDuplicateBlock,
+  parseRows,
   computeSeasonState,
   fitDixonColes,
   createScorer,
@@ -364,6 +365,17 @@ test("buildModel: Elo permanece próximo do inicial em liga equilibrada", () => 
 
 test("buildModel: rejeita dataset pequeno", () => {
   assert.throws(() => buildModel([makeRow(1, "a", "b", 1, 0)]), /insuficiente/i);
+});
+
+test("parseRows: rejeita placares inválidos sem truncar silenciosamente", () => {
+  const rows = Array.from({ length: 50 }, (_, i) =>
+    makeRow(1, `casa-${i}`, `fora-${i}`, 1, 0)
+  );
+  rows.push(makeRow(1, "negativo", "valido", -1, 0));
+  rows.push(makeRow(1, "fracionario", "valido", 1.5, 0));
+  const parsed = parseRows(rows);
+  assert.strictEqual(parsed.parsed.length, 50);
+  assert.ok(!parsed.parsed.some(p => p.home === "negativo" || p.home === "fracionario"));
 });
 
 test("buildModel: trainFromSeason corta temporadas antigas", () => {
