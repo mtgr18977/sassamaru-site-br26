@@ -373,9 +373,12 @@ test("parseRows: rejeita placares inválidos sem truncar silenciosamente", () =>
   );
   rows.push(makeRow(1, "negativo", "valido", -1, 0));
   rows.push(makeRow(1, "fracionario", "valido", 1.5, 0));
+  rows.push(makeRow(1, "nao-finito", "valido", "NaN", 0));
   const parsed = parseRows(rows);
   assert.strictEqual(parsed.parsed.length, 50);
-  assert.ok(!parsed.parsed.some(p => p.home === "negativo" || p.home === "fracionario"));
+  assert.ok(!parsed.parsed.some(p =>
+    ["negativo", "fracionario", "nao-finito"].includes(p.home)
+  ));
 });
 
 test("buildModel: trainFromSeason corta temporadas antigas", () => {
