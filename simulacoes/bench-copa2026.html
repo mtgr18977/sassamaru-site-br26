@@ -17,6 +17,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <script src="../i18n/i18n.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -49502,8 +49503,12 @@ const DISPLAY_NAMES={
   'saudi arabia':'Arábia Saudita','dr congo':'RD Congo','new caledonia':'Nova Caledônia',
   'curacao':'Curaçao','uzbekistan':'Uzbequistão','czechia':'Rep. Tcheca',
 };
+// Nomes em inglês que não saem certos só com a capitalização do nome do dataset.
+const EN_DISPLAY_NAMES={'united states':'USA','dr congo':'DR Congo','curacao':'Curaçao','czechia':'Czechia'};
 function dn(t){
   const k=norm(t);
+  if(I18N.lang==='zh') return I18N.team(k);
+  if(I18N.lang==='en') return EN_DISPLAY_NAMES[k]||String(t).replace(/\b\w/g,c=>c.toUpperCase());
   if(DISPLAY_NAMES[k]) return DISPLAY_NAMES[k];
   return String(t).replace(/\b\w/g,c=>c.toUpperCase());
 }
@@ -49648,7 +49653,7 @@ function buildModel(rawRows) {
   }
 
   if (parsed.length < 100) {
-    throw new Error(`Dataset insuficiente após filtros (${parsed.length} jogos). Verifique as colunas.`);
+    throw new Error(_t('Dataset insuficiente após filtros ({n} jogos). Verifique as colunas.', { n: parsed.length }));
   }
 
   // ── Step 2: League averages (weighted) ──
@@ -50113,7 +50118,7 @@ function renderPodium(stats){
   const el=document.getElementById('podium');
   el.innerHTML=sorted.map((x,i)=>`
     <div class="podium-card p${i+1}">
-      <div class="podium-rank">${['Favorito','2°','3°','4°','5°','6°'][i]}</div>
+      <div class="podium-rank">${i===0?_t('Favorito'):_o(i+1)}</div>
       <div class="podium-team">${flag(x.t)} ${dn(x.t)}</div>
       <div class="podium-pct">${(x.p*100).toFixed(1)}%</div>
       <div class="podium-sub">chance de título</div>
@@ -50152,7 +50157,7 @@ function renderGroups(stats){
 
     html+=`<div class="group-card">
       <div class="group-header">
-        <span class="group-letter">Grupo ${k}</span>
+        <span class="group-letter">${_t('Grupo {g}', { g: k })}</span>
         <span class="group-label">P(classificar)</span>
       </div>`;
 
@@ -50202,7 +50207,7 @@ function renderKnockout(stats){
       const [first,second]=top;
       html+=`<div class="ko-slot">
         <div class="ko-team">${flag(first.t)} ${dn(first.t)}</div>
-        <div class="ko-pct">${(first.p*100).toFixed(0)}% mais provável</div>
+        <div class="ko-pct">${_t('{p}% mais provável', { p: (first.p*100).toFixed(0) })}</div>
         ${second?`<div class="ko-alt">${flag(second.t)} ${dn(second.t)} · ${(second.p*100).toFixed(0)}%</div>`:''}
       </div>`;
     }
@@ -50217,7 +50222,7 @@ function renderKnockout(stats){
   for(const x of top3){
     html+=`<div class="ko-slot">
       <div class="ko-team">${flag(x.t)} ${dn(x.t)}</div>
-      <div class="ko-pct">${(x.p*100).toFixed(1)}% de chance</div>
+      <div class="ko-pct">${_t('{p}% de chance', { p: (x.p*100).toFixed(1) })}</div>
     </div>`;
   }
   html+='</div>';
@@ -50249,8 +50254,8 @@ async function init(){
     setProgress(100,'Modelo pronto','');
 
     // Update header
-    document.getElementById('hdr-games').textContent=MODEL.parsedCount.toLocaleString('pt-BR')+' jogos';
-    document.getElementById('hdr-teams').textContent=MODEL.teamCount+' seleções';
+    document.getElementById('hdr-games').textContent=_t('{n} jogos',{n:_n(MODEL.parsedCount)});
+    document.getElementById('hdr-teams').textContent=_t('{n} seleções',{n:MODEL.teamCount});
     document.getElementById('footer-rho').textContent=`ρ MLE = ${MODEL.dcRho.toFixed(3)}`;
 
     await new Promise(r=>setTimeout(r,200));
@@ -50258,7 +50263,7 @@ async function init(){
     document.getElementById('main').style.display='';
   }catch(e){
     document.getElementById('loading-title').textContent='Erro ao carregar modelo';
-    document.getElementById('loading-sub').textContent=e.message;
+    document.getElementById('loading-sub').textContent=_tm(e.message);
     console.error(e);
   }
 }
@@ -50277,13 +50282,13 @@ document.getElementById('btn-run').addEventListener('click',async()=>{
   try{
     const stats=await runMonteCarlo(MODEL,N,(done,total)=>{
       const p=Math.round(done/total*100);
-      btn.textContent=`Simulando… ${p}%`;
-      document.getElementById('hdr-sims').textContent=`${done.toLocaleString('pt-BR')} / ${N.toLocaleString('pt-BR')}`;
+      btn.textContent=_t('Simulando… {pct}%',{pct:p});
+      document.getElementById('hdr-sims').textContent=`${_n(done)} / ${_n(N)}`;
     });
     const elapsed=((performance.now()-t0)/1000).toFixed(1);
 
-    document.getElementById('hdr-sims').textContent=`${N.toLocaleString('pt-BR')} simulações`;
-    document.getElementById('sim-meta').textContent=`${N.toLocaleString('pt-BR')} simulações · ${elapsed}s`;
+    document.getElementById('hdr-sims').textContent=_t('{n} simulações',{n:_n(N)});
+    document.getElementById('sim-meta').textContent=_t('{n} simulações · {s}s',{n:_n(N),s:elapsed});
 
     renderPodium(stats);
     renderWinChart(stats);
@@ -50294,7 +50299,7 @@ document.getElementById('btn-run').addEventListener('click',async()=>{
     document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
   }catch(e){
     console.error(e);
-    document.getElementById('sim-meta').textContent='Erro: '+e.message;
+    document.getElementById('sim-meta').textContent=_t('Erro: {msg}',{msg:_tm(e.message)});
   }finally{
     btn.disabled=false;btn.textContent='▶ Simular Copa';
   }

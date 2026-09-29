@@ -204,6 +204,7 @@ if (fs.existsSync(headersPath)) {
 
   assert(revalida('/*.html'), 'HTML revalida (max-age=0, must-revalidate)');
   assert(revalida('/modelos/*'), 'modelos/* revalida — precisa acompanhar o HTML');
+  assert(revalida('/i18n/*'), 'i18n/* revalida — dicionários acompanham o HTML');
   assert(revalida('/service-worker.js'), 'service-worker.js revalida');
   assert(Object.keys(regras).every((r) => r.startsWith('/')),
     'todas as rotas do _headers começam com /');

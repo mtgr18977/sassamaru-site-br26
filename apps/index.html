@@ -18,6 +18,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <script src="../i18n/i18n.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script src="../modelos/model.js"></script>
 
@@ -10339,7 +10340,7 @@ const _SYNC_FLAG = 'br26-cache-reset';
 
   if (!jaTentou) {
     try { sessionStorage.setItem(_SYNC_FLAG, '1'); } catch (e) { /* modo restrito */ }
-    aviso('Descartando a versão em cache e recarregando…');
+    aviso(_t('Descartando a versão em cache e recarregando…'));
     (async () => {
       try {
         if ('serviceWorker' in navigator) {
@@ -10354,8 +10355,7 @@ const _SYNC_FLAG = 'br26-cache-reset';
       location.reload();
     })();
   } else {
-    aviso('O navegador insiste em uma versão antiga de modelos/model.js (faltando: '
-      + missing.join(', ') + '). Abra o site em uma aba anônima ou limpe os dados do site.');
+    aviso(_t('O navegador insiste em uma versão antiga de modelos/model.js (faltando: {list}). Abra o site em uma aba anônima ou limpe os dados do site.', { list: missing.join(', ') }));
   }
   throw new Error('modelos/model.js desatualizado — faltam: ' + missing.join(', '));
 })();
@@ -10547,14 +10547,14 @@ function renderSummary(results){
   const bestConf=Math.max(best.pH,best.pD,best.pA), worstConf=Math.max(worst.pH,worst.pD,worst.pA);
   function pickLabel(r){ if(r.pick==="Mandante") return displayName(r.home); if(r.pick==="Visitante") return displayName(r.away); return "Empate"; }
   function pickTag(r,conf){ const cls=r.pick==="Mandante"?"home":r.pick==="Empate"?"draw":"away"; return '<span class="tag '+cls+'" style="font-size:11px;padding:4px 10px;">'+pickLabel(r)+' <span class="odd-inline">'+(conf*100).toFixed(0)+'%</span></span>'; }
-  meta.textContent = n+" jogos";
+  meta.textContent = _t('{n} jogos', { n });
   panel.style.display = "block";
   mEl.innerHTML =
     '<div class="s-metric"><div class="s-metric-lbl">Confiança média</div><div class="s-metric-val">'+(avgConf*100).toFixed(0)+'%</div><div class="s-metric-sub">probabilidade máxima<br>média por jogo</div></div>'
     +'<div class="s-metric"><div class="s-metric-lbl">λ médio</div><div class="s-metric-val">'+avgLam.toFixed(2)+'</div><div class="s-metric-sub">gols esperados<br>por time</div></div>'
-    +'<div class="s-metric"><div class="s-metric-lbl">Jogos na rodada</div><div class="s-metric-val">'+n+'</div><div class="s-metric-sub"><span style="color:#1A4731;">'+countH+' casa</span> · <span style="color:#7A786F;">'+countD+' empate</span> · <span style="color:#D97706;">'+countA+' fora</span></div></div>'
-    +'<div class="s-metric"><div class="s-metric-lbl">Distribuição H / D / A</div><div class="s-dist-bar"><div class="s-dist-h" style="flex:'+countH+'"></div><div class="s-dist-d" style="flex:'+countD+'"></div><div class="s-dist-a" style="flex:'+countA+'"></div></div><div class="s-dist-legend"><span class="dh">'+countH+' Casa</span><span class="dd">'+countD+' Empate</span><span class="da">'+countA+' Fora</span></div></div>';
-  function hlCard(r,conf,label,fillClass){ return '<div class="s-hl"><div class="s-hl-lbl">'+label+'</div><div class="s-hl-match">'+displayName(r.home)+' × '+displayName(r.away)+'</div><div class="s-hl-pick">'+pickTag(r,conf)+'</div><div class="s-conf-track"><div class="s-conf-fill '+fillClass+'" style="width:'+(conf*100).toFixed(0)+'%"></div></div><div class="s-conf-pct">'+(conf*100).toFixed(1)+'% de confiança</div></div>'; }
+    +'<div class="s-metric"><div class="s-metric-lbl">Jogos na rodada</div><div class="s-metric-val">'+n+'</div><div class="s-metric-sub"><span style="color:#1A4731;">'+_t('{n} casa',{n:countH})+'</span> · <span style="color:#7A786F;">'+_t('{n} empate',{n:countD})+'</span> · <span style="color:#D97706;">'+_t('{n} fora',{n:countA})+'</span></div></div>'
+    +'<div class="s-metric"><div class="s-metric-lbl">Distribuição H / D / A</div><div class="s-dist-bar"><div class="s-dist-h" style="flex:'+countH+'"></div><div class="s-dist-d" style="flex:'+countD+'"></div><div class="s-dist-a" style="flex:'+countA+'"></div></div><div class="s-dist-legend"><span class="dh">'+_t('{n} Casa',{n:countH})+'</span><span class="dd">'+_t('{n} Empate',{n:countD})+'</span><span class="da">'+_t('{n} Fora',{n:countA})+'</span></div></div>';
+  function hlCard(r,conf,label,fillClass){ return '<div class="s-hl"><div class="s-hl-lbl">'+label+'</div><div class="s-hl-match">'+displayName(r.home)+' × '+displayName(r.away)+'</div><div class="s-hl-pick">'+pickTag(r,conf)+'</div><div class="s-conf-track"><div class="s-conf-fill '+fillClass+'" style="width:'+(conf*100).toFixed(0)+'%"></div></div><div class="s-conf-pct">'+_t('{p}% de confiança',{p:(conf*100).toFixed(1)})+'</div></div>'; }
   hlEl.innerHTML = hlCard(best,bestConf,"Palpite mais confiante","hi")+hlCard(worst,worstConf,"Jogo mais incerto","lo");
 }
 
@@ -10566,6 +10566,11 @@ function parseLine(raw){
 }
 function parseFixtures(text){ return text.split("\n").map(l=>parseLine(l)).filter(Boolean).map(p=>[p.home,p.away]); }
 
+// Avisos vindos de modelos/model.js (texto em português, com o nome do time no meio).
+function trWarn(w){
+  const m = /^"(.*)" não encontrado no dataset$/.exec(w);
+  return m ? _t('"{name}" não encontrado no dataset', { name: m[1] }) : w;
+}
 function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 let _valTimer=null;
 function scheduleValidation(){ clearTimeout(_valTimer); _valTimer=setTimeout(runValidation,100); }
@@ -10588,14 +10593,14 @@ function runValidation(){
     const hn=MODEL?normalizeTeam(home):home, an=MODEL?normalizeTeam(away):away;
     const hKnown=!MODEL||MODEL.teamNames.has(hn), aKnown=!MODEL||MODEL.teamNames.has(an);
     const hLabel=(MODEL&&hKnown)?escHtml(displayName(hn)):escHtml(home), aLabel=(MODEL&&aKnown)?escHtml(displayName(an)):escHtml(away);
-    if(!hKnown||!aKnown){nWarn++;const msgs=[];if(!hKnown)msgs.push('"'+escHtml(home)+'"');if(!aKnown)msgs.push('"'+escHtml(away)+'"');parts.push('<div class="val-line warn"><span class="val-lnum">'+lineNum+'</span><span class="val-icon">⚠</span><div class="val-teams"><span class="val-team'+(hKnown?'':' unknown')+'">'+hLabel+'</span><span class="val-sep">×</span><span class="val-team'+(aKnown?'':' unknown')+'">'+aLabel+'</span></div><span class="val-msg warn-msg">'+msgs.join(', ')+' não encontrado</span></div>');return;}
+    if(!hKnown||!aKnown){nWarn++;const msgs=[];if(!hKnown)msgs.push('"'+escHtml(home)+'"');if(!aKnown)msgs.push('"'+escHtml(away)+'"');parts.push('<div class="val-line warn"><span class="val-lnum">'+lineNum+'</span><span class="val-icon">⚠</span><div class="val-teams"><span class="val-team'+(hKnown?'':' unknown')+'">'+hLabel+'</span><span class="val-sep">×</span><span class="val-team'+(aKnown?'':' unknown')+'">'+aLabel+'</span></div><span class="val-msg warn-msg">'+_t('{names} não encontrado',{names:msgs.join(', ')})+'</span></div>');return;}
     nOk++;parts.push('<div class="val-line ok"><span class="val-lnum">'+lineNum+'</span><span class="val-icon">✓</span><div class="val-teams"><span class="val-team">'+hLabel+'</span><span class="val-sep">×</span><span class="val-team">'+aLabel+'</span></div></div>');
   });
   linesEl.innerHTML=parts.join('');
   const s=[];
-  if(nOk) s.push('<span class="val-summary-ok">'+nOk+' ok</span>');
+  if(nOk) s.push('<span class="val-summary-ok">'+_t('{n} ok',{n:nOk})+'</span>');
   if(nWarn) s.push('<span class="val-summary-wrn">'+nWarn+' ⚠</span>');
-  if(nErr) s.push('<span class="val-summary-err">'+nErr+' erro</span>');
+  if(nErr) s.push('<span class="val-summary-err">'+_t('{n} erro',{n:nErr})+'</span>');
   sumEl.innerHTML=s.join(' · ');
 }
 
@@ -10615,9 +10620,9 @@ runBtn.addEventListener("click", () => {
   exportPredBtn.style.display = "";
   renderRows(results);
   renderSummary(results);
-  metaEl.textContent = `${results.length} jogos • rodada ${upcomingRound} • ${(t1-t0).toFixed(0)} ms`;
-  let statusHtml = `<span class="ok">OK</span> — simulação concluída (rodada ${upcomingRound}).`;
-  if (allWarnings.length) statusHtml += `<br/><span class="warn">⚠ ${allWarnings.join("; ")}</span>`;
+  metaEl.textContent = _t('{n} jogos • rodada {r} • {ms} ms', { n: results.length, r: upcomingRound, ms: (t1-t0).toFixed(0) });
+  let statusHtml = `<span class="ok">OK</span> ${_t('— simulação concluída (rodada {r}).', { r: upcomingRound })}`;
+  if (allWarnings.length) statusHtml += `<br/><span class="warn">⚠ ${allWarnings.map(trWarn).join("; ")}</span>`;
   setStatus(statusHtml);
 });
 
@@ -10642,7 +10647,7 @@ btBtn.addEventListener("click", async () => {
   const fromYear = 2003 + fromSeason;
   $("btFromNote").textContent = fromSeason === 0
     ? "usando todos os dados desde 2003"
-    : `usando dados a partir de ${fromYear} (${23 - fromSeason} temporadas)`;
+    : _t('usando dados a partir de {y} ({n} temporadas)', { y: fromYear, n: 23 - fromSeason });
 
   btBtn.disabled = true;
   btBtn.textContent = "Calculando…";
@@ -10659,12 +10664,12 @@ btBtn.addEventListener("click", async () => {
     });
     const elapsed = ((performance.now() - t0)/1000).toFixed(1);
     btProgressFill.style.width = "100%";
-    btMeta.textContent = `${res.numTest} temporadas testadas • ${elapsed}s`;
+    btMeta.textContent = _t('{n} temporadas testadas • {s}s', { n: res.numTest, s: elapsed });
     renderBacktest(res);
     btExportBtn.style.display = "";
     btExportBtn._btData = res.seasonResults;
   } catch(e) {
-    btResult.innerHTML = `<span class="bad">Erro: ${e.message}</span>`;
+    btResult.innerHTML = `<span class="bad">${_t('Erro: {msg}', { msg: _tm(e.message) })}</span>`;
   } finally {
     CONFIG.TRAIN_FROM_SEASON = _savedTrainFrom;
     btBtn.disabled = false;
@@ -10741,7 +10746,7 @@ function renderBacktest({ seasonResults, calBins }) {
   function rpsCls(v)     { return v < 0.210 ? "bt-good" : v < 0.222 ? "bt-neutral" : "bt-bad"; }
   function brierToPrec(v){ return (1 - v / 2) * 100; }
   function precCls(v)    { return v > 70 ? "bt-good" : v >= 67 ? "bt-neutral" : "bt-bad"; }
-  const PREC_TOOLTIP = "Precisão equivalente de DeFinetti: (1 − Brier/2) × 100. Baseline ingênuo = 66,7% (chutar 33,3% em todos os resultados).";
+  const PREC_TOOLTIP = _t("Precisão equivalente de DeFinetti: (1 − Brier/2) × 100. Baseline ingênuo = 66,7% (chutar 33,3% em todos os resultados).");
 
   // ── Tabela por temporada ──
   const rows = seasonResults.map(r => `
@@ -10788,13 +10793,13 @@ function renderBacktest({ seasonResults, calBins }) {
   const summaryCards = `
     <div class="bt-grid">
       <div class="bt-card">
-        <div class="bt-card-title">Métricas médias (últimas ${seasonResults.length} temporadas)</div>
+        <div class="bt-card-title">${_t('Métricas médias (últimas {n} temporadas)', { n: seasonResults.length })}</div>
         <div class="bt-stat-row"><span class="bt-stat-lbl">Brier score</span><span class="bt-stat-val ${brierCls(avgBrier)}">${avgBrier.toFixed(4)}</span></div>
         <div class="bt-prec-row" title="${PREC_TOOLTIP}"><span class="bt-prec-lbl">↳ Precisão equiv.</span><span class="bt-prec-val ${precCls(brierToPrec(avgBrier))}">${brierToPrec(avgBrier).toFixed(1)}%</span></div>
         <div class="bt-stat-row"><span class="bt-stat-lbl">Acurácia 1X2</span><span class="bt-stat-val ${accCls(avgAcc)}">${(avgAcc*100).toFixed(1)}%</span></div>
         <div class="bt-stat-row"><span class="bt-stat-lbl">Log-loss</span><span class="bt-stat-val ${llCls(avgLL)}">${avgLL.toFixed(4)}</span></div>
         <div class="bt-stat-row"><span class="bt-stat-lbl">RPS</span><span class="bt-stat-val ${rpsCls(avgRps)}">${avgRps.toFixed(4)}</span></div>
-        <div class="bt-note">Melhor Brier: ${bestBrier.year} (${bestBrier.brier.toFixed(4)}) · Melhor acurácia: ${bestAcc.year} (${(bestAcc.accuracy*100).toFixed(1)}%)</div>
+        <div class="bt-note">${_t('Melhor Brier: {y1} ({b}) · Melhor acurácia: {y2} ({a}%)', { y1: bestBrier.year, b: bestBrier.brier.toFixed(4), y2: bestAcc.year, a: (bestAcc.accuracy*100).toFixed(1) })}</div>
       </div>
       <div class="bt-card">
         <div class="bt-card-title">Calibração agregada (todos os outcomes 1X2)</div>
@@ -10840,7 +10845,7 @@ function buildCalibrationPlot(bins) {
     const col = Math.abs(predMid - actualFreq) < 0.05 ? "#2ee59d"
               : Math.abs(predMid - actualFreq) < 0.12 ? "#ffd37a" : "#ff7a7a";
     return `<circle cx="${x}" cy="${y}" r="4" fill="${col}" opacity=".85">
-      <title>Previsto: ${(predMid*100).toFixed(1)}% → Real: ${(actualFreq*100).toFixed(1)}% (n=${b.n})</title>
+      <title>${_t('Previsto: {p}% → Real: {r}% (n={n})', { p: (predMid*100).toFixed(1), r: (actualFreq*100).toFixed(1), n: b.n })}</title>
     </circle>`;
   }).join("");
 
@@ -10953,7 +10958,7 @@ mcBtn.addEventListener("click", () => {
   mcResult.innerHTML = "";
   mcNote.textContent = "";
   $("mcProgressFill").style.width = "0%";
-  mcStatus.innerHTML = `Rodando <b>${n.toLocaleString("pt-BR")}</b> simulações em segundo plano…`;
+  mcStatus.innerHTML = _t('Rodando <b>{n}</b> simulações em segundo plano…', { n: _n(n) });
 
   const forces = {};
   MODEL.forces.forEach((v, k) => forces[k] = v);
@@ -10966,15 +10971,15 @@ mcBtn.addEventListener("click", () => {
     $("mcProgressFill").style.width = "100%";
     mcBtn.disabled = false;
     mcBtn.textContent = "Simular Campeonato";
-    mcStatus.innerHTML = `<span class="ok">OK</span> — ${n.toLocaleString("pt-BR")} simulações em ${elapsed}s · ${fixtures.length} jogos restantes`;
-    $("mcMeta").textContent = `n=${n.toLocaleString("pt-BR")} · ${elapsed}s`;
+    mcStatus.innerHTML = `<span class="ok">OK</span> ${_t('— {n} simulações em {s}s · {f} jogos restantes', { n: _n(n), s: elapsed, f: fixtures.length })}`;
+    $("mcMeta").textContent = `n=${_n(n)} · ${elapsed}s`;
     renderMonteCarlo(results, standings);
   };
   worker.onerror = err => {
     worker.terminate();
     mcBtn.disabled = false;
     mcBtn.textContent = "Simular Campeonato";
-    mcStatus.innerHTML = `<span class="bad">Erro: ${err.message}</span>`;
+    mcStatus.innerHTML = `<span class="bad">${_t('Erro: {msg}', { msg: _tm(err.message) })}</span>`;
   };
   worker.postMessage({ fixtures, standings, forces,
     homeBase: MODEL.homeBase, awayBase: MODEL.awayBase, n });
@@ -10998,7 +11003,7 @@ function renderMonteCarlo(results, standings) {
     const relPct = r.rel.toFixed(1);
     return `
       <div class="${cls}" title="${displayName(team)}">
-        <div class="mc-pos">#${pos} · ${pts}pts · DG${gd >= 0 ? '+' : ''}${gd}</div>
+        <div class="mc-pos">${_t('#{pos} · {pts}pts · DG{gd}', { pos, pts, gd: (gd >= 0 ? '+' : '') + gd })}</div>
         <div class="mc-team">${displayName(team)}</div>
         <div class="mc-row">
           <span class="mc-row-lbl" title="Probabilidade de título">🏆</span>
@@ -11063,10 +11068,10 @@ function renderCompare(tA, tB){
   }
   const fmA=avgLast(recA), fmB=avgLast(recB);
   function formPills(list){
-    if(!list.length) return '<span style="color:var(--muted);font-size:11px;">sem dados</span>';
+    if(!list.length) return '<span style="color:var(--muted);font-size:11px;">'+_t('sem dados')+'</span>';
     return list.slice(-5).map(m=>{
       const cls=m.gf>m.ga?"fp-v":(m.gf===m.ga?"fp-e":"fp-d");
-      const lbl=m.gf>m.ga?"V":(m.gf===m.ga?"E":"D");
+      const lbl=m.gf>m.ga?_t("V@@vitória"):(m.gf===m.ga?_t("E@@empate"):_t("D@@derrota"));
       return `<span class="fp ${cls}">${m.gf}-${m.ga} ${lbl}</span>`;
     }).join("");
   }
@@ -11075,15 +11080,16 @@ function renderCompare(tA, tB){
     const MAX=1.6;
     const defBar=barPct(Math.max(0,MAX-f.defH),MAX);
     const gfDiff=fm.gf-lgpt, gaDiff=fm.ga-lgpt;
-    const atkDesc=gfDiff>0.2?`Ataque em alta — GF ${fm.gf.toFixed(2)} (liga ${lgpt.toFixed(2)})`:gfDiff<-0.2?`Ataque abaixo da média — GF ${fm.gf.toFixed(2)} (liga ${lgpt.toFixed(2)})`:`Ataque na média da liga`;
-    const defDesc=gaDiff>0.2?`Defesa vulnerável — GA ${fm.ga.toFixed(2)} (liga ${lgpt.toFixed(2)})`:gaDiff<-0.2?`Defesa sólida — GA ${fm.ga.toFixed(2)} (liga ${lgpt.toFixed(2)})`:`Defesa dentro da média`;
+    const gfV={gf:fm.gf.toFixed(2),lg:lgpt.toFixed(2)}, gaV={ga:fm.ga.toFixed(2),lg:lgpt.toFixed(2)};
+    const atkDesc=gfDiff>0.2?_t('Ataque em alta — GF {gf} (liga {lg})',gfV):gfDiff<-0.2?_t('Ataque abaixo da média — GF {gf} (liga {lg})',gfV):_t('Ataque na média da liga');
+    const defDesc=gaDiff>0.2?_t('Defesa vulnerável — GA {ga} (liga {lg})',gaV):gaDiff<-0.2?_t('Defesa sólida — GA {ga} (liga {lg})',gaV):_t('Defesa dentro da média');
     return `<div class="cmp-card"><div class="cmp-head"><span class="cmp-team">${displayName(team)}</span><span class="elo-pill ${eloClass(elo)}">Elo ${Math.round(elo)}</span></div>
       <div class="cmp-section">Força estimada (MLE Dixon-Coles)</div>
       <div class="bar-row"><span class="bar-lbl">Ataque α</span><div class="bar-bg"><div class="bar-fill bar-atk" style="width:${barPct(f.atkH,MAX)}%"></div></div><span class="bar-val">${f.atkH.toFixed(2)}</span></div>
       <div class="bar-row"><span class="bar-lbl">Solidez def. β</span><div class="bar-bg"><div class="bar-fill bar-def" style="width:${defBar}%"></div></div><span class="bar-val">${f.defH.toFixed(2)}</span></div>
       <div class="cmp-section">Últimos 5 jogos (não entra no modelo)</div>
       <div class="form-pills">${formPills(rec)}</div>
-      <div class="form-avg"><span>GF: <b>${fm.gf.toFixed(2)}</b></span><span>GA: <b>${fm.ga.toFixed(2)}</b></span><span style="color:rgba(255,255,255,.25)">liga ${lgpt.toFixed(2)}</span></div>
+      <div class="form-avg"><span>GF: <b>${fm.gf.toFixed(2)}</b></span><span>GA: <b>${fm.ga.toFixed(2)}</b></span><span style="color:rgba(255,255,255,.25)">${_t('liga {v}',{v:lgpt.toFixed(2)})}</span></div>
       <div class="insight-box" style="border-color:#7aa2ff">${atkDesc}. ${defDesc}.</div>
     </div>`;
   }
@@ -11123,13 +11129,13 @@ function renderConfig(){
     { title: 'Elo', items: [
       row('Rating inicial',       CONFIG.ELO_INITIAL),
       row('K base',               CONFIG.ELO_K_BASE),
-      row('Half-life',            CONFIG.HALF_LIFE_ELO_ROUNDS + ' rodadas'),
+      row('Half-life',            _t('{n} rodadas',{n:CONFIG.HALF_LIFE_ELO_ROUNDS})),
       row('Reset α',              CONFIG.SEASON_RESET_ALPHA),
       row('γ (Elo → λ)',          CONFIG.ELO_GAMMA),
       row('Clamp ±λ',             '±' + CONFIG.ELO_LAMBDA_CLAMP),
     ]},
     { title: 'Poisson', items: [
-      row('Half-life',            CONFIG.HALF_LIFE_POISSON_ROUNDS + ' rodadas'),
+      row('Half-life',            _t('{n} rodadas',{n:CONFIG.HALF_LIFE_POISSON_ROUNDS})),
       row('Peso mínimo',          CONFIG.MIN_W_POI),
       row('α·β·γ·μ casa',          MODEL ? MODEL.homeBase.toFixed(3) : '—'),
       row('α·β·μ fora',            MODEL ? MODEL.awayBase.toFixed(3) : '—'),
@@ -11141,7 +11147,7 @@ function renderConfig(){
     ]},
     { title: 'Backtest', items: [
       row('Temporadas de teste',  CONFIG.BACKTEST_SEASONS),
-      row('Treino a partir de',   (2003 + CONFIG.TRAIN_FROM_SEASON) + ' (séason ' + CONFIG.TRAIN_FROM_SEASON + ')'),
+      row('Treino a partir de',   _t('{y} (temporada {n})',{y:2003 + CONFIG.TRAIN_FROM_SEASON,n:CONFIG.TRAIN_FROM_SEASON})),
     ]},
     { title: 'Dataset', items: [
       row('Rodada (col.)',        CONFIG.DATE_COL),
@@ -11182,9 +11188,9 @@ function renderConfig(){
 async function loadCSV(){
   renderConfig();
   setModelPill("Carregando dataset…");
-  setStatus(`Carregando <b>${CONFIG.CSV_PATH}</b>…`);
+  setStatus(_t('Carregando <b>{path}</b>…', { path: CONFIG.CSV_PATH }));
   const text = window.__EMBEDDED_CSV__ || await fetch(CONFIG.CSV_PATH, {cache:"no-store"}).then(r => {
-    if (!r.ok) throw new Error(`Falha ao carregar CSV (${r.status}).`);
+    if (!r.ok) throw new Error(_t('Falha ao carregar CSV ({status}).', { status: r.status }));
     return r.text();
   });
   const parsed = await new Promise((resolve, reject) => {
@@ -11194,7 +11200,7 @@ async function loadCSV(){
   const sample = parsed[0] || {};
   const required = [CONFIG.DATE_COL,CONFIG.HOME_TEAM_COL,CONFIG.AWAY_TEAM_COL,CONFIG.HOME_GOALS_COL,CONFIG.AWAY_GOALS_COL];
   const missing = required.filter(c=>!(c in sample));
-  if (missing.length) throw new Error(`CSV não contém colunas necessárias: ${missing.join(", ")}.`);
+  if (missing.length) throw new Error(_t('CSV não contém colunas necessárias: {cols}.', { cols: missing.join(", ") }));
 
   // Constrói lookup de últimos jogos para as pills de forma
   const recent = new Map();
@@ -11211,7 +11217,7 @@ async function loadCSV(){
 
   _rawParsed = parsed;
 
-  setStatus(`Construindo modelo a partir de <b>${parsed.length}</b> linhas…`);
+  setStatus(_t('Construindo modelo a partir de <b>{n}</b> linhas…', { n: parsed.length }));
   const t0 = performance.now();
   MODEL = buildModel(parsed);
   const t1 = performance.now();
@@ -11230,7 +11236,7 @@ async function loadCSV(){
       mcF.value = st.remaining.map(([h, a]) => `${displayName(h)} x ${displayName(a)}`).join("\n");
       const lbl = document.querySelector('label[for="mcFixtures"]');
       if (lbl) lbl.textContent =
-        `Jogos restantes — ${st.remaining.length} confrontos após a rodada ${st.roundsPlayed} (edite se quiser)`;
+        _t('Jogos restantes — {n} confrontos após a rodada {r} (edite se quiser)', { n: st.remaining.length, r: st.roundsPlayed });
     }
     if (st.excluded.length) {
       console.warn("Times ignorados na tabela (poucos jogos — provável linha errada no CSV):", st.excluded);
@@ -11239,18 +11245,18 @@ async function loadCSV(){
     console.warn("Não foi possível pré-preencher os jogos restantes:", e.message);
   }
   runValidation();
-  setModelPill(`Modelo pronto • ${MODEL.teamCount} times`, "");
-  metaEl.textContent = `dataset: ${MODEL.parsedCount} jogos • ${MODEL.seasonCount} temporadas • build: ${(t1-t0).toFixed(0)} ms`;
+  setModelPill(_t('Modelo pronto • {n} times', { n: MODEL.teamCount }), "");
+  metaEl.textContent = _t('dataset: {g} jogos • {s} temporadas • build: {ms} ms', { g: MODEL.parsedCount, s: MODEL.seasonCount, ms: (t1-t0).toFixed(0) });
   const hm = document.getElementById("hdrMatches");
   const hs = document.getElementById("hdrSeason");
   const mm = document.getElementById("modelMeta");
-  if (hm) hm.textContent = MODEL.parsedCount.toLocaleString("pt-BR") + " jogos";
-  if (hs) hs.textContent = MODEL.seasonCount + " temporadas";
-  if (mm) mm.textContent = `${MODEL.parsedCount.toLocaleString("pt-BR")} jogos · ${MODEL.teamCount} clubes · ${MODEL.seasonCount} temporadas · build ${(t1-t0).toFixed(0)} ms`;
+  if (hm) hm.textContent = _t('{n} jogos', { n: _n(MODEL.parsedCount) });
+  if (hs) hs.textContent = _t('{n} temporadas', { n: MODEL.seasonCount });
+  if (mm) mm.textContent = _t('{g} jogos · {c} clubes · {s} temporadas · build {ms} ms', { g: _n(MODEL.parsedCount), c: MODEL.teamCount, s: MODEL.seasonCount, ms: (t1-t0).toFixed(0) });
   setStatus(
-    `<span class="ok">OK</span> — modelo construído.
-     Ref: temporada #<b>${MODEL.refSeason+1}</b> rodada <b>${MODEL.refRound}</b> · médias liga: casa=${MODEL.leagueHomeAvg.toFixed(2)} fora=${MODEL.leagueAwayAvg.toFixed(2)}`
-    + (MODEL.removedDuplicates>0 ? `<br/><span class="warn">⚠ ${MODEL.removedDuplicates} linhas duplicadas removidas.</span>` : '')
+    `<span class="ok">OK</span> ${_t('— modelo construído.')}<br/>`
+    + _t('Ref: temporada #{s} rodada {r} · médias liga: casa={h} fora={a}', { s: `<b>${MODEL.refSeason+1}</b>`, r: `<b>${MODEL.refRound}</b>`, h: MODEL.leagueHomeAvg.toFixed(2), a: MODEL.leagueAwayAvg.toFixed(2) })
+    + (MODEL.removedDuplicates>0 ? `<br/><span class="warn">${_t('⚠ {n} linhas duplicadas removidas.', { n: MODEL.removedDuplicates })}</span>` : '')
   );
 }
 
@@ -11258,7 +11264,7 @@ loadCSV().catch(err => {
   console.error(err);
   runBtn.disabled = true;
   setModelPill("Erro ao carregar", "danger");
-  setStatus(`<span class="bad">Erro:</span> ${String(err.message || err)}`);
+  setStatus(`<span class="bad">Erro:</span> ${_tm(String(err.message || err))}`);
 });
 </script>
 <script>

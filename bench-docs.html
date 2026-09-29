@@ -4,6 +4,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Sassamaru — Documentação do Modelo</title>
+  <script src="i18n/i18n.js" data-i18n-extra="docs"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
@@ -442,8 +443,8 @@ footer {
     <div class="brand">
       <div class="brand-mark">B∑</div>
       <div class="brand-text">
-        <h1>Sassamaru Docs</h1>
-        <p>Documentação técnica do modelo</p>
+        <h1 data-i18n-html="docs.1">Sassamaru Docs</h1>
+        <p data-i18n-html="docs.2">Documentação técnica do modelo</p>
       </div>
     </div>
     <a class="back-link" href="index.html">← Voltar ao índice</a>
@@ -452,9 +453,9 @@ footer {
 
 <!-- ── Paper title block ── -->
 <div class="paper-meta">
-  <div class="paper-title">Sassamaru: Um modelo probabilístico de previsão de partidas de futebol</div>
-  <div class="paper-subtitle">Arquitectura, parâmetros e decisões de design para previsão de partidas e simulação de competições usando regressão de Poisson bivariada, ratings Elo e correção Dixon-Coles.</div>
-  <div class="paper-tags">
+  <div class="paper-title" data-i18n-html="docs.3">Sassamaru: Um modelo probabilístico de previsão de partidas de futebol</div>
+  <div class="paper-subtitle" data-i18n-html="docs.4">Arquitectura, parâmetros e decisões de design para previsão de partidas e simulação de competições usando regressão de Poisson bivariada, ratings Elo e correção Dixon-Coles.</div>
+  <div class="paper-tags" data-i18n-html="docs.5">
     <span class="paper-tag">Poisson bivariado</span>
     <span class="paper-tag">Ratings Elo</span>
     <span class="paper-tag">Dixon-Coles</span>
@@ -463,47 +464,47 @@ footer {
     <span class="paper-tag">Brasileirão 2003–2026</span>
     <span class="paper-tag">International 1872–2026</span>
   </div>
-  <div class="paper-date">Março 2026 · Versão 1.0</div>
+  <div class="paper-date" data-i18n-html="docs.6">Março 2026 · Versão 1.0</div>
 </div>
 
 <!-- ── Table of contents ── -->
 <div class="toc">
-  <div class="toc-title">Índice</div>
+  <div class="toc-title" data-i18n-html="docs.7">Índice</div>
   <ol class="toc-list">
-    <li><a href="#s1">Motivação e escopo</a></li>
-    <li><a href="#s2">Dados</a></li>
-    <li><a href="#s3">Arquitetura do modelo</a>
+    <li data-i18n-html="docs.8"><a href="#s1">Motivação e escopo</a></li>
+    <li data-i18n-html="docs.9"><a href="#s2">Dados</a></li>
+    <li><a href="#s3" data-i18n-html="docs.41">Arquitetura do modelo</a>
       <ul class="toc-sub">
-        <li><a href="#s3-1">Pesos temporais</a></li>
-        <li><a href="#s3-2">Regressão de Poisson</a></li>
-        <li><a href="#s3-3">Ratings Elo</a></li>
-        <li><a href="#s3-4">Forma recente (removida)</a></li>
-        <li><a href="#s3-5">Correção Dixon-Coles</a></li>
-        <li><a href="#s3-6">Fator de descanso (removido)</a></li>
-        <li><a href="#s3-7">Campo neutro</a></li>
+        <li data-i18n-html="docs.10"><a href="#s3-1">Pesos temporais</a></li>
+        <li data-i18n-html="docs.11"><a href="#s3-2">Regressão de Poisson</a></li>
+        <li data-i18n-html="docs.12"><a href="#s3-3">Ratings Elo</a></li>
+        <li data-i18n-html="docs.13"><a href="#s3-4">Forma recente (removida)</a></li>
+        <li data-i18n-html="docs.14"><a href="#s3-5">Correção Dixon-Coles</a></li>
+        <li data-i18n-html="docs.15"><a href="#s3-6">Fator de descanso (removido)</a></li>
+        <li data-i18n-html="docs.16"><a href="#s3-7">Campo neutro</a></li>
       </ul>
     </li>
-    <li><a href="#s4">Da λ às probabilidades e odds</a></li>
-    <li><a href="#s5">Validação e backtesting</a></li>
-    <li><a href="#s6">Simulação Monte Carlo</a></li>
-    <li><a href="#s7">Diferenças entre os apps</a></li>
-    <li><a href="#s8">Limitações conhecidas</a></li>
-    <li><a href="#s9">ToDo e próximos passos</a></li>
+    <li data-i18n-html="docs.17"><a href="#s4">Da λ às probabilidades e odds</a></li>
+    <li data-i18n-html="docs.18"><a href="#s5">Validação e backtesting</a></li>
+    <li data-i18n-html="docs.19"><a href="#s6">Simulação Monte Carlo</a></li>
+    <li data-i18n-html="docs.20"><a href="#s7">Diferenças entre os apps</a></li>
+    <li data-i18n-html="docs.21"><a href="#s8">Limitações conhecidas</a></li>
+    <li data-i18n-html="docs.22"><a href="#s9">ToDo e próximos passos</a></li>
   </ol>
 </div>
 
 <!-- ══════════════════════════════════════════════ -->
 <div class="section" id="s1">
   <div class="section-num">§ 1</div>
-  <h2>Motivação e escopo</h2>
+  <h2 data-i18n-html="docs.23">Motivação e escopo</h2>
 
-  <p>O Sassamaru nasceu de uma pergunta simples: é possível construir um modelo de previsão de futebol robusto que rode inteiramente no navegador, sem servidor, sem API externa, usando apenas dados históricos públicos?</p>
+  <p data-i18n-html="docs.24">O Sassamaru nasceu de uma pergunta simples: é possível construir um modelo de previsão de futebol robusto que rode inteiramente no navegador, sem servidor, sem API externa, usando apenas dados históricos públicos?</p>
 
-  <p>A resposta é sim — com ressalvas. Modelos probabilísticos de futebol têm longa tradição acadêmica, começando com Maher (1982) e Dixon &amp; Coles (1997). O Sassamaru reimplementa essa tradição em JavaScript client-side, priorizando transparência, reprodutibilidade e facilidade de uso.</p>
+  <p data-i18n-html="docs.25">A resposta é sim — com ressalvas. Modelos probabilísticos de futebol têm longa tradição acadêmica, começando com Maher (1982) e Dixon &amp; Coles (1997). O Sassamaru reimplementa essa tradição em JavaScript client-side, priorizando transparência, reprodutibilidade e facilidade de uso.</p>
 
-  <p>O escopo é deliberadamente limitado: previsão de resultados 1X2 (mandante vence / empate / visitante vence) com probabilidades calibradas e odds derivadas. Não há previsão de escanteios, cartões, marcadores individuais ou mercados asiáticos.</p>
+  <p data-i18n-html="docs.26">O escopo é deliberadamente limitado: previsão de resultados 1X2 (mandante vence / empate / visitante vence) com probabilidades calibradas e odds derivadas. Não há previsão de escanteios, cartões, marcadores individuais ou mercados asiáticos.</p>
 
-  <div class="callout note">
+  <div class="callout note" data-i18n-html="docs.27">
     <strong>O que o modelo não é:</strong> Uma ferramenta de apostas. As odds geradas são <em>odds justas</em> derivadas das probabilidades do próprio modelo, com overround fixo. Elas não refletem o mercado real e não incorporam informação de escalações, lesões ou condição de campo.
   </div>
 </div>
@@ -511,40 +512,40 @@ footer {
 <!-- ══════════════════════════════════════════════ -->
 <div class="section" id="s2">
   <div class="section-num">§ 2</div>
-  <h2>Dados</h2>
+  <h2 data-i18n-html="docs.28">Dados</h2>
 
-  <h3>Brasileirão</h3>
-  <p>Dataset customizado <code style="font-family:var(--mono);font-size:12.5px">campeonatobrasileirolimpo.csv</code> com 9 200+ partidas do Campeonato Brasileiro Série A entre 2003 e 2026 (rodadas 1–8 da edição atual). As colunas usadas são: rodada (<code style="font-family:var(--mono);font-size:12px">rodata</code>), mandante, visitante e placar.</p>
+  <h3 data-i18n-html="docs.29">Brasileirão</h3>
+  <p data-i18n-html="docs.30">Dataset customizado <code style="font-family:var(--mono);font-size:12.5px">campeonatobrasileirolimpo.csv</code> com 9 200+ partidas do Campeonato Brasileiro Série A entre 2003 e 2026 (rodadas 1–8 da edição atual). As colunas usadas são: rodada (<code style="font-family:var(--mono);font-size:12px">rodata</code>), mandante, visitante e placar.</p>
 
-  <div class="callout warn">
+  <div class="callout warn" data-i18n-html="docs.31">
     <strong>Atenção — estrutura temporal:</strong> O dataset não contém datas — apenas o número da rodada. O modelo usa a rodada como unidade de tempo, o que exige detecção automática de temporadas via clustering de "rodada 1" (mínimo de 5 ocorrências consecutivas). Isso torna o decay temporal independente de calendário, mas também significa que jogos fora de rodada (amistosos, copas) não estão presentes.
   </div>
 
-  <h3>Internacional</h3>
-  <p>Dataset público de Mart Jürisoo disponível no Kaggle (<em>international football results</em>), com 49 000+ partidas entre seleções desde 1872. Colunas: <code style="font-family:var(--mono);font-size:12px">date, home_team, away_team, home_score, away_score, neutral</code>. O campo <code style="font-family:var(--mono);font-size:12px">neutral</code> é booleano e indica se o jogo foi disputado em campo neutro.</p>
+  <h3 data-i18n-html="docs.32">Internacional</h3>
+  <p data-i18n-html="docs.33">Dataset público de Mart Jürisoo disponível no Kaggle (<em>international football results</em>), com 49 000+ partidas entre seleções desde 1872. Colunas: <code style="font-family:var(--mono);font-size:12px">date, home_team, away_team, home_score, away_score, neutral</code>. O campo <code style="font-family:var(--mono);font-size:12px">neutral</code> é booleano e indica se o jogo foi disputado em campo neutro.</p>
 
-  <p>Para o modelo de seleções, o decay é date-based (dias desde cada partida), não round-based. O treinamento usa dados a partir de 1990 por padrão, já que o futebol pré-Copa do Mundo moderna tem distribuições estatísticas bastante distintas das atuais.</p>
+  <p data-i18n-html="docs.34">Para o modelo de seleções, o decay é date-based (dias desde cada partida), não round-based. O treinamento usa dados a partir de 1990 por padrão, já que o futebol pré-Copa do Mundo moderna tem distribuições estatísticas bastante distintas das atuais.</p>
 
   <div class="metric-row">
     <div class="metric-card">
-      <div class="mc-label">Jogos (Brasileirão)</div>
+      <div class="mc-label" data-i18n-html="docs.35">Jogos (Brasileirão)</div>
       <div class="mc-val">9 200+</div>
       <div class="mc-sub">2003 – 2026</div>
     </div>
     <div class="metric-card">
-      <div class="mc-label">Clubes ativos</div>
+      <div class="mc-label" data-i18n-html="docs.36">Clubes ativos</div>
       <div class="mc-val">~50</div>
-      <div class="mc-sub">ao longo dos anos</div>
+      <div class="mc-sub" data-i18n-html="docs.37">ao longo dos anos</div>
     </div>
     <div class="metric-card">
-      <div class="mc-label">Jogos (internacional)</div>
+      <div class="mc-label" data-i18n-html="docs.38">Jogos (internacional)</div>
       <div class="mc-val">49 000+</div>
       <div class="mc-sub">1872 – 2026</div>
     </div>
     <div class="metric-card">
-      <div class="mc-label">Seleções</div>
+      <div class="mc-label" data-i18n-html="docs.39">Seleções</div>
       <div class="mc-val">~270</div>
-      <div class="mc-sub">com dados históricos</div>
+      <div class="mc-sub" data-i18n-html="docs.40">com dados históricos</div>
     </div>
   </div>
 </div>
@@ -552,12 +553,12 @@ footer {
 <!-- ══════════════════════════════════════════════ -->
 <div class="section" id="s3">
   <div class="section-num">§ 3</div>
-  <h2>Arquitetura do modelo</h2>
+  <h2 data-i18n-html="docs.41">Arquitetura do modelo</h2>
 
-  <p>O pipeline de previsão segue cinco etapas principais:</p>
+  <p data-i18n-html="docs.42">O pipeline de previsão segue cinco etapas principais:</p>
 
   <div class="fig">
-    <div class="pipeline">
+    <div class="pipeline" data-i18n-html="docs.43">
       <span class="pipe-step">1. Pesos temporais</span>
       <span class="pipe-arrow">→</span>
       <span class="pipe-step">2. Poisson (λ)</span>
@@ -568,134 +569,134 @@ footer {
       <span class="pipe-arrow">→</span>
       <span class="pipe-step">P(H/D/A)</span>
     </div>
-    <div class="fig-caption">Figura 1 — Pipeline de previsão. Cada etapa refina a estimativa de gols esperados (λ) ou a distribuição de placares resultante.</div>
+    <div class="fig-caption" data-i18n-html="docs.44">Figura 1 — Pipeline de previsão. Cada etapa refina a estimativa de gols esperados (λ) ou a distribuição de placares resultante.</div>
   </div>
 
   <!-- 3.1 -->
-  <h3 id="s3-1">3.1 Pesos temporais (temporal decay)</h3>
+  <h3 id="s3-1" data-i18n-html="docs.45">3.1 Pesos temporais (temporal decay)</h3>
 
-  <p>Partidas mais antigas são menos informativas do que partidas recentes. Para capturar isso, cada jogo histórico recebe um peso calculado com uma função de half-life exponencial:</p>
+  <p data-i18n-html="docs.46">Partidas mais antigas são menos informativas do que partidas recentes. Para capturar isso, cada jogo histórico recebe um peso calculado com uma função de half-life exponencial:</p>
 
-<div class="formula-block"><div class="formula-eq"><span class="eq-line eq-main">w(age) = max(w_min,  0.5 ^ (age / half_life))</span></div><div class="formula-vars"><div class="formula-var"><span class="formula-var-name">age</span><span class="formula-var-desc">Idade do jogo em rodadas (Brasileirão) ou dias (seleções)</span></div><div class="formula-var"><span class="formula-var-name">half_life</span><span class="formula-var-desc">Meia-vida — quando age = half_life, o peso cai para 0.5</span></div><div class="formula-var"><span class="formula-var-name">w_min</span><span class="formula-var-desc">Peso mínimo — evita que jogos muito antigos sejam zerados</span></div></div></div>
+<div class="formula-block"><div class="formula-eq" data-i18n-html="docs.47"><span class="eq-line eq-main">w(age) = max(w_min,  0.5 ^ (age / half_life))</span></div><div class="formula-vars"><div class="formula-var" data-i18n-html="docs.48"><span class="formula-var-name">age</span><span class="formula-var-desc">Idade do jogo em rodadas (Brasileirão) ou dias (seleções)</span></div><div class="formula-var" data-i18n-html="docs.49"><span class="formula-var-name">half_life</span><span class="formula-var-desc">Meia-vida — quando age = half_life, o peso cai para 0.5</span></div><div class="formula-var" data-i18n-html="docs.50"><span class="formula-var-name">w_min</span><span class="formula-var-desc">Peso mínimo — evita que jogos muito antigos sejam zerados</span></div></div></div>
 
-  <p>Três pesos independentes são calculados, com half-lives diferentes, para os três componentes que os usam:</p>
+  <p data-i18n-html="docs.51">Três pesos independentes são calculados, com half-lives diferentes, para os três componentes que os usam:</p>
 
   <table class="param-table">
-    <thead><tr><th>Componente</th><th>Half-life (Brasileirão)</th><th>Half-life (Seleções)</th><th>Peso mínimo</th></tr></thead>
+    <thead><tr><th data-i18n-html="docs.52">Componente</th><th data-i18n-html="docs.53">Half-life (Brasileirão)</th><th data-i18n-html="docs.54">Half-life (Seleções)</th><th data-i18n-html="docs.55">Peso mínimo</th></tr></thead>
     <tbody>
-      <tr><td>Elo</td><td>76 rodadas (~2 temporadas)</td><td>730 dias (~2 anos)</td><td>0.10</td></tr>
-      <tr><td>Poisson (λ)</td><td>152 rodadas (~4 temporadas)</td><td>1 460 dias (~4 anos)</td><td>0.25</td></tr>
-      <tr><td>Forma recente</td><td><em>não usado</em> (ver 3.4)</td><td>120 dias (~4 meses)</td><td>0.35</td></tr>
+      <tr><td data-i18n-html="docs.56">Elo</td><td data-i18n-html="docs.57">76 rodadas (~2 temporadas)</td><td data-i18n-html="docs.58">730 dias (~2 anos)</td><td>0.10</td></tr>
+      <tr><td data-i18n-html="docs.59">Poisson (λ)</td><td data-i18n-html="docs.60">152 rodadas (~4 temporadas)</td><td data-i18n-html="docs.61">1 460 dias (~4 anos)</td><td>0.25</td></tr>
+      <tr><td data-i18n-html="docs.62">Forma recente</td><td data-i18n-html="docs.63"><em>não usado</em> (ver 3.4)</td><td data-i18n-html="docs.64">120 dias (~4 meses)</td><td>0.35</td></tr>
     </tbody>
   </table>
 
-  <p>A intuição por trás dos diferentes half-lives: a <strong>força de ataque e defesa</strong> (Poisson) muda devagar — um time bom geralmente permanece bom por anos. A <strong>força relativa</strong> (Elo) muda um pouco mais rápido.</p>
+  <p data-i18n-html="docs.65">A intuição por trás dos diferentes half-lives: a <strong>força de ataque e defesa</strong> (Poisson) muda devagar — um time bom geralmente permanece bom por anos. A <strong>força relativa</strong> (Elo) muda um pouco mais rápido.</p>
 
   <!-- 3.2 -->
-  <h3 id="s3-2">3.2 Regressão de Poisson</h3>
+  <h3 id="s3-2" data-i18n-html="docs.66">3.2 Regressão de Poisson</h3>
 
-  <p>O modelo central assume que o número de gols marcados por cada time em uma partida segue distribuições de Poisson independentes com parâmetros λ<sub>H</sub> (gols esperados do mandante) e λ<sub>A</sub> (gols esperados do visitante).</p>
+  <p data-i18n-html="docs.67">O modelo central assume que o número de gols marcados por cada time em uma partida segue distribuições de Poisson independentes com parâmetros λ<sub>H</sub> (gols esperados do mandante) e λ<sub>A</sub> (gols esperados do visitante).</p>
 
-<div class="formula-block"><div class="formula-eq"><span class="eq-line eq-main">λ_H = atk_H × def_A × league_home_avg</span><span class="eq-line eq-sub">λ_A = atk_A × def_H × league_away_avg</span></div><div class="formula-vars"><div class="formula-var"><span class="formula-var-name">atk_H</span><span class="formula-var-desc">Força de ataque do mandante jogando em casa (razão sobre a média da liga)</span></div><div class="formula-var"><span class="formula-var-name">def_A</span><span class="formula-var-desc">Vulnerabilidade defensiva do visitante fora de casa</span></div><div class="formula-var"><span class="formula-var-name">league_home_avg</span><span class="formula-var-desc">Média ponderada de gols por jogo em casa na liga</span></div></div></div>
+<div class="formula-block"><div class="formula-eq" data-i18n-html="docs.68"><span class="eq-line eq-main">λ_H = atk_H × def_A × league_home_avg</span><span class="eq-line eq-sub">λ_A = atk_A × def_H × league_away_avg</span></div><div class="formula-vars"><div class="formula-var" data-i18n-html="docs.69"><span class="formula-var-name">atk_H</span><span class="formula-var-desc">Força de ataque do mandante jogando em casa (razão sobre a média da liga)</span></div><div class="formula-var" data-i18n-html="docs.70"><span class="formula-var-name">def_A</span><span class="formula-var-desc">Vulnerabilidade defensiva do visitante fora de casa</span></div><div class="formula-var" data-i18n-html="docs.71"><span class="formula-var-name">league_home_avg</span><span class="formula-var-desc">Média ponderada de gols por jogo em casa na liga</span></div></div></div>
 
-  <p>As quatro forças por time (ataque em casa, defesa em casa, ataque fora, defesa fora) são calculadas como razões em relação à média da liga, usando médias ponderadas pelos pesos temporais de Poisson:</p>
+  <p data-i18n-html="docs.72">As quatro forças por time (ataque em casa, defesa em casa, ataque fora, defesa fora) são calculadas como razões em relação à média da liga, usando médias ponderadas pelos pesos temporais de Poisson:</p>
 
-<div class="formula-block"><div class="formula-eq"><span class="eq-line eq-main">atk_H(t) = Σ(gols_marcados_em_casa × w_poi) / Σ(w_poi)  ÷  league_home_avg</span><span class="eq-line eq-sub">def_H(t) = Σ(gols_sofridos_em_casa  × w_poi) / Σ(w_poi)  ÷  league_away_avg</span></div><div class="formula-note">Valores &gt; 1 indicam força acima da média da liga · valores &lt; 1 indicam abaixo. w_poi = peso temporal de Poisson de cada partida.</div></div>
+<div class="formula-block"><div class="formula-eq" data-i18n-html="docs.73"><span class="eq-line eq-main">atk_H(t) = Σ(gols_marcados_em_casa × w_poi) / Σ(w_poi)  ÷  league_home_avg</span><span class="eq-line eq-sub">def_H(t) = Σ(gols_sofridos_em_casa  × w_poi) / Σ(w_poi)  ÷  league_away_avg</span></div><div class="formula-note" data-i18n-html="docs.74">Valores &gt; 1 indicam força acima da média da liga · valores &lt; 1 indicam abaixo. w_poi = peso temporal de Poisson de cada partida.</div></div>
 
-  <p>Essa estrutura é a base do modelo de Dixon &amp; Coles (1997) e equivale a uma regressão log-linear de Poisson com efeitos fixos por time e por lado (casa/fora).</p>
+  <p data-i18n-html="docs.75">Essa estrutura é a base do modelo de Dixon &amp; Coles (1997) e equivale a uma regressão log-linear de Poisson com efeitos fixos por time e por lado (casa/fora).</p>
 
   <!-- 3.3 -->
-  <h3 id="s3-3">3.3 Ratings Elo</h3>
+  <h3 id="s3-3" data-i18n-html="docs.76">3.3 Ratings Elo</h3>
 
-  <p>O sistema Elo, desenvolvido originalmente para xadrez por Arpad Elo, foi adaptado para futebol pela FIFA e por pesquisadores como Hvattum &amp; Arntzen (2010). A ideia central é que cada time tem um rating que sobe quando vence e cai quando perde, proporcionalmente à surpresa do resultado.</p>
+  <p data-i18n-html="docs.77">O sistema Elo, desenvolvido originalmente para xadrez por Arpad Elo, foi adaptado para futebol pela FIFA e por pesquisadores como Hvattum &amp; Arntzen (2010). A ideia central é que cada time tem um rating que sobe quando vence e cai quando perde, proporcionalmente à surpresa do resultado.</p>
 
-<div class="formula-block"><div class="formula-eq"><span class="eq-line eq-main">R_novo = R_antigo + K × (resultado − E[resultado])</span><span class="eq-line"></span><span class="eq-line eq-sub">E[resultado] = 1 / (1 + 10 ^ ((R_adversário − R_time) / 400))</span></div><div class="formula-vars"><div class="formula-var"><span class="formula-var-name">resultado</span><span class="formula-var-desc">1 se vitória · 0.5 se empate · 0 se derrota</span></div><div class="formula-var"><span class="formula-var-name">E[resultado]</span><span class="formula-var-desc">Probabilidade esperada de vitória via escala logística</span></div><div class="formula-var"><span class="formula-var-name">K</span><span class="formula-var-desc">K_base × (1 + 0.5 × max(0, diff_gols − 1)) × w_elo</span></div><div class="formula-var"><span class="formula-var-name">w_elo</span><span class="formula-var-desc">Peso temporal — reduz o impacto de jogos antigos no rating</span></div></div></div>
+<div class="formula-block"><div class="formula-eq" data-i18n-html="docs.78"><span class="eq-line eq-main">R_novo = R_antigo + K × (resultado − E[resultado])</span><span class="eq-line"></span><span class="eq-line eq-sub">E[resultado] = 1 / (1 + 10 ^ ((R_adversário − R_time) / 400))</span></div><div class="formula-vars"><div class="formula-var" data-i18n-html="docs.79"><span class="formula-var-name">resultado</span><span class="formula-var-desc">1 se vitória · 0.5 se empate · 0 se derrota</span></div><div class="formula-var" data-i18n-html="docs.80"><span class="formula-var-name">E[resultado]</span><span class="formula-var-desc">Probabilidade esperada de vitória via escala logística</span></div><div class="formula-var" data-i18n-html="docs.81"><span class="formula-var-name">K</span><span class="formula-var-desc">K_base × (1 + 0.5 × max(0, diff_gols − 1)) × w_elo</span></div><div class="formula-var" data-i18n-html="docs.82"><span class="formula-var-name">w_elo</span><span class="formula-var-desc">Peso temporal — reduz o impacto de jogos antigos no rating</span></div></div></div>
 
-  <p>O fator K é dinâmico: vitórias por maior placar geram atualização mais forte. O peso temporal <code style="font-family:var(--mono);font-size:12px">w_elo</code> reduz o impacto de jogos antigos no rating atual.</p>
+  <p data-i18n-html="docs.83">O fator K é dinâmico: vitórias por maior placar geram atualização mais forte. O peso temporal <code style="font-family:var(--mono);font-size:12px">w_elo</code> reduz o impacto de jogos antigos no rating atual.</p>
 
-  <p>No início de cada temporada do Brasileirão, os ratings sofrem um <strong>reset parcial</strong> em direção ao valor inicial (1500), controlado pelo parâmetro <code style="font-family:var(--mono);font-size:12px">SEASON_RESET_ALPHA = 0.20</code>. Isso captura o fato de que, com mudanças de elenco, um time forte tende a regredir um pouco à média.</p>
+  <p data-i18n-html="docs.84">No início de cada temporada do Brasileirão, os ratings sofrem um <strong>reset parcial</strong> em direção ao valor inicial (1500), controlado pelo parâmetro <code style="font-family:var(--mono);font-size:12px">SEASON_RESET_ALPHA = 0.20</code>. Isso captura o fato de que, com mudanças de elenco, um time forte tende a regredir um pouco à média.</p>
 
-<div class="formula-block"><div class="formula-eq"><span class="eq-line eq-main">R_resetado = R_anterior × (1 − α) + R_inicial × α</span></div><div class="formula-vars"><div class="formula-var"><span class="formula-var-name">α</span><span class="formula-var-desc">SEASON_RESET_ALPHA = 0.20 — fração de regressão à média a cada temporada</span></div></div></div>
+<div class="formula-block"><div class="formula-eq" data-i18n-html="docs.85"><span class="eq-line eq-main">R_resetado = R_anterior × (1 − α) + R_inicial × α</span></div><div class="formula-vars"><div class="formula-var" data-i18n-html="docs.86"><span class="formula-var-name">α</span><span class="formula-var-desc">SEASON_RESET_ALPHA = 0.20 — fração de regressão à média a cada temporada</span></div></div></div>
 
-  <p>O Elo entra no modelo como um ajuste multiplicativo em λ, usando o parâmetro γ (gamma):</p>
+  <p data-i18n-html="docs.87">O Elo entra no modelo como um ajuste multiplicativo em λ, usando o parâmetro γ (gamma):</p>
 
-<div class="formula-block"><div class="formula-eq"><span class="eq-line eq-main">λ_H_ajustado = λ_H × exp( +γ × ΔElo / 400 )</span><span class="eq-line eq-sub">λ_A_ajustado = λ_A × exp( −γ × ΔElo / 400 )</span></div><div class="formula-vars"><div class="formula-var"><span class="formula-var-name">ΔElo</span><span class="formula-var-desc">R_mandante − R_visitante</span></div><div class="formula-var"><span class="formula-var-name">γ</span><span class="formula-var-desc">0.06 — controla o quanto o Elo pesa sobre λ</span></div><div class="formula-var"><span class="formula-var-name">clamp</span><span class="formula-var-desc">O ajuste é limitado a [−0.18, +0.18] para evitar distorções extremas</span></div></div></div>
+<div class="formula-block"><div class="formula-eq" data-i18n-html="docs.88"><span class="eq-line eq-main">λ_H_ajustado = λ_H × exp( +γ × ΔElo / 400 )</span><span class="eq-line eq-sub">λ_A_ajustado = λ_A × exp( −γ × ΔElo / 400 )</span></div><div class="formula-vars"><div class="formula-var" data-i18n-html="docs.89"><span class="formula-var-name">ΔElo</span><span class="formula-var-desc">R_mandante − R_visitante</span></div><div class="formula-var" data-i18n-html="docs.90"><span class="formula-var-name">γ</span><span class="formula-var-desc">0.06 — controla o quanto o Elo pesa sobre λ</span></div><div class="formula-var" data-i18n-html="docs.91"><span class="formula-var-name">clamp</span><span class="formula-var-desc">O ajuste é limitado a [−0.18, +0.18] para evitar distorções extremas</span></div></div></div>
 
-  <div class="callout insight">
+  <div class="callout insight" data-i18n-html="docs.92">
     <strong>Por que não usar Elo diretamente?</strong> Seria possível derivar probabilidades direto do Elo via fórmula logística, mas isso perderia a informação de gols esperados — fundamental para calcular distribuição de placares. A abordagem híbrida (Poisson + Elo como ajuste) captura tanto a intensidade ofensiva/defensiva quanto a força relativa histórica.
   </div>
 
   <!-- 3.4 -->
-  <h3 id="s3-4">3.4 Forma recente — por que foi removida</h3>
+  <h3 id="s3-4" data-i18n-html="docs.93">3.4 Forma recente — por que foi removida</h3>
 
-  <p>O modelo do Brasileirão aplicava um fator de forma: as médias de gols marcados e sofridos nos últimos 5 jogos viravam multiplicadores de λ, limitados a ±25%. A ideia é intuitiva — um time em crise tende a continuar mal — mas o backtest walk-forward mostrou que ela <strong>piorava</strong> as previsões.</p>
+  <p data-i18n-html="docs.94">O modelo do Brasileirão aplicava um fator de forma: as médias de gols marcados e sofridos nos últimos 5 jogos viravam multiplicadores de λ, limitados a ±25%. A ideia é intuitiva — um time em crise tende a continuar mal — mas o backtest walk-forward mostrou que ela <strong>piorava</strong> as previsões.</p>
 
-  <p>Medido sobre as três últimas temporadas, retirando apenas o fator de forma e mantendo todo o resto igual:</p>
+  <p data-i18n-html="docs.95">Medido sobre as três últimas temporadas, retirando apenas o fator de forma e mantendo todo o resto igual:</p>
 
   <table class="param-table">
-    <thead><tr><th>Configuração</th><th>Log-loss ↓</th><th>RPS ↓</th><th>Acurácia ↑</th></tr></thead>
+    <thead><tr><th data-i18n-html="docs.96">Configuração</th><th data-i18n-html="docs.97">Log-loss ↓</th><th data-i18n-html="docs.98">RPS ↓</th><th data-i18n-html="docs.99">Acurácia ↑</th></tr></thead>
     <tbody>
-      <tr><td>Com fator de forma</td><td>1.0975</td><td>0.2229</td><td>46.6%</td></tr>
-      <tr><td>Sem fator de forma</td><td><strong>1.0584</strong></td><td><strong>0.2134</strong></td><td><strong>49.2%</strong></td></tr>
+      <tr><td data-i18n-html="docs.100">Com fator de forma</td><td>1.0975</td><td>0.2229</td><td>46.6%</td></tr>
+      <tr><td data-i18n-html="docs.101">Sem fator de forma</td><td><strong>1.0584</strong></td><td><strong>0.2134</strong></td><td><strong>49.2%</strong></td></tr>
     </tbody>
   </table>
 
-  <p>O motivo é estatístico. A média de 5 amostras de uma Poisson(1.3) tem desvio-padrão de aproximadamente 0.51, então a razão <code style="font-family:var(--mono);font-size:12px">form_GF / média_liga</code> tem desvio-padrão de cerca de 0.39 — bem maior do que a largura do próprio clamp. O fator passava quase todo o tempo saturado em 0.75 ou 1.25, respondendo a ruído amostral e não a sinal. Pior: esses mesmos 5 jogos já são os de maior peso na estimação de α e β, então a informação era contada duas vezes.</p>
+  <p data-i18n-html="docs.102">O motivo é estatístico. A média de 5 amostras de uma Poisson(1.3) tem desvio-padrão de aproximadamente 0.51, então a razão <code style="font-family:var(--mono);font-size:12px">form_GF / média_liga</code> tem desvio-padrão de cerca de 0.39 — bem maior do que a largura do próprio clamp. O fator passava quase todo o tempo saturado em 0.75 ou 1.25, respondendo a ruído amostral e não a sinal. Pior: esses mesmos 5 jogos já são os de maior peso na estimação de α e β, então a informação era contada duas vezes.</p>
 
-  <p>Um fator de forma melhor construído — baseado no <em>resíduo</em> (gols observados menos gols previstos pelo modelo) e ajustado pela força do adversário — pode ter valor. Enquanto não passar pelo backtest, o modelo não usa forma recente.</p>
+  <p data-i18n-html="docs.103">Um fator de forma melhor construído — baseado no <em>resíduo</em> (gols observados menos gols previstos pelo modelo) e ajustado pela força do adversário — pode ter valor. Enquanto não passar pelo backtest, o modelo não usa forma recente.</p>
 
   <!-- 3.5 -->
-  <h3 id="s3-5">3.5 Correção Dixon-Coles</h3>
+  <h3 id="s3-5" data-i18n-html="docs.104">3.5 Correção Dixon-Coles</h3>
 
-  <p>Dixon &amp; Coles (1997) identificaram que o modelo de Poisson puro superestima a probabilidade de placares altos e subestima os placares baixos, particularmente 0-0, 1-0, 0-1 e 1-1. A correção introduz um parâmetro ρ (rho) que ajusta essas quatro células da matriz de placares:</p>
+  <p data-i18n-html="docs.105">Dixon &amp; Coles (1997) identificaram que o modelo de Poisson puro superestima a probabilidade de placares altos e subestima os placares baixos, particularmente 0-0, 1-0, 0-1 e 1-1. A correção introduz um parâmetro ρ (rho) que ajusta essas quatro células da matriz de placares:</p>
 
-<div class="formula-block"><div class="formula-eq"><span class="eq-line eq-main">P(g_H, g_A) ∝ Poisson(λ_H, g_H) × Poisson(λ_A, g_A) × τ(g_H, g_A)</span><span class="eq-line"></span><span class="eq-line eq-sub">         ⎧ 1 − λ_H·λ_A·ρ    se g_H=0, g_A=0</span><span class="eq-line eq-sub">         ⎪ 1 + λ_A·ρ         se g_H=1, g_A=0</span><span class="eq-line eq-sub">τ(g,g) = ⎨ 1 + λ_H·ρ         se g_H=0, g_A=1</span><span class="eq-line eq-sub">         ⎪ 1 − ρ             se g_H=1, g_A=1</span><span class="eq-line eq-sub">         ⎩ 1                 caso contrário</span></div><div class="formula-vars"><div class="formula-var"><span class="formula-var-name">ρ</span><span class="formula-var-desc">Estimado via MLE — tipicamente entre −0.05 e −0.15 para o Brasileirão</span></div><div class="formula-var"><span class="formula-var-name">ρ &lt; 0</span><span class="formula-var-desc">Aumenta P(0-0) e P(1-1) · reduz P(1-0) e P(0-1)</span></div></div></div>
+<div class="formula-block"><div class="formula-eq" data-i18n-html="docs.106"><span class="eq-line eq-main">P(g_H, g_A) ∝ Poisson(λ_H, g_H) × Poisson(λ_A, g_A) × τ(g_H, g_A)</span><span class="eq-line"></span><span class="eq-line eq-sub">         ⎧ 1 − λ_H·λ_A·ρ    se g_H=0, g_A=0</span><span class="eq-line eq-sub">         ⎪ 1 + λ_A·ρ         se g_H=1, g_A=0</span><span class="eq-line eq-sub">τ(g,g) = ⎨ 1 + λ_H·ρ         se g_H=0, g_A=1</span><span class="eq-line eq-sub">         ⎪ 1 − ρ             se g_H=1, g_A=1</span><span class="eq-line eq-sub">         ⎩ 1                 caso contrário</span></div><div class="formula-vars"><div class="formula-var" data-i18n-html="docs.107"><span class="formula-var-name">ρ</span><span class="formula-var-desc">Estimado via MLE — tipicamente entre −0.05 e −0.15 para o Brasileirão</span></div><div class="formula-var" data-i18n-html="docs.108"><span class="formula-var-name">ρ &lt; 0</span><span class="formula-var-desc">Aumenta P(0-0) e P(1-1) · reduz P(1-0) e P(0-1)</span></div></div></div>
 
-  <p>O valor de ρ é estimado por <strong>máxima verossimilhança</strong>. No modelo de seleções isso é feito por busca em grade de −0.50 a +0.50 em passos de 0.01; no modelo do Brasileirão, ρ entra no vetor de parâmetros e é estimado junto com α, β, γ e μ pelo mesmo gradiente.</p>
+  <p data-i18n-html="docs.109">O valor de ρ é estimado por <strong>máxima verossimilhança</strong>. No modelo de seleções isso é feito por busca em grade de −0.50 a +0.50 em passos de 0.01; no modelo do Brasileirão, ρ entra no vetor de parâmetros e é estimado junto com α, β, γ e μ pelo mesmo gradiente.</p>
 
-  <p>O valor empírico encontrado para o Brasileirão fica <strong>próximo de zero</strong> — bem menos negativo do que o −0.10 que já foi assumido por hipótese. Ou seja: nos dados do Brasileirão a correção de Dixon-Coles é quase inerte, e forçar ρ = −0.10 estava distorcendo os placares baixos sem ganho de acurácia. É um bom exemplo de por que estimar vale mais do que arbitrar.</p>
+  <p data-i18n-html="docs.110">O valor empírico encontrado para o Brasileirão fica <strong>próximo de zero</strong> — bem menos negativo do que o −0.10 que já foi assumido por hipótese. Ou seja: nos dados do Brasileirão a correção de Dixon-Coles é quase inerte, e forçar ρ = −0.10 estava distorcendo os placares baixos sem ganho de acurácia. É um bom exemplo de por que estimar vale mais do que arbitrar.</p>
 
-  <p><strong>O τ usado na previsão é o mesmo τ que a verossimilhança maximiza.</strong> Isso parece óbvio, mas por um tempo não foi verdade: o ajuste usava <code style="font-family:var(--mono);font-size:12px">τ(0,0) = 1 − λ_H·λ_A·ρ</code> enquanto a previsão aplicava <code style="font-family:var(--mono);font-size:12px">1 − ρ</code>, sem os λ — três das quatro células com a forma funcional errada.</p>
+  <p data-i18n-html="docs.111"><strong>O τ usado na previsão é o mesmo τ que a verossimilhança maximiza.</strong> Isso parece óbvio, mas por um tempo não foi verdade: o ajuste usava <code style="font-family:var(--mono);font-size:12px">τ(0,0) = 1 − λ_H·λ_A·ρ</code> enquanto a previsão aplicava <code style="font-family:var(--mono);font-size:12px">1 − ρ</code>, sem os λ — três das quatro células com a forma funcional errada.</p>
 
-  <div class="callout warn">
+  <div class="callout warn" data-i18n-html="docs.112">
     <strong>Normalização:</strong> Após aplicar a correção, a matriz de placares é renormalizada para que a soma de todas as probabilidades seja 1.0. Isso é necessário porque τ pode distorcer ligeiramente a soma total.
   </div>
 
   <!-- 3.6 -->
-  <h3 id="s3-6">3.6 Fator de descanso — por que foi removido</h3>
+  <h3 id="s3-6" data-i18n-html="docs.113">3.6 Fator de descanso — por que foi removido</h3>
 
-  <p>O modelo ajustava λ em função de quantas rodadas o time havia descansado desde o jogo anterior (+3% por rodada extra, limitado a −8%/+6%). No backtest, ligar esse fator piorava o log-loss de 1.0975 para 1.0995.</p>
+  <p data-i18n-html="docs.114">O modelo ajustava λ em função de quantas rodadas o time havia descansado desde o jogo anterior (+3% por rodada extra, limitado a −8%/+6%). No backtest, ligar esse fator piorava o log-loss de 1.0975 para 1.0995.</p>
 
-  <p>Além de não ajudar, a construção era frágil: o descanso era inferido apenas pelo intervalo entre <strong>rodadas do Brasileirão</strong>. Um time que jogou Libertadores ou Copa do Brasil no meio de semana aparecia para o modelo como descansado — justamente o caso em que o efeito real deveria ser o oposto. Modelar isso direito exige o calendário de outras competições, que não está no dataset.</p>
+  <p data-i18n-html="docs.115">Além de não ajudar, a construção era frágil: o descanso era inferido apenas pelo intervalo entre <strong>rodadas do Brasileirão</strong>. Um time que jogou Libertadores ou Copa do Brasil no meio de semana aparecia para o modelo como descansado — justamente o caso em que o efeito real deveria ser o oposto. Modelar isso direito exige o calendário de outras competições, que não está no dataset.</p>
 
   <!-- 3.7 -->
-  <h3 id="s3-7">3.7 Campo neutro (seleções)</h3>
+  <h3 id="s3-7" data-i18n-html="docs.116">3.7 Campo neutro (seleções)</h3>
 
-  <p>Aproximadamente 30% das partidas internacionais são disputadas em campo neutro (Copas do Mundo, torneios continentais, amistosos em terceiro país). Nesses casos, a vantagem de jogar em casa não existe, então λ é calculado usando a média entre <code style="font-family:var(--mono);font-size:12px">league_home_avg</code> e <code style="font-family:var(--mono);font-size:12px">league_away_avg</code> para ambos os lados:</p>
+  <p data-i18n-html="docs.117">Aproximadamente 30% das partidas internacionais são disputadas em campo neutro (Copas do Mundo, torneios continentais, amistosos em terceiro país). Nesses casos, a vantagem de jogar em casa não existe, então λ é calculado usando a média entre <code style="font-family:var(--mono);font-size:12px">league_home_avg</code> e <code style="font-family:var(--mono);font-size:12px">league_away_avg</code> para ambos os lados:</p>
 
-<div class="formula-block"><div class="formula-eq"><span class="eq-line eq-sub">base = (league_home_avg + league_away_avg) / 2</span><span class="eq-line"></span><span class="eq-line eq-main">λ_H = atk_H × def_A × base</span><span class="eq-line eq-sub">λ_A = atk_A × def_H × base</span></div><div class="formula-note">Com vantagem de casa: λ_H usa league_home_avg (maior) e λ_A usa league_away_avg. No campo neutro, ambos usam a mesma base — eliminando o benefício do mandante.</div></div>
+<div class="formula-block"><div class="formula-eq" data-i18n-html="docs.118"><span class="eq-line eq-sub">base = (league_home_avg + league_away_avg) / 2</span><span class="eq-line"></span><span class="eq-line eq-main">λ_H = atk_H × def_A × base</span><span class="eq-line eq-sub">λ_A = atk_A × def_H × base</span></div><div class="formula-note" data-i18n-html="docs.119">Com vantagem de casa: λ_H usa league_home_avg (maior) e λ_A usa league_away_avg. No campo neutro, ambos usam a mesma base — eliminando o benefício do mandante.</div></div>
 
-  <p>Ao construir o modelo, jogos em campo neutro são tratados como "jogos fora" para ambos os times nos cálculos de força de ataque e defesa, evitando inflar o parâmetro de vantagem de casa com dados de jogos que não têm tal vantagem.</p>
+  <p data-i18n-html="docs.120">Ao construir o modelo, jogos em campo neutro são tratados como "jogos fora" para ambos os times nos cálculos de força de ataque e defesa, evitando inflar o parâmetro de vantagem de casa com dados de jogos que não têm tal vantagem.</p>
 </div>
 
 <!-- ══════════════════════════════════════════════ -->
 <div class="section" id="s4">
   <div class="section-num">§ 4</div>
-  <h2>Da λ às probabilidades e odds</h2>
+  <h2 data-i18n-html="docs.121">Da λ às probabilidades e odds</h2>
 
-  <p>Com λ<sub>H</sub> e λ<sub>A</sub> determinados, a probabilidade de cada placar possível (g<sub>H</sub>, g<sub>A</sub>) é calculada como produto das probabilidades de Poisson, corrigida por Dixon-Coles:</p>
+  <p data-i18n-html="docs.122">Com λ<sub>H</sub> e λ<sub>A</sub> determinados, a probabilidade de cada placar possível (g<sub>H</sub>, g<sub>A</sub>) é calculada como produto das probabilidades de Poisson, corrigida por Dixon-Coles:</p>
 
-<div class="formula-block"><div class="formula-eq"><span class="eq-line eq-main">P(g_H, g_A) ∝ Pois(λ_H, g_H) × Pois(λ_A, g_A) × τ(g_H, g_A)</span><span class="eq-line"></span><span class="eq-line eq-sub">Pois(λ, k) = λ^k × e^(−λ) / k!</span></div><div class="formula-vars"><div class="formula-var"><span class="formula-var-name">g_H, g_A</span><span class="formula-var-desc">Gols do mandante e visitante ∈ {0, 1, 2, …, 8} (MAX_GOALS = 8)</span></div><div class="formula-var"><span class="formula-var-name">τ(g_H, g_A)</span><span class="formula-var-desc">Fator de correção Dixon-Coles (ver §3.5)</span></div></div></div>
+<div class="formula-block"><div class="formula-eq" data-i18n-html="docs.123"><span class="eq-line eq-main">P(g_H, g_A) ∝ Pois(λ_H, g_H) × Pois(λ_A, g_A) × τ(g_H, g_A)</span><span class="eq-line"></span><span class="eq-line eq-sub">Pois(λ, k) = λ^k × e^(−λ) / k!</span></div><div class="formula-vars"><div class="formula-var" data-i18n-html="docs.124"><span class="formula-var-name">g_H, g_A</span><span class="formula-var-desc">Gols do mandante e visitante ∈ {0, 1, 2, …, 8} (MAX_GOALS = 8)</span></div><div class="formula-var" data-i18n-html="docs.125"><span class="formula-var-name">τ(g_H, g_A)</span><span class="formula-var-desc">Fator de correção Dixon-Coles (ver §3.5)</span></div></div></div>
 
-  <p>As probabilidades marginais de resultado (1X2) são obtidas pela soma das células da matriz:</p>
+  <p data-i18n-html="docs.126">As probabilidades marginais de resultado (1X2) são obtidas pela soma das células da matriz:</p>
 
-<div class="formula-block"><div class="formula-eq"><span class="eq-line eq-main">P(Mandante)  = Σ P(g_H, g_A)   ∀ g_H > g_A</span><span class="eq-line eq-sub">P(Empate)    = Σ P(g_H, g_A)   ∀ g_H = g_A</span><span class="eq-line eq-sub">P(Visitante) = Σ P(g_H, g_A)   ∀ g_H &lt; g_A</span></div></div>
+<div class="formula-block"><div class="formula-eq" data-i18n-html="docs.127"><span class="eq-line eq-main">P(Mandante)  = Σ P(g_H, g_A)   ∀ g_H > g_A</span><span class="eq-line eq-sub">P(Empate)    = Σ P(g_H, g_A)   ∀ g_H = g_A</span><span class="eq-line eq-sub">P(Visitante) = Σ P(g_H, g_A)   ∀ g_H &lt; g_A</span></div></div>
 
-  <p>As odds são derivadas dessas probabilidades adicionando um overround (margem da casa), que representa o lucro esperado do bookmaker. Com overround de 6%:</p>
+  <p data-i18n-html="docs.128">As odds são derivadas dessas probabilidades adicionando um overround (margem da casa), que representa o lucro esperado do bookmaker. Com overround de 6%:</p>
 
-<div class="formula-block"><div class="formula-eq"><span class="eq-line eq-main">odd_H = 1 / (P(H) × (1 + overround))</span><span class="eq-line eq-sub">odd_D = 1 / (P(D) × (1 + overround))</span><span class="eq-line eq-sub">odd_A = 1 / (P(A) × (1 + overround))</span></div><div class="formula-vars"><div class="formula-var"><span class="formula-var-name">overround</span><span class="formula-var-desc">0.06 — soma das probabilidades implícitas = 1.06</span></div><div class="formula-var"><span class="formula-var-name">odd justa</span><span class="formula-var-desc">1 / P(X) sem overround — odd que um mercado eficiente pagaria</span></div></div></div>
+<div class="formula-block"><div class="formula-eq" data-i18n-html="docs.129"><span class="eq-line eq-main">odd_H = 1 / (P(H) × (1 + overround))</span><span class="eq-line eq-sub">odd_D = 1 / (P(D) × (1 + overround))</span><span class="eq-line eq-sub">odd_A = 1 / (P(A) × (1 + overround))</span></div><div class="formula-vars"><div class="formula-var" data-i18n-html="docs.130"><span class="formula-var-name">overround</span><span class="formula-var-desc">0.06 — soma das probabilidades implícitas = 1.06</span></div><div class="formula-var" data-i18n-html="docs.131"><span class="formula-var-name">odd justa</span><span class="formula-var-desc">1 / P(X) sem overround — odd que um mercado eficiente pagaria</span></div></div></div>
 
-  <div class="callout insight">
+  <div class="callout insight" data-i18n-html="docs.132">
     <strong>Log-space para evitar underflow:</strong> Para λ elevados, <code style="font-family:var(--mono);font-size:12px">λ^k / k!</code> pode causar underflow em ponto flutuante. O modelo calcula Poisson em log-space: <code style="font-family:var(--mono);font-size:12px">exp(k × log(λ) − λ − logfact(k))</code>, com log-fatoriais pré-computados em cache.
   </div>
 </div>
@@ -703,23 +704,23 @@ footer {
 <!-- ══════════════════════════════════════════════ -->
 <div class="section" id="s5">
   <div class="section-num">§ 5</div>
-  <h2>Validação e backtesting</h2>
+  <h2 data-i18n-html="docs.133">Validação e backtesting</h2>
 
-  <p>O modelo inclui um backtest walk-forward: para cada uma das últimas <code style="font-family:var(--mono);font-size:12px">BACKTEST_SEASONS</code> temporadas do Brasileirão, o modelo é treinado em todas as temporadas anteriores e avaliado nos jogos da temporada corrente. As métricas calculadas são:</p>
+  <p data-i18n-html="docs.134">O modelo inclui um backtest walk-forward: para cada uma das últimas <code style="font-family:var(--mono);font-size:12px">BACKTEST_SEASONS</code> temporadas do Brasileirão, o modelo é treinado em todas as temporadas anteriores e avaliado nos jogos da temporada corrente. As métricas calculadas são:</p>
 
-  <h3>Brier Score (multi-classe)</h3>
-<div class="formula-block"><div class="formula-eq"><span class="eq-line eq-main">BS = (1/N) × Σ [(p_H − o_H)² + (p_D − o_D)² + (p_A − o_A)²]</span></div><div class="formula-vars"><div class="formula-var"><span class="formula-var-name">o_X</span><span class="formula-var-desc">1 se X ocorreu, 0 caso contrário (variável indicadora)</span></div><div class="formula-var"><span class="formula-var-name">range</span><span class="formula-var-desc">0 = perfeito · 2 = totalmente errado</span></div><div class="formula-var"><span class="formula-var-name">benchmark</span><span class="formula-var-desc">~0.667 para modelo uniforme (1/3, 1/3, 1/3)</span></div></div></div>
+  <h3 data-i18n-html="docs.135">Brier Score (multi-classe)</h3>
+<div class="formula-block"><div class="formula-eq"><span class="eq-line eq-main">BS = (1/N) × Σ [(p_H − o_H)² + (p_D − o_D)² + (p_A − o_A)²]</span></div><div class="formula-vars"><div class="formula-var" data-i18n-html="docs.136"><span class="formula-var-name">o_X</span><span class="formula-var-desc">1 se X ocorreu, 0 caso contrário (variável indicadora)</span></div><div class="formula-var" data-i18n-html="docs.137"><span class="formula-var-name">range</span><span class="formula-var-desc">0 = perfeito · 2 = totalmente errado</span></div><div class="formula-var" data-i18n-html="docs.138"><span class="formula-var-name">benchmark</span><span class="formula-var-desc">~0.667 para modelo uniforme (1/3, 1/3, 1/3)</span></div></div></div>
 
-  <h3>Log-Loss</h3>
-<div class="formula-block"><div class="formula-eq"><span class="eq-line eq-main">LL = −(1/N) × Σ log( p_resultado )</span></div><div class="formula-vars"><div class="formula-var"><span class="formula-var-name">p_resultado</span><span class="formula-var-desc">Probabilidade atribuída pelo modelo ao resultado que de fato ocorreu</span></div><div class="formula-var"><span class="formula-var-name">penalidade</span><span class="formula-var-desc">Confiança errada é punida mais do que incerteza — log(0.1) >> log(0.4)</span></div><div class="formula-var"><span class="formula-var-name">benchmark</span><span class="formula-var-desc">log(3) ≈ 1.099 para modelo uniforme</span></div></div></div>
+  <h3 data-i18n-html="docs.139">Log-Loss</h3>
+<div class="formula-block"><div class="formula-eq" data-i18n-html="docs.140"><span class="eq-line eq-main">LL = −(1/N) × Σ log( p_resultado )</span></div><div class="formula-vars"><div class="formula-var" data-i18n-html="docs.141"><span class="formula-var-name">p_resultado</span><span class="formula-var-desc">Probabilidade atribuída pelo modelo ao resultado que de fato ocorreu</span></div><div class="formula-var" data-i18n-html="docs.142"><span class="formula-var-name">penalidade</span><span class="formula-var-desc">Confiança errada é punida mais do que incerteza — log(0.1) >> log(0.4)</span></div><div class="formula-var" data-i18n-html="docs.143"><span class="formula-var-name">benchmark</span><span class="formula-var-desc">log(3) ≈ 1.099 para modelo uniforme</span></div></div></div>
 
-  <h3>Acurácia 1X2</h3>
-  <p>Percentual de jogos em que o palpite do modelo (resultado mais provável) coincidiu com o resultado real. Sassamarumark de referência: ~46% (proporção de vitórias do mandante). O modelo historicamente atinge ~52–55% no Brasileirão.</p>
+  <h3 data-i18n-html="docs.144">Acurácia 1X2</h3>
+  <p data-i18n-html="docs.145">Percentual de jogos em que o palpite do modelo (resultado mais provável) coincidiu com o resultado real. Sassamarumark de referência: ~46% (proporção de vitórias do mandante). O modelo historicamente atinge ~52–55% no Brasileirão.</p>
 
-  <h3>Calibração</h3>
-  <p>O modelo é considerado calibrado se, entre todos os jogos para os quais atribuiu probabilidade ~30%, aproximadamente 30% desses jogos ocorreram. A calibração é visualizada em um gráfico de confiabilidade com 10 bins de 10% cada.</p>
+  <h3 data-i18n-html="docs.146">Calibração</h3>
+  <p data-i18n-html="docs.147">O modelo é considerado calibrado se, entre todos os jogos para os quais atribuiu probabilidade ~30%, aproximadamente 30% desses jogos ocorreram. A calibração é visualizada em um gráfico de confiabilidade com 10 bins de 10% cada.</p>
 
-  <div class="callout note">
+  <div class="callout note" data-i18n-html="docs.148">
     <strong>Nota metodológica:</strong> O backtest usa o modelo treinado em dados históricos completos (até a temporada de teste), não um modelo re-treinado a cada rodada. Isso é uma simplificação que pode introduzir leve viés otimista, mas é computacionalmente viável para execução no navegador.
   </div>
 </div>
@@ -727,80 +728,80 @@ footer {
 <!-- ══════════════════════════════════════════════ -->
 <div class="section" id="s6">
   <div class="section-num">§ 6</div>
-  <h2>Simulação Monte Carlo</h2>
+  <h2 data-i18n-html="docs.149">Simulação Monte Carlo</h2>
 
-  <p>Para os apps de simulação de temporada (Brasileirão e Copa do Mundo), o modelo é usado para gerar distribuições de resultados possíveis via Monte Carlo: o torneio inteiro é simulado N vezes (tipicamente 5 000), e as frequências de cada evento (campeão, classificado, rebaixado, etc.) são estimadas empiricamente.</p>
+  <p data-i18n-html="docs.150">Para os apps de simulação de temporada (Brasileirão e Copa do Mundo), o modelo é usado para gerar distribuições de resultados possíveis via Monte Carlo: o torneio inteiro é simulado N vezes (tipicamente 5 000), e as frequências de cada evento (campeão, classificado, rebaixado, etc.) são estimadas empiricamente.</p>
 
-  <p>Em cada simulação, para cada partida:</p>
+  <p data-i18n-html="docs.151">Em cada simulação, para cada partida:</p>
 
-<div class="formula-block"><div class="formula-eq"><span class="eq-line eq-sub">Para cada partida em cada simulação:</span><span class="eq-line"> </span><span class="eq-line eq-sub">  1.  Calcular λ_H, λ_A via pipeline completo</span><span class="eq-line eq-sub">  2.  Construir matriz P(g_H, g_A) com correção Dixon-Coles</span><span class="eq-line eq-main">  3.  Amostrar (g_H, g_A) ~ P(g_H, g_A)</span><span class="eq-line eq-sub">  4.  Atualizar pontuação e saldo de gols</span></div><div class="formula-note">5 000 simulações × 380 partidas = ~1.9 milhões de placares amostrados por execução.</div></div>
+<div class="formula-block"><div class="formula-eq" data-i18n-html="docs.152"><span class="eq-line eq-sub">Para cada partida em cada simulação:</span><span class="eq-line"> </span><span class="eq-line eq-sub">  1.  Calcular λ_H, λ_A via pipeline completo</span><span class="eq-line eq-sub">  2.  Construir matriz P(g_H, g_A) com correção Dixon-Coles</span><span class="eq-line eq-main">  3.  Amostrar (g_H, g_A) ~ P(g_H, g_A)</span><span class="eq-line eq-sub">  4.  Atualizar pontuação e saldo de gols</span></div><div class="formula-note" data-i18n-html="docs.153">5 000 simulações × 380 partidas = ~1.9 milhões de placares amostrados por execução.</div></div>
 
-  <p>Para jogos eliminatórios (Copa do Mundo), o empate não existe como resultado final. Se a distribuição Poisson + DC gera empate, o vencedor é determinado por um sorteio ponderado pela razão P(H) / (P(H) + P(A)), emulando pênaltis.</p>
+  <p data-i18n-html="docs.154">Para jogos eliminatórios (Copa do Mundo), o empate não existe como resultado final. Se a distribuição Poisson + DC gera empate, o vencedor é determinado por um sorteio ponderado pela razão P(H) / (P(H) + P(A)), emulando pênaltis.</p>
 
-  <h3>Escalonamento e responsividade</h3>
-  <p>Para evitar travar o navegador, o loop Monte Carlo cede o controle ao event loop do JavaScript a cada 50–100 iterações via <code style="font-family:var(--mono);font-size:12px">await new Promise(r => setTimeout(r, 0))</code>. Isso permite atualizar a barra de progresso e manter a interface responsiva durante o cálculo.</p>
+  <h3 data-i18n-html="docs.155">Escalonamento e responsividade</h3>
+  <p data-i18n-html="docs.156">Para evitar travar o navegador, o loop Monte Carlo cede o controle ao event loop do JavaScript a cada 50–100 iterações via <code style="font-family:var(--mono);font-size:12px">await new Promise(r => setTimeout(r, 0))</code>. Isso permite atualizar a barra de progresso e manter a interface responsiva durante o cálculo.</p>
 
-  <h3>Interpretação das probabilidades</h3>
-  <p>Com N = 5 000 simulações, o erro padrão de uma probabilidade de 50% é √(0.5 × 0.5 / 5000) ≈ 0.7%. Para probabilidades extremas (ex.: rebaixamento do favorito, ~2%), o erro padrão é ≈ 0.2%, suficiente para diferenciar candidatos ao rebaixamento com confiança razoável.</p>
+  <h3 data-i18n-html="docs.157">Interpretação das probabilidades</h3>
+  <p data-i18n-html="docs.158">Com N = 5 000 simulações, o erro padrão de uma probabilidade de 50% é √(0.5 × 0.5 / 5000) ≈ 0.7%. Para probabilidades extremas (ex.: rebaixamento do favorito, ~2%), o erro padrão é ≈ 0.2%, suficiente para diferenciar candidatos ao rebaixamento com confiança razoável.</p>
 </div>
 
 <!-- ══════════════════════════════════════════════ -->
 <div class="section" id="s7">
   <div class="section-num">§ 7</div>
-  <h2>Diferenças entre os apps</h2>
+  <h2 data-i18n-html="docs.159">Diferenças entre os apps</h2>
 
   <table class="param-table">
     <thead>
       <tr>
-        <th>Característica</th>
-        <th>Sassamaru Rodada</th>
-        <th>Sassamaru Brasileirão</th>
-        <th>Sassamaru Seleções</th>
-        <th>Sassamaru Copa</th>
+        <th data-i18n-html="docs.160">Característica</th>
+        <th data-i18n-html="docs.161">Sassamaru Rodada</th>
+        <th data-i18n-html="docs.162">Sassamaru Brasileirão</th>
+        <th data-i18n-html="docs.163">Sassamaru Seleções</th>
+        <th data-i18n-html="docs.164">Sassamaru Copa</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td>Dataset</td>
-        <td style="font-family:var(--sans);font-size:12px">Brasileirão 2003–26</td>
-        <td style="font-family:var(--sans);font-size:12px">Brasileirão 2003–26</td>
-        <td style="font-family:var(--sans);font-size:12px">Internacional 1872–26</td>
-        <td style="font-family:var(--sans);font-size:12px">Internacional 1872–26</td>
+        <td data-i18n-html="docs.165">Dataset</td>
+        <td style="font-family:var(--sans);font-size:12px" data-i18n-html="docs.166">Brasileirão 2003–26</td>
+        <td style="font-family:var(--sans);font-size:12px" data-i18n-html="docs.167">Brasileirão 2003–26</td>
+        <td style="font-family:var(--sans);font-size:12px" data-i18n-html="docs.168">Internacional 1872–26</td>
+        <td style="font-family:var(--sans);font-size:12px" data-i18n-html="docs.169">Internacional 1872–26</td>
       </tr>
       <tr>
-        <td>Unidade de tempo</td>
-        <td style="font-family:var(--sans);font-size:12px">Rodadas</td>
-        <td style="font-family:var(--sans);font-size:12px">Rodadas</td>
-        <td style="font-family:var(--sans);font-size:12px">Dias</td>
-        <td style="font-family:var(--sans);font-size:12px">Dias</td>
+        <td data-i18n-html="docs.170">Unidade de tempo</td>
+        <td style="font-family:var(--sans);font-size:12px" data-i18n-html="docs.171">Rodadas</td>
+        <td style="font-family:var(--sans);font-size:12px" data-i18n-html="docs.172">Rodadas</td>
+        <td style="font-family:var(--sans);font-size:12px" data-i18n-html="docs.173">Dias</td>
+        <td style="font-family:var(--sans);font-size:12px" data-i18n-html="docs.174">Dias</td>
       </tr>
       <tr>
-        <td>Campo neutro</td>
-        <td style="font-family:var(--sans);font-size:12px">Não</td>
-        <td style="font-family:var(--sans);font-size:12px">Não</td>
-        <td style="font-family:var(--sans);font-size:12px">Sim (flag CSV)</td>
-        <td style="font-family:var(--sans);font-size:12px">Sim (grupo/fase)</td>
+        <td data-i18n-html="docs.175">Campo neutro</td>
+        <td style="font-family:var(--sans);font-size:12px" data-i18n-html="docs.176">Não</td>
+        <td style="font-family:var(--sans);font-size:12px" data-i18n-html="docs.177">Não</td>
+        <td style="font-family:var(--sans);font-size:12px" data-i18n-html="docs.178">Sim (flag CSV)</td>
+        <td style="font-family:var(--sans);font-size:12px" data-i18n-html="docs.179">Sim (grupo/fase)</td>
       </tr>
       <tr>
-        <td>Fator descanso</td>
-        <td style="font-family:var(--sans);font-size:12px">Não (removido)</td>
-        <td style="font-family:var(--sans);font-size:12px">Não</td>
-        <td style="font-family:var(--sans);font-size:12px">Não</td>
-        <td style="font-family:var(--sans);font-size:12px">Não</td>
+        <td data-i18n-html="docs.180">Fator descanso</td>
+        <td style="font-family:var(--sans);font-size:12px" data-i18n-html="docs.181">Não (removido)</td>
+        <td style="font-family:var(--sans);font-size:12px" data-i18n-html="docs.182">Não</td>
+        <td style="font-family:var(--sans);font-size:12px" data-i18n-html="docs.183">Não</td>
+        <td style="font-family:var(--sans);font-size:12px" data-i18n-html="docs.184">Não</td>
       </tr>
       <tr>
-        <td>Detecção de temporadas</td>
-        <td style="font-family:var(--sans);font-size:12px">Auto (clusters)</td>
-        <td style="font-family:var(--sans);font-size:12px">Auto (clusters)</td>
+        <td data-i18n-html="docs.185">Detecção de temporadas</td>
+        <td style="font-family:var(--sans);font-size:12px" data-i18n-html="docs.186">Auto (clusters)</td>
+        <td style="font-family:var(--sans);font-size:12px" data-i18n-html="docs.187">Auto (clusters)</td>
         <td style="font-family:var(--sans);font-size:12px">N/A</td>
         <td style="font-family:var(--sans);font-size:12px">N/A</td>
       </tr>
       <tr>
-        <td>Modo de saída</td>
-        <td style="font-family:var(--sans);font-size:12px">Por partida</td>
-        <td style="font-family:var(--sans);font-size:12px">Classificação Monte Carlo</td>
-        <td style="font-family:var(--sans);font-size:12px">Por partida</td>
-        <td style="font-family:var(--sans);font-size:12px">Torneio Monte Carlo</td>
+        <td data-i18n-html="docs.188">Modo de saída</td>
+        <td style="font-family:var(--sans);font-size:12px" data-i18n-html="docs.189">Por partida</td>
+        <td style="font-family:var(--sans);font-size:12px" data-i18n-html="docs.190">Classificação Monte Carlo</td>
+        <td style="font-family:var(--sans);font-size:12px" data-i18n-html="docs.191">Por partida</td>
+        <td style="font-family:var(--sans);font-size:12px" data-i18n-html="docs.192">Torneio Monte Carlo</td>
       </tr>
     </tbody>
   </table>
@@ -809,158 +810,158 @@ footer {
 <!-- ══════════════════════════════════════════════ -->
 <div class="section" id="s8">
   <div class="section-num">§ 8</div>
-  <h2>Limitações conhecidas</h2>
+  <h2 data-i18n-html="docs.193">Limitações conhecidas</h2>
 
-  <p>Nenhum modelo é completo. As limitações mais relevantes do Sassamaru são:</p>
+  <p data-i18n-html="docs.194">Nenhum modelo é completo. As limitações mais relevantes do Sassamaru são:</p>
 
-  <h3>Informação não modelada</h3>
-  <p>O modelo não sabe que Neymar está lesionado, que um técnico foi demitido ontem, que o jogo é disputado em altitude de 3 600m, que chove forte ou que um time está concentrado em outra competição. Toda essa informação contextual é real e relevante — o modelo ignora completamente.</p>
+  <h3 data-i18n-html="docs.195">Informação não modelada</h3>
+  <p data-i18n-html="docs.196">O modelo não sabe que Neymar está lesionado, que um técnico foi demitido ontem, que o jogo é disputado em altitude de 3 600m, que chove forte ou que um time está concentrado em outra competição. Toda essa informação contextual é real e relevante — o modelo ignora completamente.</p>
 
-  <h3>Empates</h3>
-  <p>O modelo de Poisson bivariado tende a subestimar a probabilidade de empate em comparação com o mercado real. A correção Dixon-Coles mitiga isso parcialmente (via aumento de P(0-0) e P(1-1)), mas o problema persiste para placares maiores (2-2, 3-3).</p>
+  <h3 data-i18n-html="docs.197">Empates</h3>
+  <p data-i18n-html="docs.198">O modelo de Poisson bivariado tende a subestimar a probabilidade de empate em comparação com o mercado real. A correção Dixon-Coles mitiga isso parcialmente (via aumento de P(0-0) e P(1-1)), mas o problema persiste para placares maiores (2-2, 3-3).</p>
 
-  <h3>Times com poucos dados</h3>
-  <p>Times recém-promovidos ou seleções com histórico limitado no dataset têm estimativas de força pouco confiáveis. O modelo usa fallback para médias da liga, o que pode super ou subestimar esses times.</p>
+  <h3 data-i18n-html="docs.199">Times com poucos dados</h3>
+  <p data-i18n-html="docs.200">Times recém-promovidos ou seleções com histórico limitado no dataset têm estimativas de força pouco confiáveis. O modelo usa fallback para médias da liga, o que pode super ou subestimar esses times.</p>
 
-  <h3>Não-estacionaridade</h3>
-  <p>O futebol muda: estilos de jogo, volume de transferências, intensidade física. O modelo trata toda a história (desde 2003 / 1990) como amostras do mesmo processo, ponderando pelo decay. Isso é uma aproximação — o futebol de 2026 não é estatisticamente idêntico ao de 2003, mesmo com decay.</p>
+  <h3 data-i18n-html="docs.201">Não-estacionaridade</h3>
+  <p data-i18n-html="docs.202">O futebol muda: estilos de jogo, volume de transferências, intensidade física. O modelo trata toda a história (desde 2003 / 1990) como amostras do mesmo processo, ponderando pelo decay. Isso é uma aproximação — o futebol de 2026 não é estatisticamente idêntico ao de 2003, mesmo com decay.</p>
 
-  <h3>Independência entre gols</h3>
-  <p>O modelo assume que os gols do mandante e do visitante são independentes. Na prática, o estado do jogo influencia o comportamento: um time que abre 3-0 não joga da mesma forma que em 0-0. Essa correlação dinâmica não é capturada.</p>
+  <h3 data-i18n-html="docs.203">Independência entre gols</h3>
+  <p data-i18n-html="docs.204">O modelo assume que os gols do mandante e do visitante são independentes. Na prática, o estado do jogo influencia o comportamento: um time que abre 3-0 não joga da mesma forma que em 0-0. Essa correlação dinâmica não é capturada.</p>
 
-  <h3>Monte Carlo e o bracket da Copa</h3>
-  <p>O chaveamento da Copa do Mundo 2026 para a fase eliminatória é complexo — o chaveamento real depende de quais grupos os 8 melhores terceiros colocados vieram. O simulador usa uma simplificação de pareamento sequencial, o que pode gerar matches que não seriam possíveis no torneio real.</p>
+  <h3 data-i18n-html="docs.205">Monte Carlo e o bracket da Copa</h3>
+  <p data-i18n-html="docs.206">O chaveamento da Copa do Mundo 2026 para a fase eliminatória é complexo — o chaveamento real depende de quais grupos os 8 melhores terceiros colocados vieram. O simulador usa uma simplificação de pareamento sequencial, o que pode gerar matches que não seriam possíveis no torneio real.</p>
 </div>
 
 <!-- ══════════════════════════════════════════════ -->
 <div class="section" id="s9">
   <div class="section-num">§ 9</div>
-  <h2>ToDo e próximos passos</h2>
+  <h2 data-i18n-html="docs.207">ToDo e próximos passos</h2>
 
-  <p>O modelo atual é funcional e produz previsões razoáveis, mas há espaço significativo para melhoria. Os itens abaixo estão ordenados por impacto esperado na qualidade das previsões.</p>
+  <p data-i18n-html="docs.208">O modelo atual é funcional e produz previsões razoáveis, mas há espaço significativo para melhoria. Os itens abaixo estão ordenados por impacto esperado na qualidade das previsões.</p>
 
-  <h3>Modelo</h3>
+  <h3 data-i18n-html="docs.209">Modelo</h3>
   <ul class="todo-list">
     <li class="todo-done-item">
       <span class="todo-tag done">Modelo</span>
-      <div class="todo-text">
+      <div class="todo-text" data-i18n-html="docs.210">
         <strong>Dixon-Coles completo com iteração MLE</strong>
         <small>Implementado em <code style="font-family:var(--mono);font-size:11px">modelos/model.js</code> e usado em produção pelas duas páginas do Brasileirão: todos os parâmetros (α ataque, β defesa, γ home advantage, μ base, ρ) estimados conjuntamente via gradiente analítico da log-verossimilhança com 400 iterações Adam e penalidades de identificabilidade.</small>
       </div>
     </li>
     <li>
       <span class="todo-tag model">Modelo</span>
-      <div class="todo-text">
+      <div class="todo-text" data-i18n-html="docs.211">
         <strong>Modelo de correlação de gols (bivariate Poisson ou Weibull-gamma)</strong>
         <small>Substitui a independência entre λ_H e λ_A por uma distribuição bivariada que captura correlações negativas (quando um time marca mais, o outro tende a recuar). O modelo de Dixon &amp; Robinson (1998) é uma extensão natural.</small>
       </div>
     </li>
     <li>
       <span class="todo-tag model">Modelo</span>
-      <div class="todo-text">
+      <div class="todo-text" data-i18n-html="docs.212">
         <strong>Inflação de empates por pressão de resultado</strong>
         <small>Times que precisam de ponto extra tendem a jogar para o empate. Um fator situacional baseado na diferença de pontos na tabela poderia corrigir a subestimação de empates em rodadas finais.</small>
       </div>
     </li>
     <li>
       <span class="todo-tag model">Modelo</span>
-      <div class="todo-text">
+      <div class="todo-text" data-i18n-html="docs.213">
         <strong>Calibração isotônica pós-treinamento</strong>
         <small>Aplicar Platt scaling ou regressão isotônica às probabilidades brutas do modelo para corrigir vieses sistemáticos de calibração (ex.: o modelo pode ser consistentemente over-confident em placares 1-0).</small>
       </div>
     </li>
     <li class="todo-done-item">
       <span class="todo-tag done">Modelo</span>
-      <div class="todo-text">
+      <div class="todo-text" data-i18n-html="docs.214">
         <strong>Home advantage por estádio/time</strong>
         <small>Implementado em <code style="font-family:var(--mono);font-size:11px">modelos/model.js</code>: fator individual estimado para times com ≥10 jogos ponderados em casa (map <code style="font-family:var(--mono);font-size:11px">homeAdv</code>), limitado ao intervalo [0.85, 1.15]. Times sem dados suficientes usam o fator médio da liga.</small>
       </div>
     </li>
   </ul>
 
-  <h3>Dados</h3>
+  <h3 data-i18n-html="docs.215">Dados</h3>
   <ul class="todo-list">
     <li>
       <span class="todo-tag dados">Dados</span>
-      <div class="todo-text">
+      <div class="todo-text" data-i18n-html="docs.216">
         <strong>Atualização automática do CSV via API</strong>
         <small>Integrar com APIs públicas (Sofascore, ESPN, football-data.org) para atualizar o dataset automaticamente após cada rodada, sem necessidade de atualização manual do arquivo.</small>
       </div>
     </li>
     <li>
       <span class="todo-tag dados">Dados</span>
-      <div class="todo-text">
+      <div class="todo-text" data-i18n-html="docs.217">
         <strong>Inclusão de dados de posse, chutes a gol e xG</strong>
         <small>Expected Goals (xG) é substancialmente mais preditivo do que gols marcados para estimar a força real de um time. Datasets públicos como o Statsbomb Open Data ou a API do Understat contêm xG histórico.</small>
       </div>
     </li>
     <li>
       <span class="todo-tag dados">Dados</span>
-      <div class="todo-text">
+      <div class="todo-text" data-i18n-html="docs.218">
         <strong>Séries B, C e estaduais para times recém-promovidos</strong>
         <small>Times que sobem da Série B chegam ao modelo com histórico apenas em divisões inferiores. Incluir dados da Série B com desconto de força (divisão inferior penaliza ataque/defesa estimados) melhoraria as previsões para times como Remo e Chapecoense.</small>
       </div>
     </li>
     <li>
       <span class="todo-tag dados">Dados</span>
-      <div class="todo-text">
+      <div class="todo-text" data-i18n-html="docs.219">
         <strong>Datas reais no dataset do Brasileirão</strong>
         <small>O CSV atual usa apenas o número da rodada, sem data. Com datas reais seria possível usar decay date-based (como no modelo de seleções), que é mais preciso durante a janela de transferências ou após longos períodos sem jogos.</small>
       </div>
     </li>
   </ul>
 
-  <h3>Interface</h3>
+  <h3 data-i18n-html="docs.220">Interface</h3>
   <ul class="todo-list">
     <li>
       <span class="todo-tag ui">UI</span>
-      <div class="todo-text">
+      <div class="todo-text" data-i18n-html="docs.221">
         <strong>Modo "o que mudou" — comparação de rodadas</strong>
         <small>Permitir ao usuário rodar o modelo em duas rodadas diferentes e ver como as probabilidades mudaram para cada confronto, com setas de variação e destaques automáticos.</small>
       </div>
     </li>
     <li class="todo-done-item">
       <span class="todo-tag done">UI</span>
-      <div class="todo-text">
+      <div class="todo-text" data-i18n-html="docs.222">
         <strong>Exportação de resultados como CSV / JSON</strong>
         <small>Implementado em <code style="font-family:var(--mono);font-size:11px">apps/index.html</code>: botão de exportação que gera CSV com todas as previsões da rodada.</small>
       </div>
     </li>
     <li>
       <span class="todo-tag ui">UI</span>
-      <div class="todo-text">
+      <div class="todo-text" data-i18n-html="docs.223">
         <strong>Modo mobile otimizado para o Sassamaru-rodada</strong>
         <small>A tabela de resultados com 11 colunas não é legível em tela pequena. Uma visualização alternativa em cards verticais para mobile melhoraria a usabilidade.</small>
       </div>
     </li>
     <li class="todo-done-item">
       <span class="todo-tag done">UI</span>
-      <div class="todo-text">
+      <div class="todo-text" data-i18n-html="docs.224">
         <strong>Bracket visual interativo para a Copa 2026</strong>
         <small>Implementado em <code style="font-family:var(--mono);font-size:11px">simulacoes/bench-copa2026.html</code>: layout estilo ESPN com chaveamento visual completo da fase eliminatória.</small>
       </div>
     </li>
   </ul>
 
-  <h3>Infraestrutura</h3>
+  <h3 data-i18n-html="docs.225">Infraestrutura</h3>
   <ul class="todo-list">
     <li class="todo-done-item">
       <span class="todo-tag done">Infra</span>
-      <div class="todo-text">
+      <div class="todo-text" data-i18n-html="docs.226">
         <strong>Testes automatizados para o modelo de seleções</strong>
         <small>Implementado em <code style="font-family:var(--mono);font-size:11px">tests/selecoes-model.test.js</code>: 110+ testes cobrindo helpers matemáticos, pesos temporais, buildModel e predict. Executar via <code style="font-family:var(--mono);font-size:11px">npm run test:selecoes</code>.</small>
       </div>
     </li>
     <li>
       <span class="todo-tag infra">Infra</span>
-      <div class="todo-text">
+      <div class="todo-text" data-i18n-html="docs.227">
         <strong>Web Worker para o Monte Carlo</strong>
         <small>Mover o loop de simulação para um Web Worker eliminaria completamente o risco de travar a UI, mesmo com 50 000 simulações, e permitiria cancelar uma simulação em andamento.</small>
       </div>
     </li>
     <li>
       <span class="todo-tag infra">Infra</span>
-      <div class="todo-text">
+      <div class="todo-text" data-i18n-html="docs.228">
         <strong>Compressão do CSV embutido</strong>
         <small>O CSV do Brasileirão ocupa ~400 KB e o de seleções ~3.7 MB inline no HTML. Comprimir com pako (gzip via JS) reduziria o tamanho dos arquivos em ~70% e aceleraria o carregamento inicial.</small>
       </div>
@@ -969,7 +970,7 @@ footer {
 </div>
 
 <!-- ── Footer ── -->
-<footer>
+<footer data-i18n-html="docs.229">
   <span>Sassamaru Docs v1.0 · Março 2026</span>
   <span>Dixon &amp; Coles (1997) · Maher (1982) · Elo (1978) · Hvattum &amp; Arntzen (2010)</span>
 </footer>
