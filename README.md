@@ -30,6 +30,10 @@ npm run test:selecoes    # testes do modelo de seleções (110+ asserções)
 npm run test:pwa         # validação do PWA (manifest, service worker, ícones)
 ```
 
+## Idiomas
+
+O site está disponível em **português (padrão), inglês e chinês simplificado**. O seletor `PT | EN | 中文` fica no cabeçalho de cada página; a escolha é guardada no navegador (ou use `?lang=en`). As traduções ficam em `i18n/` (veja a seção *Internationalization* do `CLAUDE.md`) e são validadas por `npm run test:i18n`.
+
 ## Modelos
 
 Os modelos em `modelos/` implementam regressão de Poisson com correção de Dixon-Coles:

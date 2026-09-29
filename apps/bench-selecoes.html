@@ -17,6 +17,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <script src="../i18n/i18n.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
 <style>
@@ -49955,7 +49956,7 @@ Espanha vs Portugal"></textarea>
   // ═══════════════════════════════════════════════
   function norm(s) {
     if (!s) return '';
-    let t = String(s).trim().toLowerCase()
+    let t = String(I18N.teamKey(s)).trim().toLowerCase()
       .normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
       .replace(/[-_]/g, ' ')
       .replace(/\s+/g, ' ').trim();
@@ -50276,8 +50277,9 @@ Espanha vs Portugal"></textarea>
   function parseLine(line) {
     const raw = line.trim();
     if (!raw || raw.startsWith('#')) return null;
-    const neutral = /\(neutral\)/i.test(raw);
-    const clean = raw.replace(/\(neutral\)/gi, '').trim();
+    const NEUTRAL_RE = /[(（](?:neutral|中立)[)）]/i; // aceita também "(中立)"
+    const neutral = NEUTRAL_RE.test(raw);
+    const clean = raw.replace(new RegExp(NEUTRAL_RE.source, 'gi'), '').trim();
     const m = clean.match(/^(.+?)\s+(?:vs\.?|x|[-–—])\s+(.+)$/i);
     if (!m) return { error: true, raw };
     return { home: m[1].trim(), away: m[2].trim(), neutral, raw };
@@ -50326,15 +50328,21 @@ Espanha vs Portugal"></textarea>
     }).join('');
 
     const parts = [];
-    if (ok)   parts.push(`<span style="color:#1A4731">${ok} ok</span>`);
+    if (ok)   parts.push(`<span style="color:#1A4731">${_t('{n} ok', { n: ok })}</span>`);
     if (warn) parts.push(`<span style="color:#D97706">${warn} ⚠</span>`);
-    if (err)  parts.push(`<span style="color:#991B1B">${err} erro</span>`);
+    if (err)  parts.push(`<span style="color:#991B1B">${_t('{n} erro', { n: err })}</span>`);
     document.getElementById('val-summary').innerHTML = parts.join(' · ');
   }
 
   // ═══════════════════════════════════════════════
   //  Render results
   // ═══════════════════════════════════════════════
+  // Avisos de predict() (texto em português, com o nome digitado no meio).
+  function trWarn(w) {
+    const m = /^"(.*)" não encontrado$/.exec(w);
+    return m ? _t('"{name}" não encontrado', { name: m[1] }) : w;
+  }
+
   function escHtml(s) {
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
@@ -50366,8 +50374,8 @@ Espanha vs Portugal"></textarea>
 
     for (let i=0; i<predictions.length; i++) {
       const p = predictions[i];
-      const pickLabel = p.pick==='home' ? (p.neutral ? 'Time 1' : 'Casa') :
-                        p.pick==='away' ? (p.neutral ? 'Time 2' : 'Fora') : 'Empate';
+      const pickLabel = p.pick==='home' ? (p.neutral ? _t('Time 1') : _t('Casa')) :
+                        p.pick==='away' ? (p.neutral ? _t('Time 2') : _t('Fora')) : _t('Empate');
       const pickOdd   = p.pick==='home' ? p.oh : p.pick==='away' ? p.oa : p.od;
 
       const probBar = `
@@ -50388,8 +50396,8 @@ Espanha vs Portugal"></textarea>
       mainRow.dataset.idx = i;
       mainRow.innerHTML = `
         <td class="match-cell">
-          <span class="team-name">${warnIcon}${escHtml(p.home)}${neutralBadge}</span>
-          <span class="team-name away">${escHtml(p.away)}</span>
+          <span class="team-name">${warnIcon}${escHtml(_tn(p.home))}${neutralBadge}</span>
+          <span class="team-name away">${escHtml(_tn(p.away))}</span>
         </td>
         <td class="num">${fmt2(p.lamH)}</td>
         <td class="num">${fmt2(p.lamA)}</td>
@@ -50418,20 +50426,20 @@ Espanha vs Portugal"></textarea>
               ${p.bestGH}–${p.bestGA}
             </div>
             <div style="font-size:11px;color:var(--muted);font-family:var(--mono)">
-              ${(p.bestP*100).toFixed(1)}% de probabilidade
+              ${_t('{p}% de probabilidade', { p: (p.bestP*100).toFixed(1) })}
             </div>
-            ${p.warnings.length ? `<div style="margin-top:12px;font-size:11px;color:#D97706">⚠ ${p.warnings.join(', ')}</div>` : ''}
+            ${p.warnings.length ? `<div style="margin-top:12px;font-size:11px;color:#D97706">⚠ ${p.warnings.map(trWarn).join(', ')}</div>` : ''}
           </div>
           <div>
-            <div class="score-grid-title">Odds (overround ${(CFG.OVERROUND*100).toFixed(0)}%)</div>
+            <div class="score-grid-title">${_t('Odds (overround {n}%)', { n: (CFG.OVERROUND*100).toFixed(0) })}</div>
             <div style="display:flex;gap:20px;margin-top:8px;font-family:var(--mono);font-size:13px">
-              <div><div style="font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">${p.neutral?'Time 1':'Casa'}</div>${fmt2(p.oh)}</div>
+              <div><div style="font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">${p.neutral?_t('Time 1'):_t('Casa')}</div>${fmt2(p.oh)}</div>
               <div><div style="font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Empate</div>${fmt2(p.od)}</div>
-              <div><div style="font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">${p.neutral?'Time 2':'Fora'}</div>${fmt2(p.oa)}</div>
+              <div><div style="font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">${p.neutral?_t('Time 2'):_t('Fora')}</div>${fmt2(p.oa)}</div>
             </div>
             <div style="margin-top:12px;font-size:11px;color:var(--muted);font-family:var(--mono)">
-              Elo casa: ${Math.round(_model.elo.get(p.home)||CFG.ELO_INITIAL)}<br>
-              Elo fora: ${Math.round(_model.elo.get(p.away)||CFG.ELO_INITIAL)}
+              ${_t('Elo casa: {v}', { v: Math.round(_model.elo.get(p.home)||CFG.ELO_INITIAL) })}<br>
+              ${_t('Elo fora: {v}', { v: Math.round(_model.elo.get(p.away)||CFG.ELO_INITIAL) })}
             </div>
           </div>
         </div>`;
@@ -50460,9 +50468,9 @@ Espanha vs Portugal"></textarea>
         <div class="sc-label">Partidas</div>
         <div class="sc-val">${total}</div>
         <div class="sc-sub">
-          <span style="color:#1A4731">${homes}C</span> ·
-          <span style="color:#7A786F">${draws}E</span> ·
-          <span style="color:#D97706">${aways}F</span>
+          <span style="color:#1A4731">${_t('{n}C@@casa', { n: homes })}</span> ·
+          <span style="color:#7A786F">${_t('{n}E@@empate', { n: draws })}</span> ·
+          <span style="color:#D97706">${_t('{n}F@@fora', { n: aways })}</span>
         </div>
       </div>
       <div class="summary-card">
@@ -50478,14 +50486,14 @@ Espanha vs Portugal"></textarea>
       <div class="summary-card">
         <div class="sc-label">Mais confiante</div>
         <div class="sc-val" style="font-size:13px;font-weight:500;line-height:1.5">
-          ${escHtml(mostConf.home)}<br>
-          <span style="color:var(--muted);font-size:11px">× ${escHtml(mostConf.away)}</span>
+          ${escHtml(_tn(mostConf.home))}<br>
+          <span style="color:var(--muted);font-size:11px">× ${escHtml(_tn(mostConf.away))}</span>
         </div>
         <div class="sc-sub">${fmtP(Math.max(mostConf.pH,mostConf.pD,mostConf.pA))}</div>
       </div>`;
 
     document.getElementById('results').style.display = 'block';
-    document.getElementById('results-meta').textContent = `${total} jogo${total!==1?'s':''}`;
+    document.getElementById('results-meta').textContent = total!==1 ? _t('{n} jogos', { n: total }) : _t('{n} jogo', { n: total });
   }
 
   // ═══════════════════════════════════════════════
@@ -50508,25 +50516,25 @@ Espanha vs Portugal"></textarea>
 
   function updateHeaderMeta() {
     if (!_model) return;
-    document.getElementById('hdr-matches').textContent = _model.parsedCount.toLocaleString('pt-BR') + ' jogos';
-    document.getElementById('hdr-teams').textContent   = _model.teamCount + ' seleções';
+    document.getElementById('hdr-matches').textContent = _t('{n} jogos', { n: _n(_model.parsedCount) });
+    document.getElementById('hdr-teams').textContent   = _t('{n} seleções', { n: _model.teamCount });
     document.getElementById('hdr-rho').textContent     = `ρ ${_model.dcRho.toFixed(2)}`;
     document.getElementById('footer-trained').textContent =
-      _model.earliest ? `Dados: ${_model.earliest.getFullYear()}–${_model.latest.getFullYear()}` : '';
+      _model.earliest ? _t('Dados: {a}–{b}', { a: _model.earliest.getFullYear(), b: _model.latest.getFullYear() }) : '';
   }
 
   function renderParams() {
     const grid = document.getElementById('params-grid');
     const rows = [
-      ['Half-life Elo',     `${CFG.HL_ELO} dias`],
-      ['Half-life Poisson', `${CFG.HL_POISSON} dias`],
-      ['Half-life Forma',   `${CFG.HL_FORM} dias`],
+      ['Half-life Elo',     _t('{n} dias', { n: CFG.HL_ELO })],
+      ['Half-life Poisson', _t('{n} dias', { n: CFG.HL_POISSON })],
+      ['Half-life Forma',   _t('{n} dias', { n: CFG.HL_FORM })],
       ['K base (Elo)',      CFG.ELO_K_BASE],
       ['γ (Elo→λ)',         CFG.ELO_GAMMA],
       ['N jogos (forma)',   CFG.FORM_N],
       ['Overround',         `${(CFG.OVERROUND*100).toFixed(0)}%`],
       ['ρ Dixon-Coles',     _model ? _model.dcRho.toFixed(3) : '(MLE)'],
-      ['Treino desde',      CFG.TRAIN_FROM || 'todos'],
+      ['Treino desde',      CFG.TRAIN_FROM || _t('todos')],
     ];
     grid.innerHTML = rows.map(([k,v]) =>
       `<div class="param-row"><span class="param-key">${k}</span><span class="param-val">${v}</span></div>`
@@ -50560,14 +50568,14 @@ Espanha vs Portugal"></textarea>
               document.getElementById('btn-simulate').disabled = false;
               document.getElementById('btn-clear').style.display = '';
             } catch(e) {
-              setStatus('Erro ao construir modelo: ' + e.message, 'error');
+              setStatus(_t('Erro ao construir modelo: {msg}', { msg: _tm(e.message) }), 'error');
             }
           }, 20);
         } catch(e) {
-          setStatus('Erro ao processar CSV: ' + e.message, 'error');
+          setStatus(_t('Erro ao processar CSV: {msg}', { msg: _tm(e.message) }), 'error');
         }
       },
-      error: err => setStatus('Erro ao parsear CSV: ' + err.message, 'error'),
+      error: err => setStatus(_t('Erro ao parsear CSV: {msg}', { msg: _tm(err.message) }), 'error'),
     });
   }
 
@@ -50579,7 +50587,7 @@ Espanha vs Portugal"></textarea>
         <div class="loaded-dot"></div>
         <div>
           <div class="loaded-text">${escHtml(filename)}</div>
-          <div class="loaded-sub">${model.parsedCount.toLocaleString('pt-BR')} jogos · ${model.teamCount} seleções</div>
+          <div class="loaded-sub">${_t('{g} jogos · {t} seleções', { g: _n(model.parsedCount), t: model.teamCount })}</div>
         </div>
       </div>
       <button class="btn-ghost" id="btn-reupload">Trocar arquivo</button>`;
@@ -50627,13 +50635,13 @@ Espanha vs Portugal"></textarea>
         _model = buildModel(_rawRows);
         clearStatus();
         document.getElementById('loaded-sub').textContent =
-          _model.parsedCount.toLocaleString('pt-BR') + ' jogos · ' + _model.teamCount + ' seleções';
+          _t('{g} jogos · {t} seleções', { g: _n(_model.parsedCount), t: _model.teamCount });
         renderParams();
         updateHeaderMeta();
         runValidation();
         document.getElementById('btn-simulate').disabled = false;
       } catch(e) {
-        setStatus('Erro ao construir modelo: ' + e.message, 'error');
+        setStatus(_t('Erro ao construir modelo: {msg}', { msg: _tm(e.message) }), 'error');
       }
     }, 40);
   }
@@ -50661,11 +50669,11 @@ Espanha vs Portugal"></textarea>
 
     // Pre-fill example fixtures
     document.getElementById('fixtures').value =
-`Brazil vs Argentina
+_t(`Brazil vs Argentina
 Germany vs France
 Spain vs Portugal
 England vs Netherlands (neutral)
-Italy vs Belgium`;
+Italy vs Belgium`);
     scheduleValidation();
     loadEmbedded();
   }

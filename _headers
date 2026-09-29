@@ -21,6 +21,10 @@
 /modelos/*
   Cache-Control: public, max-age=0, must-revalidate
 
+# Dicionários de tradução: têm de acompanhar o texto das páginas.
+/i18n/*
+  Cache-Control: public, max-age=0, must-revalidate
+
 /service-worker.js
   Cache-Control: public, max-age=0, must-revalidate
 
