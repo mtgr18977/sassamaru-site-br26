@@ -13,6 +13,7 @@ npm run test:backtest      # Walk-forward accuracy regression gate — run this
 npm run test:selecoes      # Selection model tests (111 assertions)
 npm run test:pwa           # PWA compliance tests (manifest, service worker, icons)
 npm run test:copa          # Copa 2026 bracket tests
+npm run test:i18n          # Translations: en/zh coverage, placeholders, _t() keys, docs blocks
 
 # Local development (no build step needed)
 python -m http.server 8000
@@ -36,6 +37,31 @@ Static HTML + vanilla JavaScript PWA — no build process, no framework.
 
 Do NOT paste the model back inline into a page. The Brasileirão model used to exist as three
 diverging hand-copied versions with different constants and no test covering any of them.
+
+### Internationalization (pt-BR · en · zh-CN)
+
+Portuguese stays written directly in the HTML/JS (the site works without any translation file);
+`i18n/en.js` and `i18n/zh.js` map **the Portuguese text → its translation** (gettext style).
+`i18n/i18n.js` must be the first `<script>` of every page.
+
+- Static HTML needs no markup: the engine walks text nodes and `title`/`placeholder`/`aria-label`/`alt`
+  attributes and replaces the ones whose whitespace-normalised text is a dictionary key. A
+  `MutationObserver` covers what page JS inserts later.
+- Text with numbers or names in the middle uses `_t('Rodada {n} de {total}', {n, total})`. Split a
+  sentence around inline markup (`<b>`, `<code>`) into `_t()` with HTML placeholders, never by
+  concatenating translated fragments. Helpers: `_n(x)` number in the page locale, `_o(n)` ordinal
+  (3º / 3rd / 第3名), `_tn(name)` national-team name (zh), `_tm(msg)` translates model error messages.
+- **Short/ambiguous keys need a context suffix**: `_t('V@@vitória')`. Otherwise the DOM walk translates
+  *every* text node that is exactly `V` (e.g. a club avatar) — and a key equal to a club name
+  ("Internacional") would rename the club. `tests/i18n.test.js` fails on clashes with club names.
+  For static markup with such a key use `data-i18n="Internacional@@categoria"`.
+- `bench-docs.html` prose is tagged block by block with `data-i18n-html="docs.N"`; translations live in
+  `i18n/{en,zh}-docs.js` (loaded by `data-i18n-extra="docs"` on the script tag).
+- Switching language stores `br26-lang` in `localStorage` and reloads (models rebuild from scratch);
+  `?lang=en|zh|pt` also works. First visit: browser language (pt → pt, zh → zh, anything else → en).
+- Dictionaries are cached by the service worker (`PRECACHE_ASSETS`) — bump `CACHE_VERSION` when adding files.
+- Do not translate `modelos/*.js` output that the code branches on (`pick === "Mandante"`,
+  `"home"`/`"draw"`/`"away"`); translate only at display time.
 
 ### Prediction model pipeline (`modelos/model.js`)
 

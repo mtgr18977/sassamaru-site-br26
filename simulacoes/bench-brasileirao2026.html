@@ -17,6 +17,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <script src="../i18n/i18n.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -9733,7 +9734,7 @@ const _SYNC_FLAG = 'br26-cache-reset';
 
   if (!jaTentou) {
     try { sessionStorage.setItem(_SYNC_FLAG, '1'); } catch (e) { /* modo restrito */ }
-    show('Atualizando…', 'Descartando a versão em cache e recarregando.');
+    show(_t('Atualizando…'), _t('Descartando a versão em cache e recarregando.'));
     (async () => {
       try {
         if ('serviceWorker' in navigator) {
@@ -9748,10 +9749,8 @@ const _SYNC_FLAG = 'br26-cache-reset';
       location.reload();
     })();
   } else {
-    show('Cópia em cache desatualizada',
-      'O navegador insiste em uma versão antiga de <code>modelos/model.js</code> ' +
-      '(faltando: ' + missing.join(', ') + ').<br>' +
-      'Abra o site em uma aba anônima ou limpe os dados do site nas configurações do navegador.');
+    show(_t('Cópia em cache desatualizada'),
+      _t('O navegador insiste em uma versão antiga de <code>modelos/model.js</code> (faltando: {list}).<br>Abra o site em uma aba anônima ou limpe os dados do site nas configurações do navegador.', { list: missing.join(', ') }));
   }
   throw new Error('modelos/model.js desatualizado — faltam: ' + missing.join(', '));
 })();
@@ -9934,7 +9933,7 @@ function renderPodium(stats){
 
   document.getElementById('podium').innerHTML = sorted.map((x,i)=>`
     <div class="podium-card p${i+1}" data-team="${x.t}" title="Clique para ver os detalhes">
-      <div class="podium-rank">${['Favorito','2º','3º','4º','5º','6º'][i]}</div>
+      <div class="podium-rank">${i===0?_t('Favorito'):_o(i+1)}</div>
       <div class="podium-team">${avatar(x.t)} ${dn(x.t)}</div>
       <div class="podium-pct">${fmtPct(x.cp)}</div>
       <div class="podium-sub">chance de título</div>
@@ -9960,7 +9959,7 @@ function renderRelegation(stats){
 
   document.getElementById('rel-podium').innerHTML = rows.map(x=>`
     <div class="podium-card relz" data-team="${x.t}" title="Clique para ver os detalhes">
-      <div class="podium-rank">${x.pos}º hoje${inZ4.has(x.t)?' · no Z4':''}</div>
+      <div class="podium-rank">${inZ4.has(x.t)?_t('{pos} hoje · no Z4',{pos:_o(x.pos)}):_t('{pos} hoje',{pos:_o(x.pos)})}</div>
       <div class="podium-team">${avatar(x.t)} ${dn(x.t)}</div>
       <div class="podium-pct">${fmtPct(x.rp)}</div>
       <div class="podium-sub">risco de rebaixamento</div>
@@ -9986,7 +9985,7 @@ function sumRange(hist, a, b){
 // do histograma de posições e a campanha real até aqui.
 function detailHTML(row, N){
   const h = row.hist, nT = h.length;
-  const fmtN = n => n.toLocaleString('pt-BR');
+  const fmtN = n => _n(n);
   const champ = h[0];
   const g4   = sumRange(h, 0, 3);
   const g6   = sumRange(h, 0, 5);
@@ -10013,11 +10012,11 @@ function detailHTML(row, N){
   const curPos = TEAMS.indexOf(row.t) + 1;
   const st = SEASON_STATE && SEASON_STATE.standings.get(row.t);
   const cur = st
-    ? `<b>${curPos}º</b> com <b>${st.pts} pts</b> em ${st.played} jogos · ${st.w}V ${st.d}E ${st.l}D · gols ${st.gf}:${st.ga} (${st.gd>=0?'+':''}${st.gd})`
+    ? _t('{pos} com {pts} em {played} jogos · {w}V {d}E {l}D · gols {gf}:{ga} ({gd})', { pos: `<b>${_o(curPos)}</b>`, pts: `<b>${st.pts} pts</b>`, played: st.played, w: st.w, d: st.d, l: st.l, gf: st.gf, ga: st.ga, gd: (st.gd>=0?'+':'')+st.gd })
     : '—';
 
   return `<div class="detail-box">
-    <div class="detail-head">em ${fmtN(N)} temporadas simuladas, ${dn(row.t)} terminou…</div>
+    <div class="detail-head">${_t('em {n} temporadas simuladas, {team} terminou…', { n: fmtN(N), team: dn(row.t) })}</div>
     <div class="dstat-grid">
       ${cell('🏆 Campeão', champ, 'gold')}
       ${cell('G4 (top 4)', g4, 'lib')}
@@ -10027,10 +10026,10 @@ function detailHTML(row, N){
     </div>
     <div class="dstat-grid">
       ${info('Pontos médios', row.avgPts.toFixed(1))}
-      ${info('Posição média', (row.avgPos+1).toFixed(1)+'º')}
-      ${info('Posição mais provável', (mode+1)+'º', fmtPct(h[mode]/N)+' das simulações')}
-      ${info('Melhor posição', best>=0 ? (best+1)+'º' : '—', best>=0 ? fmtN(h[best])+'×' : '')}
-      ${info('Pior posição', worst>=0 ? (worst+1)+'º' : '—', worst>=0 ? fmtN(h[worst])+'×' : '')}
+      ${info('Posição média', _t('{pos}º',{pos:(row.avgPos+1).toFixed(1)}))}
+      ${info('Posição mais provável', _o(mode+1), _t('{p} das simulações',{p:fmtPct(h[mode]/N)}))}
+      ${info('Melhor posição', best>=0 ? _o(best+1) : '—', best>=0 ? fmtN(h[best])+'×' : '')}
+      ${info('Pior posição', worst>=0 ? _o(worst+1) : '—', worst>=0 ? fmtN(h[worst])+'×' : '')}
     </div>
     <div class="detail-cur">Campanha real até aqui: ${cur}</div>
   </div>`;
@@ -10124,10 +10123,10 @@ function rebuildModel(numSeasons){
   const yearOf = (si) => currentYear - (total - 1 - si);
   const usedSeasons = total - trainFromSeason;
 
-  document.getElementById('hdr-jogos').textContent = MODEL.parsedCount.toLocaleString('pt-BR')+' jogos';
-  document.getElementById('hdr-temporadas').textContent = total+' temporadas no dataset';
+  document.getElementById('hdr-jogos').textContent = _t('{n} jogos', { n: _n(MODEL.parsedCount) });
+  document.getElementById('hdr-temporadas').textContent = _t('{n} temporadas no dataset', { n: total });
   document.getElementById('hdr-janela').textContent =
-    `treino: ${usedSeasons} temp. (${yearOf(trainFromSeason)}–${yearOf(total-1)})`;
+    _t('treino: {n} temp. ({a}–{b})', { n: usedSeasons, a: yearOf(trainFromSeason), b: yearOf(total-1) });
   document.getElementById('footer-rho').textContent = `ρ MLE = ${MODEL.dc.rho.toFixed(4)}`;
 }
 
@@ -10162,7 +10161,7 @@ async function init(){
 
     const elState = document.getElementById('hdr-estado');
     if(elState){
-      elState.textContent = `rodada ${SEASON_STATE.roundsPlayed} · ${REMAINING.length} jogos restantes`;
+      elState.textContent = _t('rodada {r} · {n} jogos restantes', { r: SEASON_STATE.roundsPlayed, n: REMAINING.length });
     }
     if(SEASON_STATE.excluded.length){
       console.warn('Times ignorados na tabela (poucos jogos — provável linha errada no CSV):',
@@ -10170,9 +10169,9 @@ async function init(){
       const elWarn = document.getElementById('data-warning');
       if(elWarn){
         elWarn.style.display='';
-        elWarn.textContent = 'Aviso: ' + SEASON_STATE.excluded
-          .map(e=>`"${e.team}" aparece em apenas ${e.played} jogo(s) da temporada e foi ignorado`)
-          .join(' · ');
+        elWarn.textContent = _t('Aviso: {list}', { list: SEASON_STATE.excluded
+          .map(e=>_t('"{team}" aparece em apenas {n} jogo(s) da temporada e foi ignorado', { team: e.team, n: e.played }))
+          .join(' · ') });
       }
     }
 
@@ -10180,7 +10179,7 @@ async function init(){
     document.getElementById('loading').style.display='none';
     document.getElementById('main').style.display='';
   }catch(e){
-    document.getElementById('loading-title').textContent='Erro: '+e.message;
+    document.getElementById('loading-title').textContent=_t('Erro: {msg}', { msg: _tm(e.message) });
     document.getElementById('loading-sub').textContent='';
     console.error(e);
   }
@@ -10192,7 +10191,7 @@ document.getElementById('n-seasons').addEventListener('change', (e)=>{
     rebuildModel(parseInt(e.target.value,10)||5);
   }catch(err){
     console.error(err);
-    document.getElementById('sim-meta').textContent = 'Erro: '+err.message;
+    document.getElementById('sim-meta').textContent = _t('Erro: {msg}', { msg: _tm(err.message) });
     return;
   }
   // Resultados da simulação anterior valem para o modelo antigo — escondê-los
@@ -10212,12 +10211,12 @@ document.getElementById('btn-run').addEventListener('click', async()=>{
   try{
     const stats = await runMC(MODEL, N, (done,total)=>{
       const pct = Math.round(done/total*100);
-      btn.textContent = `Simulando… ${pct}%`;
-      document.getElementById('hdr-sims').textContent = `${done.toLocaleString('pt-BR')} / ${N.toLocaleString('pt-BR')}`;
+      btn.textContent = _t('Simulando… {pct}%', { pct });
+      document.getElementById('hdr-sims').textContent = `${_n(done)} / ${_n(N)}`;
     });
     const elapsed = ((performance.now()-t0)/1000).toFixed(1);
-    document.getElementById('hdr-sims').textContent = `${N.toLocaleString('pt-BR')} simulações`;
-    document.getElementById('sim-meta').textContent = `${N.toLocaleString('pt-BR')} temporadas · ${elapsed}s`;
+    document.getElementById('hdr-sims').textContent = _t('{n} simulações', { n: _n(N) });
+    document.getElementById('sim-meta').textContent = _t('{n} temporadas · {s}s', { n: _n(N), s: elapsed });
 
     renderPodium(stats);
     renderRelegation(stats);
@@ -10227,7 +10226,7 @@ document.getElementById('btn-run').addEventListener('click', async()=>{
     document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
   }catch(e){
     console.error(e);
-    document.getElementById('sim-meta').textContent='Erro: '+e.message;
+    document.getElementById('sim-meta').textContent=_t('Erro: {msg}', { msg: _tm(e.message) });
   }finally{
     btn.disabled=false; btn.textContent='▶ Simular temporada';
   }

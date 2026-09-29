@@ -13,6 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <script src="i18n/i18n.js"></script>
   <script src="papaparse.min.js"></script>
   <script src="modelos/selecoes-model.js"></script>
 <style>
@@ -582,6 +583,8 @@ const TEAMS = {
   GHA:{name:'Gana',flag:'🇬🇭'},
   PAN:{name:'Panamá',flag:'🇵🇦'},
 };
+// Nome da seleção no idioma da página (a chave é o nome em português).
+Object.values(TEAMS).forEach(t => { t.name = _t(t.name); });
 
 const GROUPS = {
   A:['MEX','RSA','KOR','CZE'],
@@ -931,12 +934,12 @@ function renderGroups() {
     card.className='group-card';
 
     let html=`<div class="group-header">
-      <span class="group-letter">Grupo ${g}</span>
+      <span class="group-letter">${_t('Grupo {g}', { g })}</span>
       <span class="group-label">${rows.map(r=>TEAMS[r.code].flag).join(' ')}</span>
     </div>
     <table class="standings-table">
     <thead><tr>
-      <th></th><th>J</th><th>V</th><th>E</th><th>D</th><th>GP</th><th>GC</th><th>SG</th><th>Pts</th>
+      <th></th><th title="${_t('Jogos')}">${_t('J@@jogos')}</th><th title="${_t('Vitórias')}">${_t('V@@vitórias')}</th><th title="${_t('Empates')}">${_t('E@@empates')}</th><th title="${_t('Derrotas')}">${_t('D@@derrotas')}</th><th title="${_t('Gols pró')}">${_t('GP@@gols pró')}</th><th title="${_t('Gols contra')}">${_t('GC@@gols contra')}</th><th title="${_t('Saldo de gols')}">${_t('SG@@saldo de gols')}</th><th title="${_t('Pontos')}">${_t('Pts@@pontos')}</th>
     </tr></thead><tbody>`;
 
     rows.forEach((r,i)=>{
@@ -962,11 +965,13 @@ function renderGroups() {
 // FORMAT DATE
 // ──────────────────────────────────────────────
 function fmtDate(d) {
+  if (I18N.lang !== 'pt') return new Intl.DateTimeFormat(I18N.locale, { day: 'numeric', month: 'short' }).format(new Date(d + 'T12:00:00'));
   const [y,mo,day]=d.split('-');
   const months=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
   return `${parseInt(day)} ${months[parseInt(mo)-1]}`;
 }
 function fmtDateLong(d){
+  if (I18N.lang !== 'pt') return new Intl.DateTimeFormat(I18N.locale, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(d + 'T12:00:00'));
   const [y,mo,day]=d.split('-');
   const months=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
   const wdays=['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
@@ -987,7 +992,7 @@ function matchCardHtml(m) {
   }
   return `<div class="match-card ${m.played?'':'upcoming'}" onclick="openModal(${m.id})">
     <div class="match-row">
-      <span class="match-group-badge">Grupo ${m.group} · R${m.round}</span>
+      <span class="match-group-badge">${_t('Grupo {g} · R{r}', { g: m.group, r: m.round })}</span>
       <div class="match-teams">
         <div class="match-team">
           <span class="team-flag">${ht.flag}</span>
@@ -1002,7 +1007,7 @@ function matchCardHtml(m) {
       <span class="match-arrow">›</span>
     </div>
     <div class="match-info">
-      <span class="match-venue-text">📍 ${m.venue}</span>
+      <span class="match-venue-text">📍 ${_t(m.venue)}</span>
       ${m.played?`<span class="results-badge">✓ Encerrado</span>`:`<span class="upcoming-badge">🗓 ${fmtDate(m.date)}</span>`}
     </div>
   </div>`;
@@ -1056,18 +1061,18 @@ function renderThirds() {
     const team=TEAMS[t.code];
     const qualifies = i<8;
     return `<div class="third-card ${qualifies?'qualify':''}">
-      <div class="third-rank">#${i+1} ${qualifies?'<span style="color:var(--green);font-weight:600">✓ Classifica</span>':'<span style="color:var(--muted)">✗ Eliminado</span>'}</div>
+      <div class="third-rank">#${i+1} ${qualifies?'<span style="color:var(--green);font-weight:600">'+_t('✓ Classifica')+'</span>':'<span style="color:var(--muted)">'+_t('✗ Eliminado')+'</span>'}</div>
       <div class="third-team">
         <span style="font-size:22px">${team.flag}</span>
         <div>
           <div style="font-weight:600;font-size:13px">${team.name}</div>
-          <span class="third-group">Grupo ${t.group}</span>
+          <span class="third-group">${_t('Grupo {g}', { g: t.group })}</span>
         </div>
       </div>
       <div class="third-stats">
-        <div class="third-stat"><span class="third-stat-val">${t.pts}</span><span>Pts</span></div>
-        <div class="third-stat"><span class="third-stat-val">${t.gd>0?'+'+t.gd:t.gd}</span><span>SG</span></div>
-        <div class="third-stat"><span class="third-stat-val">${t.gf}</span><span>GP</span></div>
+        <div class="third-stat"><span class="third-stat-val">${t.pts}</span><span>${_t('Pts@@pontos')}</span></div>
+        <div class="third-stat"><span class="third-stat-val">${t.gd>0?'+'+t.gd:t.gd}</span><span>${_t('SG@@saldo de gols')}</span></div>
+        <div class="third-stat"><span class="third-stat-val">${t.gf}</span><span>${_t('GP@@gols pró')}</span></div>
         <div class="third-stat"><span class="third-stat-val">${t.p}</span><span>Jogos</span></div>
       </div>
     </div>`;
@@ -1082,14 +1087,14 @@ function openModal(id) {
   if(!m)return;
   const ht=TEAMS[m.home], at=TEAMS[m.away];
 
-  document.getElementById('modal-group-badge').textContent=`Grupo ${m.group} · Rodada ${m.round}`;
+  document.getElementById('modal-group-badge').textContent=_t('Grupo {g} · Rodada {r}', { g: m.group, r: m.round });
   document.getElementById('modal-date').textContent=fmtDateLong(m.date);
   document.getElementById('modal-home-flag').textContent=ht.flag;
   document.getElementById('modal-home-name').textContent=ht.name;
   document.getElementById('modal-away-flag').textContent=at.flag;
   document.getElementById('modal-away-name').textContent=at.name;
-  document.getElementById('modal-venue').textContent=m.venue;
-  document.getElementById('modal-round').textContent=`Rodada ${m.round} da fase de grupos`;
+  document.getElementById('modal-venue').textContent=_t(m.venue);
+  document.getElementById('modal-round').textContent=_t('Rodada {r} da fase de grupos', { r: m.round });
 
   const scoreEl=document.getElementById('modal-score');
   if(m.played && m.hs!==null){
@@ -1209,7 +1214,7 @@ function bmHtml(m, homeCode, awayCode, homeLbl, awayLbl) {
 
   function teamRow(t, score, isWinner, lbl) {
     const win = played && isWinner ? ' winner' : '';
-    if (!t) return `<div class="bm-team${win}"><span class="bm-nm tbd">${lbl||'A definir'}</span>${played ? `<span class="bm-sc">${score}</span>` : ''}</div>`;
+    if (!t) return `<div class="bm-team${win}"><span class="bm-nm tbd">${lbl||_t('A definir')}</span>${played ? `<span class="bm-sc">${score}</span>` : ''}</div>`;
     return `<div class="bm-team${win}">
       <span class="bm-flag">${t.flag}</span>
       <span class="bm-nm">${t.name}</span>
@@ -1250,24 +1255,24 @@ function resolveBracketRef(ref) {
   return null;
 }
 function bracketRefLabel(ref) {
-  if (!ref) return 'A definir';
-  if (ref.startsWith('VJ')) return 'Venc. ' + ref.slice(1);
-  if (ref.startsWith('RU-')) return 'Perd. ' + ref.slice(3);
-  return 'A definir';
+  if (!ref) return _t('A definir');
+  if (ref.startsWith('VJ')) return _t('Venc. {j}', { j: ref.slice(1) });
+  if (ref.startsWith('RU-')) return _t('Perd. {j}', { j: ref.slice(3) });
+  return _t('A definir');
 }
 function r32Home(m) { return m.home || resolveTeam(m.homePos, null) || resolveBracketRef(m.hl); }
 function r32Away(m) { return m.away || resolveTeam(m.awayPos, null) || resolveBracketRef(m.al); }
 function r32HomeLbl(m) {
   if (m.homeLabel) return m.homeLabel;
-  if (m.homePos) return ['','1º','2º','3º'][m.homePos.r] + ' ' + m.homePos.g;
+  if (m.homePos) return _o(m.homePos.r) + ' ' + m.homePos.g;
   if (m.hl) return bracketRefLabel(m.hl);
-  return 'A definir';
+  return _t('A definir');
 }
 function r32AwayLbl(m) {
   if (m.awayLabel) return m.awayLabel;
-  if (m.awayPos) return ['','1º','2º','3º'][m.awayPos.r] + ' ' + m.awayPos.g;
+  if (m.awayPos) return _o(m.awayPos.r) + ' ' + m.awayPos.g;
   if (m.al) return bracketRefLabel(m.al);
-  return 'A definir';
+  return _t('A definir');
 }
 
 // ──────────────────────────────────────────────
@@ -1313,7 +1318,7 @@ function renderBracket() {
 
   // 3rd place match
   document.getElementById('third-place-match').innerHTML =
-    `<div class="third-match-label">3º Lugar — J103 · 18/jul</div>${bmHtml(B_THIRD, r32Home(B_THIRD), r32Away(B_THIRD), r32HomeLbl(B_THIRD), r32AwayLbl(B_THIRD))}`;
+    `<div class="third-match-label">${_t('3º Lugar — J103 · 18/jul')}</div>${bmHtml(B_THIRD, r32Home(B_THIRD), r32Away(B_THIRD), r32HomeLbl(B_THIRD), r32AwayLbl(B_THIRD))}`;
 
   updateBracketScrollEdges();
 }
@@ -1511,7 +1516,7 @@ function renderChancesResults(winCounts, N) {
     .filter(x=>x.p>0.0005);
 
   // Pódio (top 6)
-  const podiumLabels = ['Favorito','2°','3°','4°','5°','6°'];
+  const podiumLabels = [_t('Favorito'),_o(2),_o(3),_o(4),_o(5),_o(6)];
   document.getElementById('chances-podium').innerHTML = sorted.slice(0,6).map((x,i)=>`
     <div class="podium-item rank-${i+1}">
       <div class="podium-rank-label">${podiumLabels[i]}</div>
@@ -1559,10 +1564,10 @@ document.getElementById('btn-chances').addEventListener('click', async () => {
     const elapsed = ((Date.now()-t0)/1000).toFixed(1);
 
     document.getElementById('chances-loading').style.display='none';
-    document.getElementById('chances-meta').textContent=`${N.toLocaleString('pt-BR')} simulações · ${elapsed}s`;
+    document.getElementById('chances-meta').textContent=_t('{n} simulações · {s}s', { n: _n(N), s: elapsed });
     renderChancesResults(winCounts, N);
   } catch(e) {
-    loadingText.textContent='Erro ao carregar modelo: '+e.message;
+    loadingText.textContent=_t('Erro ao carregar modelo: {msg}', { msg: _tm(e.message) });
     console.error(e);
   }
   btn.disabled=false;
@@ -1599,23 +1604,23 @@ function renderCopaStatsCard(code) {
   const t = TEAMS[code];
   const {stats, matches} = getTeamCopaStats(code);
   if (!stats.p) return `<div class="copa-stats-card">
-    <div class="copa-stats-title">${t.flag} ${t.name} — Copa 2026</div>
-    <div style="font-size:12px;color:var(--muted)">Nenhuma partida disputada ainda</div>
+    <div class="copa-stats-title">${_t('{team} — Copa 2026', { team: t.flag + ' ' + t.name })}</div>
+    <div style="font-size:12px;color:var(--muted)">${_t('Nenhuma partida disputada ainda')}</div>
   </div>`;
 
   const matchesHtml = matches.map(m=>{
     const opp = TEAMS[m.opp];
     return `<div class="copa-match-item">
-      <span>${opp.flag} ${opp.name} (Gr.${m.group} R${m.round})</span>
+      <span>${_t('{opp} (Gr.{g} R{r})', { opp: opp.flag + ' ' + opp.name, g: m.group, r: m.round })}</span>
       <span class="copa-match-score result-${m.res}">${m.tGf}–${m.tGa}</span>
     </div>`;
   }).join('');
 
   return `<div class="copa-stats-card">
-    <div class="copa-stats-title">${t.flag} ${t.name} — Copa 2026</div>
-    <div class="stat-line"><span>Jogos</span><span class="stat-line-val">${stats.p}</span></div>
+    <div class="copa-stats-title">${_t('{team} — Copa 2026', { team: t.flag + ' ' + t.name })}</div>
+    <div class="stat-line"><span>${_t('Jogos')}</span><span class="stat-line-val">${stats.p}</span></div>
     <div class="stat-line"><span>V / E / D</span><span class="stat-line-val">${stats.w}/${stats.d}/${stats.l}</span></div>
-    <div class="stat-line"><span>Gols</span><span class="stat-line-val">${stats.gf}:${stats.ga} (SG ${stats.gf-stats.ga>0?'+':''}${stats.gf-stats.ga})</span></div>
+    <div class="stat-line"><span>Gols</span><span class="stat-line-val">${_t('{gf}:{ga} (SG {sg})', { gf: stats.gf, ga: stats.ga, sg: (stats.gf-stats.ga>0?'+':'')+(stats.gf-stats.ga) })}</span></div>
     <div class="stat-line"><span>Pontos</span><span class="stat-line-val">${stats.pts}</span></div>
     <div class="copa-match-list">${matchesHtml}</div>
   </div>`;
@@ -1625,7 +1630,7 @@ async function calcConfronto() {
   const codeA = document.getElementById('team-a').value;
   const codeB = document.getElementById('team-b').value;
   if (!codeA||!codeB||codeA===codeB) {
-    alert('Selecione duas seleções diferentes.');
+    alert(_t('Selecione duas seleções diferentes.'));
     return;
   }
 
@@ -1667,7 +1672,7 @@ async function calcConfronto() {
         </div>
         <div class="odds-row">
           <div class="odds-card">
-            <div class="odds-label">${tA.name} ganha</div>
+            <div class="odds-label">${_t('{team} ganha', { team: tA.name })}</div>
             <div class="odds-val">${pr.oh.toFixed(2)}</div>
           </div>
           <div class="odds-card">
@@ -1675,13 +1680,12 @@ async function calcConfronto() {
             <div class="odds-val">${pr.od.toFixed(2)}</div>
           </div>
           <div class="odds-card">
-            <div class="odds-label">${tB.name} ganha</div>
+            <div class="odds-label">${_t('{team} ganha', { team: tB.name })}</div>
             <div class="odds-val">${pr.oa.toFixed(2)}</div>
           </div>
         </div>
         <div style="margin-top:10px;font-size:10.5px;color:var(--muted);font-family:var(--mono)">
-          Placar mais provável: ${pr.bestGH}–${pr.bestGA} · λ ${TEAM_MODEL_NAMES[codeA]}: ${pr.lamH.toFixed(2)} · λ ${TEAM_MODEL_NAMES[codeB]}: ${pr.lamA.toFixed(2)}
-          · Partida considerada em campo neutro
+          ${_t('Placar mais provável: {s} · λ {a}: {la} · λ {b}: {lb} · Partida considerada em campo neutro', { s: pr.bestGH+'–'+pr.bestGA, a: tA.name, la: pr.lamH.toFixed(2), b: tB.name, lb: pr.lamA.toFixed(2) })}
         </div>
       </div>
       <div class="copa-stats-grid">
@@ -1696,7 +1700,7 @@ async function calcConfronto() {
     document.getElementById('confronto-result').innerHTML=html;
     document.getElementById('confronto-result').style.display='';
   } catch(e) {
-    document.getElementById('confronto-loading').innerHTML='<div style="color:var(--red)">Erro: '+e.message+'</div>';
+    document.getElementById('confronto-loading').innerHTML='<div style="color:var(--red)">'+_t('Erro: {msg}', { msg: _tm(e.message) })+'</div>';
     console.error(e);
   }
   btn.disabled=false;
@@ -1705,7 +1709,7 @@ async function calcConfronto() {
 // Popular dropdowns
 (function populateDropdowns() {
   const allCodes = Object.values(GROUPS).flat();
-  const sorted = [...allCodes].sort((a,b)=>TEAMS[a].name.localeCompare(TEAMS[b].name,'pt-BR'));
+  const sorted = [...allCodes].sort((a,b)=>TEAMS[a].name.localeCompare(TEAMS[b].name, I18N.locale));
   const opts = sorted.map(c=>`<option value="${c}">${TEAMS[c].flag} ${TEAMS[c].name}</option>`).join('');
   document.getElementById('team-a').innerHTML=opts;
   document.getElementById('team-b').innerHTML=opts;
