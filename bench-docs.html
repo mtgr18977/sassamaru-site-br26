@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Sassamaru — Documentação do Modelo</title>
   <script src="i18n/i18n.js" data-i18n-extra="docs"></script>
+  <link rel="stylesheet" href="shell/shell.css"/>
+  <script src="shell/shell.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
@@ -179,7 +181,7 @@ h3 {
 }
 p {
   font-size: 14px;
-  color: #2A2A26;
+  color: var(--s-text2);
   margin-bottom: 14px;
   line-height: 1.75;
 }
@@ -201,7 +203,7 @@ p:last-child { margin-bottom: 0; }
   color: var(--text);
   line-height: 1.9;
   overflow-x: auto;
-  background: #FAFAF8;
+  background: var(--s-sunk);
 }
 .formula-eq .eq-line {
   display: block;
@@ -212,7 +214,7 @@ p:last-child { margin-bottom: 0; }
   font-weight: 500;
   color: var(--accent);
 }
-.formula-eq .eq-sub  { color: #3A3A36; }
+.formula-eq .eq-sub  { color: var(--s-text2); }
 .formula-vars {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -247,7 +249,7 @@ p:last-child { margin-bottom: 0; }
 }
 /* Legacy one-liner formulas */
 .formula {
-  background: #FAFAF8;
+  background: var(--s-sunk);
   border: 1px solid var(--border);
   border-left: 3px solid var(--accent);
   border-radius: var(--radius);
@@ -274,7 +276,7 @@ p:last-child { margin-bottom: 0; }
   letter-spacing: .07em;
   text-transform: uppercase;
   color: var(--muted);
-  background: #F9F8F5;
+  background: var(--s-sunk);
   padding: 8px 12px;
   border-bottom: 1px solid var(--border);
   text-align: left;
@@ -307,9 +309,9 @@ p:last-child { margin-bottom: 0; }
   font-size: 13px;
   line-height: 1.65;
 }
-.callout.note    { background: var(--accent-lt); border: 1px solid #a7c7b5; color: #1A3D2B; }
-.callout.warn    { background: #FEF3C7; border: 1px solid #fcd34d; color: #78350F; }
-.callout.insight { background: #EFF6FF; border: 1px solid #BFDBFE; color: #1E3A5F; }
+.callout.note    { background: var(--accent-lt); border: 1px solid var(--s-accent-bd); color: var(--s-accent-fg2); }
+.callout.warn    { background: var(--s-warn-bg); border: 1px solid var(--s-warn-bd); color: var(--s-warn-fg); }
+.callout.insight { background: var(--s-blue-bg); border: 1px solid var(--s-blue-bd); color: var(--s-blue-fg); }
 .callout strong  { font-weight: 600; }
 
 /* ── Figure / diagram ── */
@@ -411,10 +413,10 @@ p:last-child { margin-bottom: 0; }
   margin-top: 2px;
 }
 .todo-tag.model   { background: var(--accent-lt); color: var(--accent); }
-.todo-tag.dados   { background: #EFF6FF; color: #1E40AF; }
-.todo-tag.ui      { background: #F0EEE8; color: var(--muted); }
-.todo-tag.infra   { background: #FEF3C7; color: #92400E; }
-.todo-tag.done    { background: #F0F0EC; color: #9A9892; }
+.todo-tag.dados   { background: var(--s-blue-bg); color: var(--s-blue-fg); }
+.todo-tag.ui      { background: var(--s-chip); color: var(--muted); }
+.todo-tag.infra   { background: var(--s-warn-bg); color: var(--s-warn-fg); }
+.todo-tag.done    { background: var(--s-chip); color: var(--s-faint); }
 .todo-text strong { font-weight: 600; }
 .todo-text small  { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; }
 .todo-done-item   { opacity: 0.6; }
@@ -706,7 +708,7 @@ footer {
   <div class="section-num">§ 5</div>
   <h2 data-i18n-html="docs.133">Validação e backtesting</h2>
 
-  <p data-i18n-html="docs.134">O modelo inclui um backtest walk-forward: para cada uma das últimas <code style="font-family:var(--mono);font-size:12px">BACKTEST_SEASONS</code> temporadas do Brasileirão, o modelo é treinado em todas as temporadas anteriores e avaliado nos jogos da temporada corrente. As métricas calculadas são:</p>
+  <p data-i18n-html="docs.134">O modelo inclui um backtest walk-forward: para cada uma das últimas <code style="font-family:var(--mono);font-size:12px">BACKTEST_SEASONS</code> temporadas do Brasileirão, o modelo é treinado apenas com os jogos anteriores a cada partida (refit a cada 4 rodadas) e avaliado nos jogos seguintes. As métricas calculadas são:</p>
 
   <h3 data-i18n-html="docs.135">Brier Score (multi-classe)</h3>
 <div class="formula-block"><div class="formula-eq"><span class="eq-line eq-main">BS = (1/N) × Σ [(p_H − o_H)² + (p_D − o_D)² + (p_A − o_A)²]</span></div><div class="formula-vars"><div class="formula-var" data-i18n-html="docs.136"><span class="formula-var-name">o_X</span><span class="formula-var-desc">1 se X ocorreu, 0 caso contrário (variável indicadora)</span></div><div class="formula-var" data-i18n-html="docs.137"><span class="formula-var-name">range</span><span class="formula-var-desc">0 = perfeito · 2 = totalmente errado</span></div><div class="formula-var" data-i18n-html="docs.138"><span class="formula-var-name">benchmark</span><span class="formula-var-desc">~0.667 para modelo uniforme (1/3, 1/3, 1/3)</span></div></div></div>
@@ -715,13 +717,27 @@ footer {
 <div class="formula-block"><div class="formula-eq" data-i18n-html="docs.140"><span class="eq-line eq-main">LL = −(1/N) × Σ log( p_resultado )</span></div><div class="formula-vars"><div class="formula-var" data-i18n-html="docs.141"><span class="formula-var-name">p_resultado</span><span class="formula-var-desc">Probabilidade atribuída pelo modelo ao resultado que de fato ocorreu</span></div><div class="formula-var" data-i18n-html="docs.142"><span class="formula-var-name">penalidade</span><span class="formula-var-desc">Confiança errada é punida mais do que incerteza — log(0.1) >> log(0.4)</span></div><div class="formula-var" data-i18n-html="docs.143"><span class="formula-var-name">benchmark</span><span class="formula-var-desc">log(3) ≈ 1.099 para modelo uniforme</span></div></div></div>
 
   <h3 data-i18n-html="docs.144">Acurácia 1X2</h3>
-  <p data-i18n-html="docs.145">Percentual de jogos em que o palpite do modelo (resultado mais provável) coincidiu com o resultado real. Sassamarumark de referência: ~46% (proporção de vitórias do mandante). O modelo historicamente atinge ~52–55% no Brasileirão.</p>
+  <p data-i18n-html="docs.145">Percentual de jogos em que o palpite do modelo (resultado mais provável) coincidiu com o resultado real. Referência: ~47% (palpitar sempre o resultado mais frequente). No backtest atual o modelo acerta ~48% — o futebol tem muito ruído, e o ganho real está nas probabilidades, não no palpite.</p>
 
   <h3 data-i18n-html="docs.146">Calibração</h3>
   <p data-i18n-html="docs.147">O modelo é considerado calibrado se, entre todos os jogos para os quais atribuiu probabilidade ~30%, aproximadamente 30% desses jogos ocorreram. A calibração é visualizada em um gráfico de confiabilidade com 10 bins de 10% cada.</p>
 
   <div class="callout note" data-i18n-html="docs.148">
-    <strong>Nota metodológica:</strong> O backtest usa o modelo treinado em dados históricos completos (até a temporada de teste), não um modelo re-treinado a cada rodada. Isso é uma simplificação que pode introduzir leve viés otimista, mas é computacionalmente viável para execução no navegador.
+    <strong>Nota metodológica:</strong> o backtest é walk-forward de verdade: a cada 4 rodadas o modelo é reajustado só com o que já tinha acontecido, e as partidas seguintes são previstas sem enxergar o futuro. Ele roda no terminal (<code style="font-family:var(--mono);font-size:12px">npm run test:backtest</code>) e funciona como trava de regressão: o modelo precisa vencer a taxa-base fixa 47/27/26 em log-loss e RPS.
+  </div>
+
+  <h3 data-i18n-html="docs.230">Resultado atual do backtest</h3>
+  <div class="tbl-block" data-i18n-html="docs.231">
+    <table class="param-table">
+      <thead><tr><th>Temporada</th><th>Jogos</th><th>Log-loss</th><th>RPS</th><th>Acurácia</th></tr></thead>
+      <tbody>
+        <tr><td>2024</td><td>380</td><td>1,026</td><td>0,213</td><td>48,7%</td></tr>
+        <tr><td>2025</td><td>380</td><td>1,037</td><td>0,214</td><td>47,6%</td></tr>
+        <tr><td>2026 (até a rodada 28)</td><td>279</td><td>1,028</td><td>0,209</td><td>48,0%</td></tr>
+        <tr><td><strong>Modelo</strong></td><td><strong>1 039</strong></td><td><strong>1,031</strong></td><td><strong>0,212</strong></td><td><strong>48,1%</strong></td></tr>
+        <tr><td>Taxa-base fixa 47/27/26</td><td>1 039</td><td>1,058</td><td>0,222</td><td>47,1%</td></tr>
+      </tbody>
+    </table>
   </div>
 </div>
 
@@ -971,7 +987,7 @@ footer {
 
 <!-- ── Footer ── -->
 <footer data-i18n-html="docs.229">
-  <span>Sassamaru Docs v1.0 · Março 2026</span>
+  <span>Sassamaru Docs v1.1 · Outubro 2026</span>
   <span>Dixon &amp; Coles (1997) · Maher (1982) · Elo (1978) · Hvattum &amp; Arntzen (2010)</span>
 </footer>
 

@@ -11,13 +11,15 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="apple-mobile-web-app-title" content="BR26" />
+  <meta name="apple-mobile-web-app-title" content="Sassamaru" />
   <link rel="apple-touch-icon" href="../icons/icon-192.png" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
   <script src="../i18n/i18n.js"></script>
+  <link rel="stylesheet" href="../shell/shell.css"/>
+  <script src="../shell/shell.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
 <style>
@@ -123,7 +125,7 @@
 
   .pill.accent {
     background: var(--accent-lt);
-    border-color: #a7c7b5;
+    border-color: var(--s-accent-bd);
     color: var(--accent);
     font-weight: 500;
   }
@@ -147,7 +149,7 @@
 
   #upload-section.loaded {
     border-style: solid;
-    border-color: #a7c7b5;
+    border-color: var(--s-accent-bd);
     background: var(--accent-lt);
     padding: 14px 20px;
     cursor: default;
@@ -436,7 +438,7 @@
   }
 
   tbody tr:last-child { border-bottom: none; }
-  tbody tr:hover { background: #F9F8F5; }
+  tbody tr:hover { background: var(--s-sunk); }
 
   tbody td {
     padding: 10px 12px;
@@ -468,7 +470,7 @@
     font-size: 9.5px;
     font-family: var(--mono);
     color: var(--muted);
-    background: #EEECE7;
+    background: var(--s-chip);
     border-radius: 3px;
     padding: 1px 5px;
     margin-left: 4px;
@@ -491,8 +493,8 @@
     flex-shrink: 0;
   }
 
-  .prob-bar .seg-h  { background: #1A4731; }
-  .prob-bar .seg-d  { background: #C9C6BC; }
+  .prob-bar .seg-h  { background: var(--accent); }
+  .prob-bar .seg-d  { background: var(--s-line); }
   .prob-bar .seg-a  { background: #D97706; }
 
   .prob-nums {
@@ -516,8 +518,8 @@
   }
 
   .pick-tag.home { background: var(--accent-lt); color: var(--accent); }
-  .pick-tag.draw { background: #F0EEE8; color: #5A5750; }
-  .pick-tag.away { background: #FEF3C7; color: #92400E; }
+  .pick-tag.draw { background: var(--s-chip); color: var(--s-text2); }
+  .pick-tag.away { background: var(--s-warn-bg); color: var(--s-warn-fg); }
 
   .pick-odd {
     font-weight: 400;
@@ -525,7 +527,7 @@
   }
 
   /* ── Score grid (expandable) ── */
-  .score-row { display: none; background: #FAFAF8; }
+  .score-row { display: none; background: var(--s-sunk); }
   .score-row.open { display: table-row; }
 
   .score-row td {
@@ -563,7 +565,7 @@
   }
 
   .score-grid th {
-    background: #F0EEE8;
+    background: var(--s-chip);
     color: var(--muted);
     font-weight: 500;
     font-size: 9.5px;
@@ -50324,11 +50326,11 @@ Espanha vs Portugal"></textarea>
       if (d.t==='empty') return `<div class="val-dot"></div>`;
       if (d.t==='err')   return `<div class="val-dot" style="color:#991B1B">✕</div>`;
       if (d.t==='warn')  return `<div class="val-dot" style="color:#D97706">⚠</div>`;
-      return `<div class="val-dot" style="color:#1A4731">✓</div>`;
+      return `<div class="val-dot" style="color:var(--accent)">✓</div>`;
     }).join('');
 
     const parts = [];
-    if (ok)   parts.push(`<span style="color:#1A4731">${_t('{n} ok', { n: ok })}</span>`);
+    if (ok)   parts.push(`<span style="color:var(--accent)">${_t('{n} ok', { n: ok })}</span>`);
     if (warn) parts.push(`<span style="color:#D97706">${warn} ⚠</span>`);
     if (err)  parts.push(`<span style="color:#991B1B">${_t('{n} erro', { n: err })}</span>`);
     document.getElementById('val-summary').innerHTML = parts.join(' · ');
@@ -50468,8 +50470,8 @@ Espanha vs Portugal"></textarea>
         <div class="sc-label">Partidas</div>
         <div class="sc-val">${total}</div>
         <div class="sc-sub">
-          <span style="color:#1A4731">${_t('{n}C@@casa', { n: homes })}</span> ·
-          <span style="color:#7A786F">${_t('{n}E@@empate', { n: draws })}</span> ·
+          <span style="color:var(--accent)">${_t('{n}C@@casa', { n: homes })}</span> ·
+          <span style="color:var(--muted)">${_t('{n}E@@empate', { n: draws })}</span> ·
           <span style="color:#D97706">${_t('{n}F@@fora', { n: aways })}</span>
         </div>
       </div>

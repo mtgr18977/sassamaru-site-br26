@@ -11,7 +11,7 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="apple-mobile-web-app-title" content="BR26" />
+  <meta name="apple-mobile-web-app-title" content="Sassamaru" />
   <link rel="apple-touch-icon" href="../icons/icon-192.png" />
 
   <!-- CSV parser (CDN) -->
@@ -19,8 +19,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
   <script src="../i18n/i18n.js"></script>
+  <link rel="stylesheet" href="../shell/shell.css"/>
+  <script src="../shell/shell.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script src="../modelos/model.js"></script>
+  <script src="../modelos/competicoes.js"></script>
+  <script src="../datasets/calendario.js"></script>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -209,13 +213,13 @@
     }
     .pill.accent {
       background: var(--accent-lt);
-      border-color: #a7c7b5;
+      border-color: var(--s-accent-bd);
       color: var(--accent);
       font-weight: 500;
     }
     .pill.danger {
       background: var(--bad-lt);
-      border-color: #fca5a5;
+      border-color: var(--s-bad-bd);
       color: var(--bad);
     }
 
@@ -255,7 +259,7 @@
       letter-spacing: .07em;
       text-transform: uppercase;
       color: var(--muted);
-      background: #F9F8F5;
+      background: var(--s-sunk);
       padding: 9px 10px;
       border-bottom: 1px solid var(--border);
       white-space: nowrap;
@@ -269,7 +273,7 @@
       vertical-align: middle;
     }
     tbody tr:last-child td { border-bottom: none; }
-    tbody tr:hover td { background: #F9F8F5; }
+    tbody tr:hover td { background: var(--s-sunk); }
 
     .num  { font-family: var(--mono); text-align: right; }
 
@@ -286,7 +290,7 @@
       white-space: nowrap;
     }
     .tag.home { background: var(--accent-lt); color: var(--accent); }
-    .tag.draw { background: #F0EEE8; color: #5A5750; }
+    .tag.draw { background: var(--s-chip); color: var(--s-text2); }
     .tag.away { background: var(--warn-lt); color: var(--warn); }
     .odd-inline { font-weight: 400; opacity: .7; }
 
@@ -307,8 +311,8 @@
       border-radius: 3px; overflow: hidden;
       margin-bottom: 3px;
     }
-    .prob-h { background: #1A4731; }
-    .prob-d { background: #C9C6BC; }
+    .prob-h { background: var(--accent); }
+    .prob-d { background: var(--s-line); }
     .prob-a { background: #D97706; }
     .prob-labels {
       display: flex; justify-content: space-between;
@@ -317,9 +321,9 @@
 
     /* ── Expandable score row ── */
     tr.match-row { cursor: pointer; }
-    tr.match-row:hover td { background: #F9F8F5; }
+    tr.match-row:hover td { background: var(--s-sunk); }
     tr.match-row.open td  { background: var(--accent-lt); }
-    tr.detail-row td { padding: 0; border-bottom: 1px solid var(--border); background: #FAFAF8; }
+    tr.detail-row td { padding: 0; border-bottom: 1px solid var(--border); background: var(--s-sunk); }
 
     .detail-panel {
       padding: 16px 14px;
@@ -337,7 +341,7 @@
       font-family: var(--mono);
     }
     .score-matrix th {
-      background: #F0EEE8;
+      background: var(--s-chip);
       color: var(--muted);
       font-weight: 500;
       padding: 3px 6px;
@@ -380,8 +384,8 @@
     .di-bar-lbl { font-size: 11px; color: var(--muted); width: 90px; flex-shrink: 0; }
     .pct-bar-bg  { flex: 1; background: var(--border); border-radius: 3px; height: 6px; overflow: hidden; }
     .pct-bar-fill { height: 6px; border-radius: 3px; }
-    .pct-bar-home { background: #1A4731; }
-    .pct-bar-draw { background: #C9C6BC; }
+    .pct-bar-home { background: var(--accent); }
+    .pct-bar-draw { background: var(--s-line); }
     .pct-bar-away { background: #D97706; }
     .di-bar-val { font-family: var(--mono); font-size: 11px; width: 38px; text-align: right; }
 
@@ -423,11 +427,11 @@
       border-radius: 3px; overflow: hidden;
       margin: 6px 0 5px; gap: 1px;
     }
-    .s-dist-h { background: #1A4731; }
-    .s-dist-d { background: #C9C6BC; }
+    .s-dist-h { background: var(--accent); }
+    .s-dist-d { background: var(--s-line); }
     .s-dist-a { background: #D97706; }
     .s-dist-legend { display: flex; gap: 12px; font-size: 11px; font-family: var(--mono); }
-    .s-dist-legend .dh { color: #1A4731; font-weight: 600; }
+    .s-dist-legend .dh { color: var(--accent); font-weight: 600; }
     .s-dist-legend .dd { color: #7A786F; font-weight: 600; }
     .s-dist-legend .da { color: #D97706; font-weight: 600; }
 
@@ -484,7 +488,7 @@
       display: flex; align-items: center; gap: 6px;
     }
     .cfg-group-title::after {
-      content: ''; flex: 1; height: 1px; background: #a7c7b5;
+      content: ''; flex: 1; height: 1px; background: var(--s-accent-bd);
     }
     .cfg-row {
       display: flex; justify-content: space-between; align-items: baseline;
@@ -527,10 +531,10 @@
     .val-line.err  .val-icon { color: var(--bad);  }
     .val-teams { display: flex; align-items: center; gap: 5px; flex: 1; flex-wrap: wrap; }
     .val-team  { font-weight: 500; font-size: 12px; }
-    .val-team.unknown { text-decoration: underline wavy #D97706; color: #92400E; }
+    .val-team.unknown { text-decoration: underline wavy #D97706; color: var(--s-warn-fg); }
     .val-sep   { color: var(--muted); font-size: 11px; }
     .val-msg   { font-size: 10.5px; color: var(--muted); font-family: var(--mono); }
-    .warn-msg  { color: #92400E; }
+    .warn-msg  { color: var(--s-warn-fg); }
     #valSummary { font-family: var(--mono); font-size: 11px; color: var(--muted); }
     .val-summary-ok  { color: var(--good); font-weight: 500; }
     .val-summary-wrn { color: var(--warn); font-weight: 500; }
@@ -586,8 +590,8 @@
     .mc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     .mc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 10px; margin-top: 14px; }
     .mc-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; }
-    .mc-card-title { border-color: #a7c7b5; background: var(--accent-lt); }
-    .mc-card-rel   { border-color: #fca5a5; background: var(--bad-lt); }
+    .mc-card-title { border-color: var(--s-accent-bd); background: var(--accent-lt); }
+    .mc-card-rel   { border-color: var(--s-bad-bd); background: var(--bad-lt); }
     .mc-pos  { font-size: 10px; color: var(--muted); margin-bottom: 4px; }
     .mc-team { font-size: 12px; font-weight: 600; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .mc-row { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; font-size: 10.5px; }
@@ -599,7 +603,7 @@
     .mc-bar-rel { background: var(--bad); }
     .mc-pct { font-family: var(--mono); font-size: 10px; font-weight: 600; min-width: 38px; text-align: right; }
     .mc-pct-t   { color: var(--good); }
-    .mc-pct-g4  { color: #2e7d32; }
+    .mc-pct-g4  { color: var(--s-ok-fg); }
     .mc-pct-rel { color: var(--bad); }
     .mc-note { font-size: 10.5px; color: var(--muted); margin-top: 10px; line-height: 1.5; }
 
@@ -619,9 +623,9 @@
       font-family: var(--mono); font-size: 10.5px;
       padding: 3px 9px; border-radius: 99px; border: 1px solid var(--border);
     }
-    .elo-hi { border-color: #a7c7b5; color: var(--accent); background: var(--accent-lt); }
-    .elo-lo { border-color: #fca5a5; color: var(--bad); background: var(--bad-lt); }
-    .elo-md { border-color: #fcd34d; color: #92400E; background: var(--warn-lt); }
+    .elo-hi { border-color: var(--s-accent-bd); color: var(--accent); background: var(--accent-lt); }
+    .elo-lo { border-color: var(--s-bad-bd); color: var(--bad); background: var(--bad-lt); }
+    .elo-md { border-color: var(--s-warn-bd); color: var(--s-warn-fg); background: var(--warn-lt); }
 
     .cmp-section {
       font-size: 10px; color: var(--muted); text-transform: uppercase;
@@ -631,7 +635,7 @@
     .bar-lbl { font-size: 11px; color: var(--muted); width: 116px; flex-shrink: 0; }
     .bar-bg  { flex: 1; background: var(--border); border-radius: 3px; height: 6px; overflow: hidden; }
     .bar-fill { height: 6px; border-radius: 3px; transition: width .3s; }
-    .bar-atk { background: #1A4731; }
+    .bar-atk { background: var(--accent); }
     .bar-def { background: #2563EB; }
     .bar-val { font-family: var(--mono); font-size: 11px; width: 32px; text-align: right; }
 
@@ -640,9 +644,9 @@
       font-size: 10px; font-weight: 600; padding: 2px 7px;
       border-radius: 99px;
     }
-    .fp-v { background: var(--accent-lt); color: var(--accent); border: 1px solid #a7c7b5; }
-    .fp-e { background: #F0EEE8; color: #5A5750; border: 1px solid var(--border); }
-    .fp-d { background: var(--bad-lt); color: var(--bad); border: 1px solid #fca5a5; }
+    .fp-v { background: var(--accent-lt); color: var(--accent); border: 1px solid var(--s-accent-bd); }
+    .fp-e { background: var(--s-chip); color: var(--s-text2); border: 1px solid var(--border); }
+    .fp-d { background: var(--bad-lt); color: var(--bad); border: 1px solid var(--s-bad-bd); }
 
     .form-avg { font-size: 11px; color: var(--muted); margin-top: 6px; display: flex; gap: 14px; }
     .form-avg span b { color: var(--text); }
@@ -671,7 +675,41 @@
     .cmp-table tr:last-child td { border-bottom: none; }
     .val-better { color: var(--good); font-weight: 700; }
     .val-worse  { color: var(--bad); }
-  </style>
+  
+    /* ── Calendário da rodada + seletor de competição ── */
+    [hidden] { display: none !important; }
+    .cal { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; margin-bottom: 18px; }
+    .cal-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 18px; align-items: stretch; }
+    .cal-main .eyebrow { font: 500 10.5px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+    .cal-main .big { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin: 4px 0 2px; }
+    .cal-main .big b { font-size: 30px; letter-spacing: -1px; line-height: 1.1; }
+    .cal-main .count { font: 500 13px var(--mono); padding: 3px 10px; border-radius: 99px; background: var(--accent-lt); color: var(--accent); }
+    .cal-main .count.now { background: #D4AF37; color: #1b1b12; }
+    .cal-main .sub { font-size: 13px; color: var(--muted); }
+    .cal-side { border-left: 1px solid var(--border); padding-left: 18px; display: grid; gap: 10px; align-content: center; }
+    .cal-side .k { font: 500 10px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+    .cal-side .v { font-size: 14px; font-weight: 600; }
+    .cal-side .v small { font-weight: 400; color: var(--muted); font-size: 12px; }
+    .cal-strip { display: grid; grid-template-columns: repeat(38, 1fr); gap: 2px; margin-top: 16px; }
+    .cal-strip i { height: 10px; border-radius: 2px; background: var(--accent); opacity: .85; }
+    .cal-strip i.now { background: #D4AF37; opacity: 1; box-shadow: 0 0 0 2px rgba(212,175,55,.35); }
+    .cal-strip i.conf { background: var(--s-line); opacity: 1; }
+    .cal-strip i.prov { background: transparent; border: 1px dashed var(--s-line); }
+    .cal-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 8px; font: 400 10.5px var(--mono); color: var(--muted); }
+    .cal-legend span::before { content: ''; display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; background: var(--accent); }
+    .cal-legend .l-now::before { background: #D4AF37; }
+    .cal-legend .l-conf::before { background: var(--s-line); }
+    .cal-legend .l-prov::before { background: transparent; border: 1px dashed var(--s-line); }
+    .cal-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+    .cal-note { font-size: 11.5px; color: var(--muted); margin-top: 10px; }
+    .cal-note.warn { color: var(--s-warn-fg); }
+    .sem-dados { margin-bottom: 18px; border-style: dashed; }
+    .sem-dados h3 { font-size: 15px; margin-bottom: 6px; }
+    .sem-dados p, .sem-dados li { font-size: 13px; color: var(--muted); }
+    .sem-dados ol { margin: 8px 0 0 18px; display: grid; gap: 4px; }
+    .sem-dados code { font-family: var(--mono); font-size: 11.5px; background: var(--s-chip); padding: 1px 5px; border-radius: 3px; }
+    @media (max-width: 720px) { .cal-grid { grid-template-columns: 1fr; } .cal-side { border-left: 0; border-top: 1px solid var(--border); padding: 12px 0 0; } }
+</style>
 <script>window.__EMBEDDED_CSV__ = `ID,rodata,mandante,visitante,vencedor,mandante_Placar,visitante_Placar
 1,1.0,Guarani,Vasco,Guarani,4,2
 2,1.0,Athletico-PR,Gremio,Athletico-PR,2,0
@@ -10113,7 +10151,9 @@
 9439,28.0,Flamengo,Bragantino,Flamengo,2,1
 9440,28.0,Athletico Paranaense,Bahia,Athletico Paranaense,2,1
 9441,4.0,Flamengo,Mirassol,Flamengo,2,0
-9442,21.0,Botafogo,Grêmio,Botafogo,3,2`;</script>
+9442,21.0,Botafogo,Grêmio,Botafogo,3,2
+9443,21.0,São Paulo,Santos,Santos,1,2
+9444,21.0,Atlético Mineiro,Bragantino,Atlético Mineiro,1,0`;</script>
 </head>
 
 <body>
@@ -10134,6 +10174,10 @@
       </div>
     </header>
 
+    <!-- Calendário: qual rodada é a de hoje (dia do dispositivo) -->
+    <section class="cal" id="calCard" aria-live="polite" hidden></section>
+    <div class="card sem-dados" id="semDados" hidden></div>
+
     <!-- Config colapsável -->
     <details class="cfg-details" id="cfgDetails">
       <summary>▸ Parâmetros do modelo</summary>
@@ -10144,16 +10188,7 @@
       <div class="card">
         <label for="fixtures">Rodada (uma por linha — Mandante x Visitante)</label>
         <div style="position:relative;">
-          <textarea id="fixtures" spellcheck="false">mirassol x santos
-atletico-mg x internacional
-bahia x vitoria
-flamengo x cruzeiro
-corinthians x coritiba
-remo x fluminense
-vasco x palmeiras
-sao paulo x chapecoense
-gremio x bragantino
-athletico-pr x botafogo</textarea>
+          <textarea id="fixtures" spellcheck="false" placeholder="Mandante x Visitante — um jogo por linha"></textarea>
         </div>
 
         <div id="validationPanel" style="display:none;margin-top:8px;">
@@ -10434,8 +10469,8 @@ function probBar(pH, pD, pA){
     +'<div class="prob-a" style="flex:'+pA+'"></div>'
     +'</div>'
     +'<div class="prob-labels">'
-    +'<span style="color:#1A4731">'+h+'%</span>'
-    +'<span style="color:#7A786F">'+d+'%</span>'
+    +'<span style="color:var(--accent)">'+h+'%</span>'
+    +'<span style="color:var(--muted)">'+d+'%</span>'
     +'<span style="color:#D97706">'+a+'%</span>'
     +'</div></div>';
 }
@@ -10554,7 +10589,7 @@ function renderSummary(results){
   mEl.innerHTML =
     '<div class="s-metric"><div class="s-metric-lbl">Confiança média</div><div class="s-metric-val">'+(avgConf*100).toFixed(0)+'%</div><div class="s-metric-sub">probabilidade máxima<br>média por jogo</div></div>'
     +'<div class="s-metric"><div class="s-metric-lbl">λ médio</div><div class="s-metric-val">'+avgLam.toFixed(2)+'</div><div class="s-metric-sub">gols esperados<br>por time</div></div>'
-    +'<div class="s-metric"><div class="s-metric-lbl">Jogos na rodada</div><div class="s-metric-val">'+n+'</div><div class="s-metric-sub"><span style="color:#1A4731;">'+_t('{n} casa',{n:countH})+'</span> · <span style="color:#7A786F;">'+_t('{n} empate',{n:countD})+'</span> · <span style="color:#D97706;">'+_t('{n} fora',{n:countA})+'</span></div></div>'
+    +'<div class="s-metric"><div class="s-metric-lbl">Jogos na rodada</div><div class="s-metric-val">'+n+'</div><div class="s-metric-sub"><span style="color:var(--accent);">'+_t('{n} casa',{n:countH})+'</span> · <span style="color:var(--muted);">'+_t('{n} empate',{n:countD})+'</span> · <span style="color:#D97706;">'+_t('{n} fora',{n:countA})+'</span></div></div>'
     +'<div class="s-metric"><div class="s-metric-lbl">Distribuição H / D / A</div><div class="s-dist-bar"><div class="s-dist-h" style="flex:'+countH+'"></div><div class="s-dist-d" style="flex:'+countD+'"></div><div class="s-dist-a" style="flex:'+countA+'"></div></div><div class="s-dist-legend"><span class="dh">'+_t('{n} Casa',{n:countH})+'</span><span class="dd">'+_t('{n} Empate',{n:countD})+'</span><span class="da">'+_t('{n} Fora',{n:countA})+'</span></div></div>';
   function hlCard(r,conf,label,fillClass){ return '<div class="s-hl"><div class="s-hl-lbl">'+label+'</div><div class="s-hl-match">'+displayName(r.home)+' × '+displayName(r.away)+'</div><div class="s-hl-pick">'+pickTag(r,conf)+'</div><div class="s-conf-track"><div class="s-conf-fill '+fillClass+'" style="width:'+(conf*100).toFixed(0)+'%"></div></div><div class="s-conf-pct">'+_t('{p}% de confiança',{p:(conf*100).toFixed(1)})+'</div></div>'; }
   hlEl.innerHTML = hlCard(best,bestConf,"Palpite mais confiante","hi")+hlCard(worst,worstConf,"Jogo mais incerto","lo");
@@ -10822,8 +10857,8 @@ function buildCalibrationPlot(bins) {
 
   // Eixos
   const axes = `
-    <line x1="${PAD}" y1="${PAD}" x2="${PAD}" y2="${PAD+iH}" stroke="#E2E0D9" stroke-width="1"/>
-    <line x1="${PAD}" y1="${PAD+iH}" x2="${PAD+iW}" y2="${PAD+iH}" stroke="#E2E0D9" stroke-width="1"/>`;
+    <line x1="${PAD}" y1="${PAD}" x2="${PAD}" y2="${PAD+iH}" stroke="var(--border)" stroke-width="1"/>
+    <line x1="${PAD}" y1="${PAD+iH}" x2="${PAD+iW}" y2="${PAD+iH}" stroke="var(--border)" stroke-width="1"/>`;
 
   // Labels eixos
   const xLabels = [0, 0.25, 0.5, 0.75, 1.0].map(v => {
@@ -11187,11 +11222,134 @@ function renderConfig(){
     + `</div>`;
 }
 
+
+// ── Competição + calendário ────────────────────────────────────────────────
+const Comp = window.Competicoes;
+const COMP = Comp.obter(new URLSearchParams(location.search).get('comp') || Comp.PADRAO);
+CONFIG.TRAIN_FROM_SEASON = Comp.indiceTreino(COMP);
+document.querySelector('header h1').textContent = _t('Previsão de rodada · {nome}', { nome: COMP.nome });
+const LOC = (window.I18N && I18N.LANGS[I18N.lang].locale) || 'pt-BR';
+const CAL = COMP.calendario ? (window.CALENDARIOS || {})[COMP.calendario] : null;
+
+
+const fmtCurto = (s) => Comp.dia(s).toLocaleDateString(LOC, { day: 'numeric', month: 'short' });
+const fmtLongo = (s) => Comp.dia(s).toLocaleDateString(LOC, { weekday: 'long', day: 'numeric', month: 'long' });
+function fmtFaixa(r) {
+  if (!r) return '—';
+  if (r.inicioStr === r.fimStr) return fmtLongo(r.inicioStr);
+  const a = Comp.dia(r.inicioStr), b = Comp.dia(r.fimStr);
+  try { return new Intl.DateTimeFormat(LOC, { day: 'numeric', month: 'short' }).formatRange(a, b); }
+  catch (e) { return fmtCurto(r.inicioStr) + ' – ' + fmtCurto(r.fimStr); }
+}
+function fmtDias(d) {
+  if (d === 0) return _t('hoje@@cal');
+  if (d === 1) return _t('amanhã@@cal');
+  return _t('em {n} dias', { n: d });
+}
+
+function renderCalendario() {
+  const card = $("calCard");
+  if (!CAL) { card.hidden = true; return; }
+  const st = Comp.statusCalendario(CAL, new Date());
+  const foco = st.foco;
+  let titulo, sub, count, agora = false;
+  if (st.estado === 'em-andamento') {
+    titulo = _t('Rodada {n}', { n: foco.n }); agora = true;
+    count = _t('acontecendo agora');
+    sub = _t('{faixa} · termina {quando}', { faixa: fmtFaixa(foco), quando: st.diasParaFimAtual === 0 ? _t('hoje@@cal') : fmtDias(st.diasParaFimAtual) });
+  } else if (foco) {
+    titulo = _t('Rodada {n}', { n: foco.n });
+    count = fmtDias(st.diasAteFoco);
+    sub = _t('começa {dia}', { dia: fmtLongo(foco.inicioStr) }) + (foco.fimStr !== foco.inicioStr ? ' · ' + _t('termina {dia}', { dia: fmtLongo(foco.fimStr) }) : '');
+  } else if (st.estado === 'sem-calendario') {
+    titulo = _t('Sem datas para as próximas rodadas'); count = '';
+    sub = _t('O calendário do app vai até a rodada {n}; as datas seguintes ainda não foram divulgadas.', { n: st.ultima ? st.ultima.n : '—' });
+  } else {
+    titulo = _t('Temporada encerrada'); count = ''; sub = _t('Não há mais rodadas no calendário.');
+  }
+
+  // painel lateral: próxima rodada (se já há uma em andamento) e última encerrada
+  const lado = [];
+  const prox = st.estado === 'em-andamento' ? st.proxima : null;
+  if (prox) lado.push([_t('Próxima rodada'), `${prox.n} <small>· ${fmtFaixa(prox)} · ${fmtDias(st.diasAteProxima)}</small>`]);
+  if (st.ultima) lado.push([_t('Última rodada encerrada'), `${st.ultima.n} <small>· ${fmtFaixa(st.ultima)}</small>`]);
+  lado.push([_t('Hoje (seu dispositivo)'), `<small>${new Date().toLocaleDateString(LOC, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</small>`]);
+  lado.push([_t('Dados do modelo'), `<span id="calDados"><small>…</small></span>`]);
+
+  // faixa das 38 rodadas
+  const strip = CAL.rodadas.map(r => {
+    const cls = foco && r.n === foco.n && st.estado === 'em-andamento' ? 'now'
+      : foco && r.n === foco.n ? 'now'
+      : r.status === 'concluida' ? '' : r.status === 'confirmada' ? 'conf' : 'prov';
+    const datas = r.inicio ? (r.inicio === r.fim ? fmtCurto(r.inicio) : fmtCurto(r.inicio) + ' – ' + fmtCurto(r.fim)) : '';
+    return `<i class="${cls}" title="${_t('Rodada {n}', { n: r.n })}${datas ? ' · ' + datas : ''}"></i>`;
+  }).join('');
+
+  const jogos = foco ? Comp.jogosDaRodada(CAL, foco.n) : [];
+  const pend = CAL.pendentes || [];
+  const provisorio = foco && foco.status === 'provisoria';
+  const atualizado = Comp.dia(CAL.atualizadoEm);
+  const velho = Comp.diasEntre(atualizado, st.hoje) > 21;
+
+  card.innerHTML =
+    `<div class="cal-grid"><div class="cal-main">`
+    + `<div class="eyebrow">${st.estado === 'em-andamento' ? _t('Rodada atual') : _t('Próxima rodada')} · ${COMP.nome} ${CAL.temporada}</div>`
+    + `<div class="big"><b>${titulo}</b>${count ? `<span class="count${agora ? ' now' : ''}">${count}</span>` : ''}</div>`
+    + `<div class="sub">${sub}</div>`
+    + `<div class="cal-actions">`
+    + (jogos.length ? `<button type="button" id="calLoad">${_t('Simular os {n} jogos da rodada {r}', { n: jogos.length, r: foco.n })}</button>` : '')
+    + `</div></div>`
+    + `<div class="cal-side">${lado.map(([k, v]) => `<div><div class="k">${k}</div><div class="v">${v}</div></div>`).join('')}</div></div>`
+    + `<div class="cal-strip" aria-label="${_t('Rodadas da temporada')}">${strip}</div>`
+    + `<div class="cal-legend"><span>${_t('disputada@@cal')}</span><span class="l-now">${_t('em foco@@cal')}</span><span class="l-conf">${_t('confirmada pela CBF')}</span><span class="l-prov">${_t('data provisória')}</span></div>`
+    + (pend.length ? `<div class="cal-note">${_t('Jogo atrasado da {r}ª rodada ainda sem data: {jogos}.', { r: pend[0].rodada, jogos: pend.map(p => displayName(normalizeTeam(p.mandante)) + ' × ' + displayName(normalizeTeam(p.visitante))).join(', ') })}</div>` : '')
+    + `<div class="cal-note${provisorio || velho ? ' warn' : ''}">`
+    + _t('Calendário atualizado em {data}. Fonte: {fonte}.', { data: Comp.dia(CAL.atualizadoEm).toLocaleDateString(LOC, { day: 'numeric', month: 'long' }), fonte: CAL.fonte })
+    + (provisorio ? ' ' + _t('As datas desta rodada ainda são provisórias.') : '')
+    + (velho ? ' ' + _t('Faz mais de 3 semanas — as datas podem ter mudado.') : '')
+    + `</div>`
+    + (foco && !jogos.length ? `<div class="cal-note warn">${_t('Os jogos da rodada {n} ainda não estão no calendário do app — cole-os no campo abaixo (um por linha).', { n: foco.n })}</div>` : '')
+    + (COMP.rodadasSinteticas ? `<div class="cal-note warn">${_t('Dados da {nome}: temporadas {de}–{ate} (Wikipedia; a de {ate} está em andamento, só com os jogos já disputados). A fonte não traz datas, então a ordem dos jogos dentro de cada temporada é sintética — resultados e mandos são reais.', { nome: COMP.nome, de: COMP.primeiraTemporadaNoCsv, ate: COMP.ultimaTemporadaNoCsv })}</div>` : '');
+  card.hidden = false;
+
+  // o campo de jogos já vem com a rodada em foco (a atual, ou a próxima se hoje não há rodada)
+  const campo = $("fixtures");
+  campo.value = jogos.map(j => `${j.mandante} x ${j.visitante}`).join("\n");
+  if (foco) $("upcomingRound").value = foco.n;
+  campo.dispatchEvent(new Event('input', { bubbles: true }));
+
+  const btn = $("calLoad");
+  if (btn) btn.addEventListener('click', () => {
+    if (!runBtn.disabled) runBtn.click();
+  });
+}
+
+function mostrarSemDados() {
+  const box = $("semDados");
+  box.innerHTML =
+    `<h3>${_t('Os dados da {nome} ainda não foram importados', { nome: COMP.nome })}</h3>`
+    + `<p>${_t('O modelo já está preparado para a {nome} (a partir de {ano}, 20 clubes, 38 rodadas), mas o arquivo de resultados ainda não existe.', { nome: COMP.nome, ano: COMP.pontosCorridosDesde })}</p>`
+    + `<ol><li>${_t('Reúna os resultados em um CSV com uma linha por jogo, em ordem cronológica.')}</li>`
+    + `<li>${_t('Converta e valide: {cmd}', { cmd: '<code>python scripts/dados_serie.py converter …</code>' })}</li>`
+    + `<li>${_t('Salve o resultado como {arq} e troque {flag} em {arq2}.', { arq: `<code>${COMP.csv}</code>`, flag: '<code>dados: \'pendente\'</code>', arq2: '<code>modelos/competicoes.js</code>' })}</li></ol>`;
+  box.hidden = false;
+  // sem dados não há o que simular: esconde tudo que vem depois do aviso (menos rodapé/scripts)
+  for (let el = box.nextElementSibling; el; el = el.nextElementSibling) {
+    if (!['FOOTER', 'SCRIPT'].includes(el.tagName)) el.hidden = true;
+  }
+}
+
 async function loadCSV(){
+  renderCalendario();
+  if (COMP.dados === 'pendente') {
+    setModelPill(_t('Sem dados da {nome}', { nome: COMP.nome }), "danger");
+    mostrarSemDados();
+    return;
+  }
   renderConfig();
   setModelPill("Carregando dataset…");
   setStatus(_t('Carregando <b>{path}</b>…', { path: CONFIG.CSV_PATH }));
-  const text = window.__EMBEDDED_CSV__ || await fetch(CONFIG.CSV_PATH, {cache:"no-store"}).then(r => {
+  const text = (COMP.dados === 'embutido' && window.__EMBEDDED_CSV__) || await fetch("../" + COMP.csv, {cache:"no-store"}).then(r => {
     if (!r.ok) throw new Error(_t('Falha ao carregar CSV ({status}).', { status: r.status }));
     return r.text();
   });
@@ -11216,6 +11374,11 @@ async function loadCSV(){
     recent.get(away).push({gf:ag,ga:hg});
   }
   window.__BENCH_RECENT__ = recent;
+  // nomes de clubes que não estão em DISPLAY_NAMES (Série B…) aparecem como no dataset, com acento e hífen
+  for (const r of parsed) for (const col of [CONFIG.HOME_TEAM_COL, CONFIG.AWAY_TEAM_COL]) {
+    const raw = (r[col] || '').trim(), n = normalizeTeam(raw);
+    if (n && !DISPLAY_NAMES[n]) DISPLAY_NAMES[n] = raw;
+  }
 
   _rawParsed = parsed;
 
@@ -11246,6 +11409,9 @@ async function loadCSV(){
   } catch (e) {
     console.warn("Não foi possível pré-preencher os jogos restantes:", e.message);
   }
+  const cd = document.getElementById("calDados");
+  if (cd) { try { const stt = computeSeasonState(parsed); const jj = COMP.nTimes * (COMP.nTimes - 1) - stt.remaining.length;
+      cd.innerHTML = `<small>${COMP.rodadasSinteticas ? _t('{j} jogos em {t} (rodadas sintéticas)', { j: jj, t: CAL ? CAL.temporada : '' }) : _t('até a rodada {r} · {j} jogos em {t}', { r: stt.roundsPlayed, j: jj, t: CAL ? CAL.temporada : '' })}</small>`; } catch (e) { cd.innerHTML = '<small>—</small>'; } }
   runValidation();
   setModelPill(_t('Modelo pronto • {n} times', { n: MODEL.teamCount }), "");
   metaEl.textContent = _t('dataset: {g} jogos • {s} temporadas • build: {ms} ms', { g: MODEL.parsedCount, s: MODEL.seasonCount, ms: (t1-t0).toFixed(0) });

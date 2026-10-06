@@ -1,0 +1,125 @@
+/* Sassamaru 2026 — identidade visual compartilhada + tema claro/escuro.
+ * Tokens `--s-*` são usados pelas páginas no lugar de cores fixas; o tema escuro (html[data-theme="dark"])
+ * sobrescreve tanto eles quanto os tokens de cada página (--bg, --surface, --accent…). */
+:root {
+  --s-sunk:#F9F8F5; --s-chip:#F0EEE8; --s-line:#C9C6BC; --s-text2:#5A5750; --s-faint:#9A9892;
+  --s-accent-bd:#A7C7B5; --s-accent-fg2:#1A3D2B; --accent-2:#2D6E4E;
+  --s-bad-bd:#FCA5A5; --s-bad-bg:#FEE2E2; --s-bad-fg:#991B1B;
+  --s-warn-bd:#FCD34D; --s-warn-bg:#FEF3C7; --s-warn-fg:#92400E;
+  --s-blue-bg:#EFF6FF; --s-blue-fg:#1E40AF; --s-blue-bd:#BFDBFE;
+  --s-ok-bd:#86EFAC; --s-ok-bg:#D1FAE5; --s-ok-fg:#065F46;
+  --app-green:#1A4731;
+}
+/* tokens comuns a todas as abas (html:root vence o :root de cada página) */
+html:root { --radius: 8px; --muted: #6B695F; }
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --bg:#0E1210; --surface:#161C18; --border:#2A332D; --text:#E8EBE6; --muted:#9AA39B;
+  --accent:#35906A; --accent-lt:#17281F; --accent-2:#2F7D57; --gold-lt:#2A2410;
+  --lib:#3DA678; --lib-lt:#17281F; --sul:#8FA9F0; --sul-lt:#172036; --rel:#F08A8A; --rel-lt:#301A1A;
+  --warn:#E8A33D; --warn-lt:#2E2511; --bad:#F08A8A; --bad-lt:#301A1A; --err:#F08A8A; --err-lt:#301A1A;
+  --blue:#8FA9F0; --blue-lt:#172036; --orange:#E08A3C; --orange-lt:#2E2511;
+  --red:#F08A8A; --red-lt:#301A1A; --green:#4FC983; --green-lt:#14291D;
+  --good:#4FC983; --shadow:0 1px 3px rgba(0,0,0,.5);
+  --s-sunk:#1B221D; --s-chip:#222B25; --s-line:#3A453D; --s-text2:#B5BDB6; --s-faint:#6E776F;
+  --s-accent-bd:#2F5E45; --s-accent-fg2:#A9E0C2;
+  --s-bad-bd:#7A3535; --s-bad-bg:#301A1A; --s-bad-fg:#F08A8A;
+  --s-warn-bd:#7A5C1B; --s-warn-bg:#2E2511; --s-warn-fg:#F2C46B;
+  --s-blue-bg:#172036; --s-blue-fg:#8FA9F0; --s-blue-bd:#2D4272;
+  --s-ok-bd:#2F6B45; --s-ok-bg:#14291D; --s-ok-fg:#6EDB9B;
+  --app-green:#12261B;
+}
+html[data-theme="dark"] img.invert-dark { filter: invert(1) hue-rotate(180deg); }
+html[data-theme="dark"] ::selection { background: #2F5E45; color: #fff; }
+html { transition: background-color .2s; }
+
+/* cabeçalho, pílulas e rodapé iguais em todas as páginas */
+body { background: var(--bg); color: var(--text); font-family: var(--sans, 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif); }
+body header { padding: 26px 0 20px; margin-bottom: 28px; border-bottom: 1px solid var(--border); }
+body header .brand-text h1 { font-size: 22px; font-weight: 600; letter-spacing: -.5px; line-height: 1.15; }
+body header .brand-text p { font: 400 12px/1.4 var(--mono, 'IBM Plex Mono', ui-monospace, monospace); color: var(--muted); margin-top: 3px; }
+body .pill { font: 400 11px/1.3 var(--mono, 'IBM Plex Mono', ui-monospace, monospace); padding: 4px 10px; border-radius: 99px;
+  border: 1px solid var(--border); color: var(--muted); background: var(--surface); }
+body .pill.accent { background: var(--accent-lt); border-color: var(--s-accent-bd); color: var(--accent); font-weight: 500; }
+body footer { border-top: 1px solid var(--border); color: var(--muted); font: 400 11px var(--mono, 'IBM Plex Mono', ui-monospace, monospace); }
+html:not([data-page="docs"]) body .page, html:not([data-page="docs"]) body .wrap { max-width: 1080px; }
+html[data-page="docs"] body .page { max-width: 760px; }
+body .page, body .wrap { padding-left: 20px; padding-right: 20px; }
+
+/* ── barra de aplicativo (abas no topo) ── */
+:root { --app-bar-h: 52px; }
+html { -webkit-tap-highlight-color: transparent; }
+body { overscroll-behavior-y: none; }
+
+.app-bar {
+  position: sticky; top: 0; z-index: 1000;
+  background: var(--app-green); color: #fff;
+  padding-top: env(safe-area-inset-top);
+  box-shadow: 0 1px 0 rgba(0,0,0,.25), 0 2px 10px rgba(0,0,0,.12);
+  font-family: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+  -webkit-user-select: none; user-select: none;
+}
+.app-bar-in {
+  max-width: 1180px; margin: 0 auto; min-height: var(--app-bar-h);
+  display: flex; align-items: center; gap: 14px;
+  padding: 0 max(16px, env(safe-area-inset-left)) 0 max(16px, env(safe-area-inset-right));
+}
+.app-brand {
+  display: flex; align-items: center; gap: 9px; flex-shrink: 0;
+  color: #fff; text-decoration: none; font-weight: 700; font-size: 16px; letter-spacing: -.3px;
+}
+.app-brand img { width: 28px; height: 28px; border-radius: 7px; display: block; }
+.app-brand small { font: 500 10px/1 'IBM Plex Mono', ui-monospace, monospace; opacity: .7; letter-spacing: 0; }
+
+.app-tabs {
+  display: flex; align-items: stretch; gap: 2px; flex: 1; min-width: 0;
+  overflow-x: auto; scrollbar-width: none; align-self: stretch;
+}
+.app-tabs::-webkit-scrollbar { display: none; }
+.app-tab {
+  display: flex; align-items: center; gap: 6px; white-space: nowrap; flex-shrink: 0;
+  padding: 0 13px; color: rgba(255,255,255,.72); text-decoration: none;
+  font-size: 13.5px; font-weight: 500; border-bottom: 3px solid transparent; margin-top: 3px;
+  transition: color .12s, background .12s;
+}
+.app-tab:hover { color: #fff; background: rgba(255,255,255,.07); }
+.app-tab[aria-current="page"] { color: #fff; border-bottom-color: #D4AF37; font-weight: 600; }
+.app-tab:focus-visible { outline: 2px solid #fff; outline-offset: -3px; }
+.app-tab .ico { font-size: 14px; line-height: 1; }
+
+.app-sub { background: rgba(0,0,0,.18); border-top: 1px solid rgba(255,255,255,.08); }
+.app-sub-in { max-width: 1180px; margin: 0 auto; display: flex; gap: 6px; padding: 6px max(16px, env(safe-area-inset-left)) 7px; overflow-x: auto; scrollbar-width: none; }
+.app-sub a { white-space: nowrap; color: rgba(255,255,255,.75); text-decoration: none; font: 500 12px/1 'IBM Plex Mono', ui-monospace, monospace; padding: 6px 12px; border-radius: 99px; border: 1px solid transparent; }
+.app-sub a:hover { color: #fff; background: rgba(255,255,255,.08); }
+.app-sub a[aria-current="page"] { color: #fff; background: rgba(255,255,255,.14); border-color: rgba(255,255,255,.28); }
+.app-sub a:focus-visible { outline: 2px solid #fff; outline-offset: 1px; }
+.app-tools { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.app-bar .lang-switch { color: #fff; border-color: rgba(255,255,255,.35); background: rgba(255,255,255,.08); }
+.app-install {
+  all: unset; cursor: pointer; font: 600 11.5px/1 'IBM Plex Mono', ui-monospace, monospace;
+  padding: 7px 10px; border-radius: 99px; background: #D4AF37; color: #1b1b12;
+}
+.app-install[hidden] { display: none; }
+.app-theme {
+  all: unset; cursor: pointer; box-sizing: border-box; width: 30px; height: 30px; display: grid; place-items: center;
+  border-radius: 50%; border: 1px solid rgba(255,255,255,.35); background: rgba(255,255,255,.08); font-size: 14px; line-height: 1;
+}
+.app-theme:hover { background: rgba(255,255,255,.18); }
+.app-theme:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+html[data-theme="dark"] .app-bar { box-shadow: 0 1px 0 rgba(255,255,255,.08), 0 2px 10px rgba(0,0,0,.4); }
+
+/* o logotipo do app já está na barra: some com o da página e com o link "voltar" */
+header .brand-mark, .back-link { display: none !important; }
+header { padding-top: 22px !important; }
+
+@media (max-width: 720px) {
+  .app-bar-in { flex-wrap: wrap; gap: 0 10px; padding-top: 6px; }
+  .app-brand { order: 1; flex: 1; }
+  .app-tools { order: 2; }
+  .app-tabs { order: 3; flex: 0 0 100%; margin: 4px -16px 0; padding: 0 12px; height: 42px; }
+  .app-tab { padding: 0 11px; font-size: 13px; }
+  .app-brand small { display: none; }
+}
+@media (display-mode: standalone) { .app-install { display: none; } }
+@media print { .app-bar { display: none; } }

@@ -147,6 +147,8 @@ if (swApi) {
   assert(decide('/modelos/selecoes-model.js'), 'selecoes-model.js usa network-first');
   assert(decide('/apps/index.html'), 'apps/index.html usa network-first');
   assert(decide('/manifest.json'), 'manifest.json usa network-first');
+  assert(decide('/datasets/campeonato-brasileiro-serie-b.csv'), 'CSVs de dados usam network-first (dataset atualizado precisa chegar)');
+  assert(decide('/datasets/calendario.js'), 'calendario.js usa network-first');
   assert(decide('/', 'navigate'), 'navegação na raiz usa network-first');
   assert(decide('/qualquer/coisa', 'navigate'), 'qualquer navegação usa network-first');
 
