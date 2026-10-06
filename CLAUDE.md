@@ -147,7 +147,7 @@ became a 21st club in the table.
 
 ### PWA
 
-`service-worker.js` uses cache-first for same-origin assets and stale-while-revalidate for CDN resources (fonts, JS libs). `manifest.json` defines two app shortcuts (Brasileirão and Copa 2026).
+`service-worker.js` is network-first for same-origin code and data (`.html .js .json .csv` — a CSV served cache-first once left users on a stale Série B dataset), cache-first for icons/images and stale-while-revalidate for CDN resources (fonts, JS libs). `manifest.json` defines two app shortcuts (Brasileirão and Copa 2026).
 
 ## Model accuracy
 

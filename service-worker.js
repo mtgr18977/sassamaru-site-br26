@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-globals */
 'use strict';
 
-const CACHE_VERSION = 'v8';
+const CACHE_VERSION = 'v9';
 const CACHE_NAME = `br26-${CACHE_VERSION}`;
 
 // Assets to pre-cache on install
@@ -46,7 +46,9 @@ const CDN_HOSTS = [
 // vinha novo da rede — a página chamava uma função que a cópia em cache não
 // tinha ("computeSeasonState is not a function"). Manter o código em
 // network-first faz a consistência não depender de ninguém lembrar do bump.
-const NETWORK_FIRST_RE = /\.(?:html|js|json)$/i;
+// Os CSVs também: com cache-first, uma atualização do dataset (ex.: a Série B ganhou a temporada 2026 e o
+// São Bernardo) nunca chegava a quem já tinha o arquivo antigo guardado.
+const NETWORK_FIRST_RE = /\.(?:html|js|json|csv)$/i;
 
 function isAppCode(url, request) {
   return request.mode === 'navigate'
