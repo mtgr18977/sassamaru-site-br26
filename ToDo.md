@@ -32,7 +32,7 @@
 
 - [x] **Sassamaru 2026: shell de aplicativo** — barra de abas no topo (`shell/`), página inicial explicando o site, botão "Instalar app", manifest com novo nome e atalhos.
 - [x] **Rodada de hoje + contagem regressiva** — `modelos/competicoes.js` + `datasets/calendario.js`, comparados com o relógio do visitante (aba Rodada e página inicial).
-- [x] **Estrutura multi-competição (Série B)** — registro, seletor na aba Rodada, `scripts/dados_serie.py`, teste com liga de alta rotatividade.
+- [x] **Estrutura multi-competição (Série B)** — registro, abas Série A / Série B no topo, `scripts/dados_serie.py`, teste com liga de alta rotatividade.
 - [ ] **Dados da Série B 2006+** — não há CSV público baixável em massa que eu tenha conseguido obter; importar (Kaggle/Wikipedia) e rodar `dados_serie.py converter`.
 - [ ] **Clubes sem histórico (promovidos/rebaixados)** — hoje entram como média da liga. Melhor: prior vindo da outra divisão com desconto (Série C→B→A), e `log γ` por time. Medir no backtest da Série B.
 - [ ] **Simulação de temporada para a Série B** — `bench-brasileirao2026.html` tem as zonas da Série A fixas; ler de `Competicoes.zonas` (acesso G4 / Z4).

@@ -7,14 +7,27 @@
   var root = me ? me.src.replace(/shell\/shell\.js(\?.*)?$/, '') : './';
 
   // Chaves de tradução com contexto "@@aba": nomes curtos que não podem colidir com texto solto do DOM.
+  // `on(página, parâmetros)` decide se a aba está ativa; as duas divisões usam a mesma página (apps/index.html) com ?comp=
+  var SERIE_A = function (p, q) { return (p === 'apps/index.html' && q.comp !== 'serie-b') || p === 'simulacoes/bench-brasileirao2026.html'; };
+  var SERIE_B = function (p, q) { return p === 'apps/index.html' && q.comp === 'serie-b'; };
   var TABS = [
-    { href: 'index.html',                           key: 'Início@@aba',      ico: '🏠' },
-    { href: 'apps/index.html',                      key: 'Rodada@@aba',      ico: '🗓️' },
-    { href: 'simulacoes/bench-brasileirao2026.html', key: 'Brasileirão@@aba', ico: '🏆' },
-    { href: 'apps/bench-selecoes.html',             key: 'Seleções@@aba',    ico: '🌍' },
-    { href: 'simulacoes/bench-copa2026.html',       key: 'Copa 2026@@aba',   ico: '🌐' },
-    { href: 'bench-docs.html',                      key: 'Docs@@aba',        ico: '📄' },
+    { href: 'index.html',                           key: 'Início@@aba',    ico: '🏠', on: function (p) { return p === 'index.html' || p === ''; } },
+    { href: 'apps/index.html?comp=serie-a',         key: 'Série A@@aba',   ico: '🏆', on: SERIE_A },
+    { href: 'apps/index.html?comp=serie-b',         key: 'Série B@@aba',   ico: '🥈', on: SERIE_B },
+    { href: 'apps/bench-selecoes.html',             key: 'Seleções@@aba',  ico: '🌍', on: function (p) { return p === 'apps/bench-selecoes.html'; } },
+    { href: 'simulacoes/bench-copa2026.html',       key: 'Copa 2026@@aba', ico: '🌐', on: function (p) { return p === 'simulacoes/bench-copa2026.html'; } },
+    { href: 'bench-docs.html',                      key: 'Docs@@aba',      ico: '📄', on: function (p) { return p === 'bench-docs.html'; } },
   ];
+  // segunda linha, só dentro de uma divisão: previsão da rodada × simulação da temporada
+  var SUBTABS = {
+    a: [
+      { href: 'apps/index.html?comp=serie-a',          key: 'Previsão da rodada@@sub',     on: function (p) { return p === 'apps/index.html'; } },
+      { href: 'simulacoes/bench-brasileirao2026.html', key: 'Simulação da temporada@@sub', on: function (p) { return p === 'simulacoes/bench-brasileirao2026.html'; } },
+    ],
+    b: [
+      { href: 'apps/index.html?comp=serie-b',          key: 'Previsão da rodada@@sub',     on: function () { return true; } },
+    ],
+  };
   // ── tema claro/escuro ── aplicado já no <head>, antes da primeira pintura (sem "flash" branco)
   var THEME_KEY = 'br26-theme', html = document.documentElement;
   var mq = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : { matches: false };
@@ -44,18 +57,23 @@
     var cur = here();
     var bar = document.createElement('div');
     bar.className = 'app-bar';
+    var q = {}; try { new URLSearchParams(location.search).forEach(function (v, k) { q[k] = v; }); } catch (e) { /* ignore */ }
     var tabs = TABS.map(function (t) {
-      var on = t.href === cur || (cur === '' && t.href === 'index.html');
+      var on = t.on(cur, q);
       return '<a class="app-tab" href="' + root + t.href + '"' + (on ? ' aria-current="page"' : '') + '>' +
              '<span class="ico" aria-hidden="true">' + t.ico + '</span><span>' + T(t.key) + '</span></a>';
     }).join('');
+    var grupo = SERIE_A(cur, q) ? 'a' : SERIE_B(cur, q) ? 'b' : null;
+    var sub = grupo ? '<nav class="app-sub" aria-label="Sassamaru 2026"><div class="app-sub-in">' + SUBTABS[grupo].map(function (t) {
+      return '<a href="' + root + t.href + '"' + (t.on(cur, q) ? ' aria-current="page"' : '') + '>' + T(t.key) + '</a>';
+    }).join('') + '</div></nav>' : '';
     bar.innerHTML =
       '<div class="app-bar-in">' +
         '<a class="app-brand" href="' + root + 'index.html"><img src="' + root + 'icons/icon.svg" alt="" width="28" height="28">' +
           '<span>Sassamaru 2026</span></a>' +
         '<nav class="app-tabs" aria-label="Sassamaru 2026">' + tabs + '</nav>' +
         '<div class="app-tools"><button type="button" class="app-theme"></button><button type="button" class="app-install" hidden>' + T('Instalar app') + '</button></div>' +
-      '</div>';
+      '</div>' + sub;
     document.body.insertBefore(bar, document.body.firstChild);
 
     var sw = document.querySelector('.lang-switch'); // criado por i18n.js

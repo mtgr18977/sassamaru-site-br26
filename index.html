@@ -124,16 +124,22 @@ footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--border
 
   <h2 class="sec">O que tem no app</h2>
   <div class="grid">
-    <a class="card" href="apps/index.html" style="--c:#1A4731">
-      <div class="top"><span class="ico">🗓️</span><div><div class="t">Rodada</div><div class="s">Previsão de partidas</div></div></div>
+    <a class="card" href="apps/index.html?comp=serie-a" style="--c:#1A4731">
+      <div class="top"><span class="ico">🗓️</span><div><div class="t">Série A · Rodada</div><div class="s">Previsão de partidas</div></div></div>
       <p>Cole os jogos de uma rodada e obtenha probabilidades 1X2, odds, placar mais provável e matriz de placares por partida.</p>
       <div class="tags"><span class="tag">λ Poisson</span><span class="tag">Elo</span><span class="tag">Dixon-Coles</span></div>
       <span class="go">Abrir →</span>
     </a>
     <a class="card" href="simulacoes/bench-brasileirao2026.html" style="--c:#D4AF37">
-      <div class="top"><span class="ico">🏆</span><div><div class="t">Brasileirão</div><div class="s">Simulação de temporada</div></div></div>
+      <div class="top"><span class="ico">🏆</span><div><div class="t">Série A · Temporada</div><div class="s">Simulação de temporada</div></div></div>
       <p>Simula o resto da Série A 2026 via Monte Carlo a partir da tabela atual e projeta campeão, Libertadores, Sul-Americana e rebaixamento.</p>
       <div class="tags"><span class="tag">20 clubes</span><span class="tag">380 jogos</span><span class="tag">Monte Carlo</span></div>
+      <span class="go">Abrir →</span>
+    </a>
+    <a class="card" href="apps/index.html?comp=serie-b" style="--c:#64748B">
+      <div class="top"><span class="ico">🥈</span><div><div class="t">Série B</div><div class="s">Em preparação</div></div></div>
+      <p>A mesma previsão de rodada para a Série B, em pontos corridos desde 2006. A estrutura e o importador de dados já estão prontos; falta carregar os resultados.</p>
+      <div class="tags"><span class="tag">20 clubes</span><span class="tag">2006+</span><span class="tag">G4 · Z4</span></div>
       <span class="go">Abrir →</span>
     </a>
     <a class="card" href="apps/bench-selecoes.html" style="--c:#1E40AF">
@@ -160,8 +166,8 @@ footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--border
   <div class="tbl-wrap"><table>
     <thead><tr><th>Base de dados</th><th>Cobertura</th><th class="num">Jogos</th><th>Atualização</th><th>Usada em</th></tr></thead>
     <tbody>
-      <tr><td>Brasileirão (clubes)</td><td>2003 – rodada 28 de 2026</td><td class="num">9 444</td><td>6 out 2026</td><td>Rodada, Brasileirão</td></tr>
-      <tr><td>Série B (2006+)</td><td>estrutura pronta</td><td class="num">—</td><td>aguardando dados</td><td>Rodada (seletor Série A | Série B)</td></tr>
+      <tr><td>Brasileirão (clubes)</td><td>2003 – rodada 28 de 2026</td><td class="num">9 444</td><td>6 out 2026</td><td>Série A (rodada e temporada)</td></tr>
+      <tr><td>Série B (2006+)</td><td>estrutura pronta</td><td class="num">—</td><td>aguardando dados</td><td>Série B (aba própria)</td></tr>
       <tr><td>Seleções</td><td>1872 – 2026</td><td class="num">49 000+</td><td>Copa 2026</td><td>Seleções, Copa 2026</td></tr>
     </tbody>
   </table></div>

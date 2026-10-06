@@ -26,9 +26,9 @@ Static HTML + vanilla JavaScript PWA — no build process, no framework.
 ### App shell (Sassamaru 2026)
 
 The product is called **Sassamaru 2026**. `shell/shell.js` + `shell/shell.css` inject the sticky top tab
-bar (Início · Rodada · Brasileirão · Seleções · Copa 2026 · Docs), move the `PT | EN | 中文`
+bar (Início · Série A · Série B · Seleções · Copa 2026 · Docs; Série A/B have a second row: Previsão da rodada · Simulação da temporada), move the `PT | EN | 中文`
 switcher into it and show an "Instalar app" button on `beforeinstallprompt`. Every page loads them right
-after `i18n/i18n.js`. To add a section: add it to `TABS` in `shell/shell.js`, add `Nome@@aba` to
+after `i18n/i18n.js`. To add a section: add it to `TABS` in `shell/shell.js` (each tab has an `on(page, params)` predicate; both divisions share `apps/index.html?comp=`), add `Nome@@aba` to
 `i18n/{en,zh}.js`, precache the page in `service-worker.js`. `index.html` is the home page (what the
 site contains, data status, backtest numbers) — its figures are hand-written, update them with the data.
 

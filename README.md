@@ -9,19 +9,19 @@ A barra de abas no topo (`shell/shell.js` + `shell/shell.css`, injetada em todas
 | Aba | Página | O que faz |
 |-----|--------|-----------|
 | Início | `index.html` | Apresenta o app, estado dos dados e precisão do modelo |
-| Rodada | `apps/index.html` | Rodada de hoje e contagem regressiva para a próxima (pelo relógio do dispositivo); previsão 1X2, odds e placares; seletor Série A \| Série B |
-| Brasileirão | `simulacoes/bench-brasileirao2026.html` | Monte Carlo do resto da temporada 2026 |
+| Série A | `apps/index.html?comp=serie-a` | Rodada de hoje e contagem regressiva; previsão 1X2, odds e placares. Sub-aba **Simulação da temporada** (`simulacoes/bench-brasileirao2026.html`): Monte Carlo do resto de 2026 |
+| Série B | `apps/index.html?comp=serie-b` | Mesma previsão de rodada para a Série B (estrutura pronta, dados pendentes) |
 | Seleções | `apps/bench-selecoes.html` | Previsão de partidas entre seleções |
 | Copa 2026 | `simulacoes/bench-copa2026.html` | Simulação do torneio completo |
 | Docs | `bench-docs.html` | Documentação técnica do modelo |
 
 ## Calendário e rodada atual
 
-A aba **Rodada** compara o dia do dispositivo com `datasets/calendario.js` e mostra a rodada em andamento (ou a próxima), as datas, quantos dias faltam e a faixa das 38 rodadas; um botão carrega os jogos da rodada para o simulador. O navegador não consegue ler ge.globo.com nem a Wikipedia (CORS/bloqueio) e o app precisa funcionar offline, então o calendário é um arquivo editado a cada atualização, a partir da tabela detalhada da CBF. Hoje: rodadas 29–32 confirmadas, 33–38 provisórias; jogos completos das rodadas 29 e 30.
+A aba **Série A** compara o dia do dispositivo com `datasets/calendario.js` e mostra a rodada em andamento (ou a próxima), as datas, quantos dias faltam e a faixa das 38 rodadas; um botão carrega os jogos da rodada para o simulador. O navegador não consegue ler ge.globo.com nem a Wikipedia (CORS/bloqueio) e o app precisa funcionar offline, então o calendário é um arquivo editado a cada atualização, a partir da tabela detalhada da CBF. Hoje: rodadas 29–32 confirmadas, 33–38 provisórias; jogos completos das rodadas 29 e 30.
 
 ## Série B (estrutura pronta, dados pendentes)
 
-`modelos/competicoes.js` registra Série A e Série B (20 clubes, 38 rodadas, pontos corridos desde 2006, G4 de acesso e Z4). O seletor **Série A | Série B** da aba Rodada já existe; enquanto não houver CSV ele mostra o passo a passo. Para ativar:
+`modelos/competicoes.js` registra Série A e Série B (20 clubes, 38 rodadas, pontos corridos desde 2006, G4 de acesso e Z4). A aba **Série B** já existe; enquanto não houver CSV ela mostra o passo a passo. Para ativar:
 
 ```bash
 python scripts/dados_serie.py converter resultados_b.csv datasets/campeonato-brasileiro-serie-b.csv   # converte e valida

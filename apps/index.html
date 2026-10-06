@@ -678,10 +678,6 @@
   
     /* ── Calendário da rodada + seletor de competição ── */
     [hidden] { display: none !important; }
-    .comp-switch { display: inline-flex; border: 1px solid var(--border); border-radius: 99px; overflow: hidden; background: var(--surface); }
-    .comp-switch button { all: unset; cursor: pointer; padding: 6px 14px; font: 500 12px var(--mono); color: var(--muted); }
-    .comp-switch button[aria-selected="true"] { background: var(--accent); color: #fff; }
-    .comp-switch button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
     .cal { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; margin-bottom: 18px; }
     .cal-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 18px; align-items: stretch; }
     .cal-main .eyebrow { font: 500 10.5px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
@@ -10170,7 +10166,6 @@
           <p>Poisson · Elo · Dixon-Coles · MLE</p>
         </div>
       </div>
-      <div class="comp-switch" id="compSwitch" role="tablist" aria-label="Competição"></div>
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
         <span class="pill" id="hdrMatches">—</span>
         <span class="pill" id="hdrSeason">—</span>
@@ -11239,23 +11234,12 @@ function renderConfig(){
 
 // ── Competição + calendário ────────────────────────────────────────────────
 const Comp = window.Competicoes;
-const _safeLS = { get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* modo privado */ } } };
-const COMP = Comp.obter(new URLSearchParams(location.search).get('comp') || _safeLS.get('br26-comp') || Comp.PADRAO);
+const COMP = Comp.obter(new URLSearchParams(location.search).get('comp') || Comp.PADRAO);
 CONFIG.TRAIN_FROM_SEASON = Comp.indiceTreino(COMP);
+document.querySelector('header h1').textContent = _t('Previsão de rodada · {nome}', { nome: COMP.nome });
 const LOC = (window.I18N && I18N.LANGS[I18N.lang].locale) || 'pt-BR';
 const CAL = COMP.calendario ? (window.CALENDARIOS || {})[COMP.calendario] : null;
 
-function renderSeletorCompeticao() {
-  const box = $("compSwitch");
-  box.innerHTML = Comp.lista().map(c =>
-    `<button type="button" role="tab" data-comp="${c.id}" aria-selected="${c.id === COMP.id}">${c.nome}</button>`).join('');
-  box.addEventListener('click', (e) => {
-    const b = e.target.closest('button[data-comp]');
-    if (!b || b.dataset.comp === COMP.id) return;
-    _safeLS.set('br26-comp', b.dataset.comp);
-    const u = new URL(location.href); u.searchParams.set('comp', b.dataset.comp); location.href = u.toString();
-  });
-}
 
 const fmtCurto = (s) => Comp.dia(s).toLocaleDateString(LOC, { day: 'numeric', month: 'short' });
 const fmtLongo = (s) => Comp.dia(s).toLocaleDateString(LOC, { weekday: 'long', day: 'numeric', month: 'long' });
@@ -11357,7 +11341,6 @@ function mostrarSemDados() {
 }
 
 async function loadCSV(){
-  renderSeletorCompeticao();
   renderCalendario();
   if (COMP.dados === 'pendente') {
     setModelPill(_t('Sem dados da {nome}', { nome: COMP.nome }), "danger");
