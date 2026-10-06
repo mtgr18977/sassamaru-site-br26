@@ -9,7 +9,6 @@ Dados usados pelos modelos. Nenhum arquivo daqui é gerado em tempo de execuçã
 | `campeonato-brasileiro-full_ate_2025.csv` | Variante rica do Brasileirão até 2025 (datas reais, arena, técnico, estado). **Sem uso hoje** — é a fonte para recuperar datas e `log γ` por estádio | 2025 |
 | `results.csv` | Jogos internacionais de seleções desde 1872 (49 000+ linhas) | 2026 |
 | `calendario.js` | Calendário 2026 da Série A e da Série B: janelas das rodadas (`concluida` / `confirmada` / `provisoria` / `semdata`), jogos pendentes e confrontos das rodadas detalhadas. Editado à mão | 6 out 2026 |
-| `brasileirao-26.zip` | Cópia de fev 2026 dos dois CSVs do Brasileirão (`limpo` e `full_ate_2025`) — desatualizada | fev 2026 |
 | `selecoes.zip` | Fonte original das seleções: `results.csv`, `goalscorers.csv`, `shootouts.csv`, `former_names.csv` (só `results.csv` é usado) | fev 2026 |
 
 ## Ao acrescentar resultados

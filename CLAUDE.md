@@ -70,8 +70,6 @@ Keep a club's name identical across divisions (the importer's `CANONICO` map) or
 - `scripts/` — Python: Série B importer, `dados_serie.py` (see `scripts/readme.md`)
 - Root: `bench-docs.html` (technical docs, "Docs" tab), `service-worker.js`, `manifest.json`, `_headers`.
   Per-folder READMEs (`apps/`, `datasets/`, `modelos/`, `simulacoes/`, `scripts/`, `tests/`) hold the detail.
-  **Legacy/unused:** `mundial-2026.html` (old Copa page, not in `TABS` nor the precache, still listed in `tests/i18n.test.js`),
-  `fetch_xg.py` + `campeonatobrasileirolimpo_xg.csv` (xG experiment, columns empty), `papaparse.min.js` (only `mundial-2026.html` uses the local copy)
 - `modelos/` — **single source of truth** for the models (pure JS, shared by browser and Node tests)
   - `model.js` — Brasileirão club model
   - `selecoes-model.js` — national teams model

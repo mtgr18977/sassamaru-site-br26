@@ -36,7 +36,6 @@ const ZH_DOCS = require('../i18n/zh-docs.js');
 const PAGES = [
   'index.html',
   'bench-docs.html',
-  'mundial-2026.html',
   'apps/index.html',
   'apps/bench-selecoes.html',
   'simulacoes/bench-brasileirao2026.html',

@@ -95,11 +95,6 @@
 - **`simulacoes/bench-copa2026.html` e `apps/bench-selecoes.html` ainda carregam
   cópias inline do modelo de seleções** (`buildModel` embutido). A mesma unificação já feita
   no modelo de clubes (`modelos/selecoes-model.js`) deveria ser aplicada a elas.
-- **`mundial-2026.html` é uma página órfã**: fora da barra de abas e do cache offline,
-  substituída por `simulacoes/bench-copa2026.html`. Remover (e tirá-la de `tests/i18n.test.js`
-  e `modelos/readme.md`) ou religar. O `papaparse.min.js` da raiz só serve a ela.
-- **`campeonatobrasileirolimpo_xg.csv` tem as colunas de xG 100% vazias** e `fetch_xg.py`
-  nunca produziu dados. Rodar a coleta ou remover os dois da raiz.
 - **A coluna `data` foi descartada** ao gerar o CSV "limpo", mas existe em
   `datasets/campeonato-brasileiro-full_ate_2025.csv`. Recuperá-la permitiria
   decay por data em vez de assumir `roundsPerSeason = 38`.
@@ -107,8 +102,9 @@
   atualizados juntos a cada rodada; hoje estão em sincronia (9 443 jogos), mas já divergiram antes.
 - **Números escritos à mão** em `index.html`, `README.md`, `CLAUDE.md` e `datasets/readme.md`
   (veja *Home com números ao vivo*).
-- **`datasets/*.zip`** são cópias de fev 2026 (o do Brasileirão está desatualizado).
+- **`datasets/selecoes.zip`** é uma cópia de fev 2026 (só `results.csv` é usado).
 
 ### Resolvido
+- ~~Arquivos órfãos~~ — removidos `mundial-2026.html`, `fetch_xg.py`, `campeonatobrasileirolimpo_xg.csv`, `papaparse.min.js` e `datasets/brasileirao-26.zip`. A coleta de xG (item em *Dados*) recomeça do zero se for retomada.
 - ~~Linha errada na rodada 7 (`Mirassol x Fortaleza`)~~ — corrigida para `Mirassol x Coritiba`.
 - ~~`apps/index.html` com CSV embutido atrasado~~ — em sincronia desde a rodada 28.

@@ -6,7 +6,7 @@ Fonte única da lógica. As páginas HTML carregam estes arquivos via `<script s
 |---|---|---|
 | `model.js` | Brasileirão (clubes): Dixon-Coles/Poisson + Elo, MLE conjunto via Adam; também `computeSeasonState()` para o Monte Carlo | `apps/index.html`, `simulacoes/bench-brasileirao2026.html`, `tests/` |
 | `competicoes.js` | Registro das divisões (`serie-a`, `serie-b`) e `statusCalendario()` (rodada de hoje, próxima, dias restantes) | `apps/index.html`, `index.html`, `tests/` |
-| `selecoes-model.js` | Seleções: Dixon-Coles/Poisson + Elo, ρ por busca em grade | `mundial-2026.html` (página antiga), `tests/` |
+| `selecoes-model.js` | Seleções: Dixon-Coles/Poisson + Elo, ρ por busca em grade | só `tests/` (as páginas usam cópia inline, veja abaixo) |
 
 Os arquivos expõem um objeto global no navegador (`BenchModel`, `Competicoes`, `SelecoesModel`) e `module.exports` no Node, para que os testes rodem o mesmo código que o site.
 

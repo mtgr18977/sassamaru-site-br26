@@ -292,7 +292,7 @@
   "Dataset insuficiente após limpeza. Verifique nomes das colunas e formato dos dados.": "Not enough data after cleaning. Check the column names and the data format.",
   "Nenhuma temporada detectada. Verifique se o CSV contém rodada 1.": "No season detected. Check that the CSV contains round 1.",
   "Poucos jogos após o corte de temporada ({n}). Reduza CONFIG.TRAIN_FROM_SEASON (atual: {a}).": "Too few matches after the season cut-off ({n}). Lower CONFIG.TRAIN_FROM_SEASON (current: {a}).",
-  /* ── mundial-2026.html — Copa do Mundo 2026 ── */
+  /* ── Copa do Mundo 2026 — nomes das seleções ── */
   "México": "Mexico",
   "África do Sul": "South Africa",
   "Coreia do Sul": "South Korea",
