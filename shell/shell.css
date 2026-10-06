@@ -1,0 +1,63 @@
+/* Sassamaru 2026 — barra de aplicativo (abas no topo), compartilhada por todas as páginas. */
+:root { --app-bar-h: 52px; --app-green: #1A4731; }
+html { -webkit-tap-highlight-color: transparent; }
+body { overscroll-behavior-y: none; }
+
+.app-bar {
+  position: sticky; top: 0; z-index: 1000;
+  background: var(--app-green); color: #fff;
+  padding-top: env(safe-area-inset-top);
+  box-shadow: 0 1px 0 rgba(0,0,0,.25), 0 2px 10px rgba(0,0,0,.12);
+  font-family: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+  -webkit-user-select: none; user-select: none;
+}
+.app-bar-in {
+  max-width: 1180px; margin: 0 auto; min-height: var(--app-bar-h);
+  display: flex; align-items: center; gap: 14px;
+  padding: 0 max(16px, env(safe-area-inset-left)) 0 max(16px, env(safe-area-inset-right));
+}
+.app-brand {
+  display: flex; align-items: center; gap: 9px; flex-shrink: 0;
+  color: #fff; text-decoration: none; font-weight: 700; font-size: 16px; letter-spacing: -.3px;
+}
+.app-brand img { width: 28px; height: 28px; border-radius: 7px; display: block; }
+.app-brand small { font: 500 10px/1 'IBM Plex Mono', ui-monospace, monospace; opacity: .7; letter-spacing: 0; }
+
+.app-tabs {
+  display: flex; align-items: stretch; gap: 2px; flex: 1; min-width: 0;
+  overflow-x: auto; scrollbar-width: none; align-self: stretch;
+}
+.app-tabs::-webkit-scrollbar { display: none; }
+.app-tab {
+  display: flex; align-items: center; gap: 6px; white-space: nowrap; flex-shrink: 0;
+  padding: 0 13px; color: rgba(255,255,255,.72); text-decoration: none;
+  font-size: 13.5px; font-weight: 500; border-bottom: 3px solid transparent; margin-top: 3px;
+  transition: color .12s, background .12s;
+}
+.app-tab:hover { color: #fff; background: rgba(255,255,255,.07); }
+.app-tab[aria-current="page"] { color: #fff; border-bottom-color: #D4AF37; font-weight: 600; }
+.app-tab:focus-visible { outline: 2px solid #fff; outline-offset: -3px; }
+.app-tab .ico { font-size: 14px; line-height: 1; }
+
+.app-tools { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.app-bar .lang-switch { color: #fff; border-color: rgba(255,255,255,.35); background: rgba(255,255,255,.08); }
+.app-install {
+  all: unset; cursor: pointer; font: 600 11.5px/1 'IBM Plex Mono', ui-monospace, monospace;
+  padding: 7px 10px; border-radius: 99px; background: #D4AF37; color: #1b1b12;
+}
+.app-install[hidden] { display: none; }
+
+/* o logotipo do app já está na barra: some com o da página e com o link "voltar" */
+header .brand-mark, .back-link { display: none !important; }
+header { padding-top: 22px !important; }
+
+@media (max-width: 720px) {
+  .app-bar-in { flex-wrap: wrap; gap: 0 10px; padding-top: 6px; }
+  .app-brand { order: 1; flex: 1; }
+  .app-tools { order: 2; }
+  .app-tabs { order: 3; flex: 0 0 100%; margin: 4px -16px 0; padding: 0 12px; height: 42px; }
+  .app-tab { padding: 0 11px; font-size: 13px; }
+  .app-brand small { display: none; }
+}
+@media (display-mode: standalone) { .app-install { display: none; } }
+@media print { .app-bar { display: none; } }

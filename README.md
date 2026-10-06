@@ -1,9 +1,41 @@
-# Sassamaru BR 26 | Sassamaru WC 26
+# Sassamaru 2026
 
-Simulador de **seleções (Copa do Mundo)** e de **clubes (Campeonato Brasileiro)**, com páginas HTML estáticas e materiais de apoio (datasets, modelos e simulações).
+**Sassamaru 2026** é um aplicativo web (PWA instalável) de previsões e simulações de futebol: **clubes (Campeonato Brasileiro)** e **seleções (Copa do Mundo)**. É HTML estático + JavaScript puro, sem servidor e sem build — funciona offline depois da primeira visita.
+
+## Navegação
+
+A barra de abas no topo (`shell/shell.js` + `shell/shell.css`, injetada em todas as páginas) leva às seções do app:
+
+| Aba | Página | O que faz |
+|-----|--------|-----------|
+| Início | `index.html` | Apresenta o app, estado dos dados e precisão do modelo |
+| Rodada | `apps/index.html` | Previsão 1X2, odds e placares de uma rodada do Brasileirão |
+| Brasileirão | `simulacoes/bench-brasileirao2026.html` | Monte Carlo do resto da temporada 2026 |
+| Seleções | `apps/bench-selecoes.html` | Previsão de partidas entre seleções |
+| Copa 2026 | `simulacoes/bench-copa2026.html` | Simulação do torneio completo |
+| Grupos | `mundial-2026.html` | Grupos, resultados e melhores terceiros |
+| Docs | `bench-docs.html` | Documentação técnica do modelo |
+
+## Estado dos dados (6 out 2026)
+
+| Base | Cobertura | Jogos |
+|------|-----------|-------|
+| Brasileirão (clubes) | 2003 – rodada 28 de 2026 (+ adiados da 21ª) | 9 444 |
+| Seleções | 1872 – 2026 | 49 000+ |
+
+Faltam no Brasileirão 2026: 101 jogos (279 de 380 disputados), entre eles Chapecoense × Vasco, adiado da 21ª rodada.
+
+Precisão do modelo de clubes (backtest walk-forward, n = 1 039):
+
+| | log-loss | RPS | acurácia |
+|---|---|---|---|
+| Modelo | 1,031 | 0,212 | 48,1% |
+| Taxa-base fixa 47/27/26 | 1,058 | 0,222 | 47,1% |
 
 ## Estrutura do repositório
 
+- `shell/` — Casca do app: barra de abas no topo e botão de instalação
+- `i18n/` — Traduções (en, zh-CN)
 - `apps/` — Webapps interativas de predição
   - `apps/index.html` — Simulador do Brasileirão
   - `apps/bench-selecoes.html` — Simulador da Copa do Mundo
@@ -19,13 +51,15 @@ Este projeto **não requer build** — são arquivos HTML estáticos. Abra diret
 ```bash
 cd /caminho/para/o/repositorio
 python -m http.server 8000
-# acesse http://localhost:8000/apps/
+# acesse http://localhost:8000/
 ```
 
 ## Testes
 
 ```bash
-npm test                 # testes do modelo de clubes
+npm test                 # as quatro suítes (modelo, seleções, PWA, Copa)
+npm run test:backtest    # trava de regressão de acurácia do modelo de clubes
+npm run test:i18n        # traduções en/zh
 npm run test:selecoes    # testes do modelo de seleções (110+ asserções)
 npm run test:pwa         # validação do PWA (manifest, service worker, ícones)
 ```
@@ -39,20 +73,20 @@ O site está disponível em **português (padrão), inglês e chinês simplifica
 Os modelos em `modelos/` implementam regressão de Poisson com correção de Dixon-Coles:
 
 - **Força de ataque/defesa** por equipe estimada via MLE (Adam optimizer, 400 iterações)
-- **Sistema Elo** com decaimento temporal (meia-vida: 730 dias / 2 anos para clubes e seleções)
-- **Fator de forma** baseado nos últimos jogos com bônus de recência
-- **Vantagem em casa** calculada por equipe quando há dados suficientes
+- **Sistema Elo** com reset parcial por temporada (clubes) e decaimento por data (seleções)
+- **Vantagem em casa** (γ) estimada junto com ataque e defesa
+- **Sem fator de forma nem de descanso**: ambos pioravam o backtest e foram removidos (veja `CLAUDE.md`)
 
 ## Webapps disponíveis
 
 | Webapp | Arquivo |
 |--------|---------|
-| Brasileirão 2026 | `apps/index.html` |
-| Copa do Mundo 2026 | `apps/bench-selecoes.html` |
+| Rodada do Brasileirão | `apps/index.html` |
+| Seleções | `apps/bench-selecoes.html` |
 
 ## Atualização de dados
 
-Para adicionar novas rodadas, atualize o artefato de simulação em `simulacoes/` (ex.: `simulacoes/bench-brasileirao2026.html`), que contém o modelo e os dados embutidos inline. Os webapps em `apps/` (ex.: `apps/index.html`, `apps/bench-selecoes.html`) também incluem dados embutidos (via `window.__EMBEDDED_CSV__`) e são os arquivos referenciados na seção **"Webapps disponíveis"**; se você estiver alterando os dados do simulador principal, lembre-se de atualizar tanto o HTML em `simulacoes/` quanto o HTML correspondente em `apps/`, mantendo os blocos de dados sincronizados.
+Novos resultados do Brasileirão entram em **três lugares**, sempre iguais: `datasets/campeonato-brasileiro-limpo.csv` (lido pelo backtest) e o bloco `window.__EMBEDDED_CSV__` de `apps/index.html` e de `simulacoes/bench-brasileirao2026.html`. Depois rode `npm test` e `npm run test:backtest`, atualize os números da página inicial (`index.html`), do `CLAUDE.md` e do `README.md`, e suba o `CACHE_VERSION` em `service-worker.js`.
 
 ## Contribuição
 

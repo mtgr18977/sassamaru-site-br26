@@ -23,8 +23,18 @@ python -m http.server 8000
 
 Static HTML + vanilla JavaScript PWA — no build process, no framework.
 
+### App shell (Sassamaru 2026)
+
+The product is called **Sassamaru 2026**. `shell/shell.js` + `shell/shell.css` inject the sticky top tab
+bar (Início · Rodada · Brasileirão · Seleções · Copa 2026 · Grupos · Docs), move the `PT | EN | 中文`
+switcher into it and show an "Instalar app" button on `beforeinstallprompt`. Every page loads them right
+after `i18n/i18n.js`. To add a section: add it to `TABS` in `shell/shell.js`, add `Nome@@aba` to
+`i18n/{en,zh}.js`, precache the page in `service-worker.js`. `index.html` is the home page (what the
+site contains, data status, backtest numbers) — its figures are hand-written, update them with the data.
+
 ### Directory layout
 
+- `shell/` — app shell shared by all pages (tab bar, install button)
 - `modelos/` — **single source of truth** for the models (pure JS, shared by browser and Node tests)
   - `model.js` — Brasileirão club model
   - `selecoes-model.js` — national teams model
@@ -110,12 +120,12 @@ became a 21st club in the table.
 ## Model accuracy
 
 `npm run test:backtest` is the regression gate. Current numbers (walk-forward, refit every 4
-rounds, last 3 seasons, n=955):
+rounds, last 3 seasons, n=1039, data through round 28 of 2026):
 
 | | log-loss | RPS | accuracy |
 |---|---|---|---|
-| Model | 1.030 | 0.212 | 48.2% |
-| Constant 47/27/26 baseline | 1.059 | 0.222 | 47.0% |
+| Model | 1.031 | 0.212 | 48.1% |
+| Constant 47/27/26 baseline | 1.058 | 0.222 | 47.1% |
 
 The constant baseline matters: before this gate existed, the shipped model scored 1.069 —
 **worse than predicting the same three numbers for every match**. Any model change that does

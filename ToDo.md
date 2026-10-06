@@ -28,7 +28,15 @@
   A primeira tentativa (multiplicador empírico por time, aplicado por cima do γ do MLE) foi removida: contava a vantagem de casa duas vezes e piorava o log-loss. A forma correta é um `log γ_i` por time dentro do vetor de parâmetros, com prior hierárquico (2n+3 → 3n+2), estimado junto com o resto. A coluna `arena` de `datasets/campeonato-brasileiro-full_ate_2025.csv` permitiria fazer isso por estádio.
 
 
+## App
+
+- [x] **Sassamaru 2026: shell de aplicativo** — barra de abas no topo (`shell/`), página inicial explicando o site, botão "Instalar app", manifest com novo nome e atalhos.
+- [ ] **Navegação sem recarregar a página** — hoje cada aba é uma página; um roteador leve manteria o modelo em memória entre abas.
+- [ ] **Home com números ao vivo** — a página inicial (`index.html`) usa números escritos à mão; gerá-los do CSV evitaria divergência.
+
 ## Dados
+
+- [x] **Dados do Brasileirão atualizados até 6 out 2026** — rodada 28 completa + adiados da 21ª (São Paulo 1×2 Santos, Atlético-MG 1×0 Bragantino). Pendente: Chapecoense × Vasco.
 
 - [ ] **Atualização automática do CSV via API**  
   Integrar com APIs públicas (Sofascore, ESPN, football-data.org) para atualizar o dataset automaticamente após cada rodada, sem necessidade de atualização manual do arquivo.

@@ -1,7 +1,7 @@
 {
-  "name": "Sassamaru BR26",
-  "short_name": "BR26",
-  "description": "Previsões e simulações para o Brasileirão e Copa do Mundo 2026",
+  "name": "Sassamaru 2026",
+  "short_name": "Sassamaru",
+  "description": "Previsões e simulações do Brasileirão e da Copa do Mundo 2026",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
@@ -9,7 +9,10 @@
   "background_color": "#F7F6F2",
   "theme_color": "#1A4731",
   "lang": "pt-BR",
-  "categories": ["sports", "entertainment"],
+  "categories": [
+    "sports",
+    "entertainment"
+  ],
   "icons": [
     {
       "src": "./icons/icon-192.png",
@@ -32,18 +35,41 @@
   ],
   "shortcuts": [
     {
-      "name": "Brasileirão",
+      "name": "Brasileirão 2026",
       "short_name": "Brasileirão",
-      "description": "Previsões do Campeonato Brasileiro",
+      "description": "Simulação da temporada",
+      "url": "./simulacoes/bench-brasileirao2026.html",
+      "icons": [
+        {
+          "src": "./icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Prever rodada",
+      "short_name": "Rodada",
+      "description": "Previsão de partidas do Brasileirão",
       "url": "./apps/index.html",
-      "icons": [{ "src": "./icons/icon-192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "./icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     },
     {
       "name": "Copa do Mundo",
       "short_name": "Copa 2026",
       "description": "Previsões das Seleções — Copa 2026",
       "url": "./apps/bench-selecoes.html",
-      "icons": [{ "src": "./icons/icon-192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "./icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
-  ]
+  ],
+  "id": "./index.html"
 }

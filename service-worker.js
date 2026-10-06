@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-globals */
 'use strict';
 
-const CACHE_VERSION = 'v4';
+const CACHE_VERSION = 'v5';
 const CACHE_NAME = `br26-${CACHE_VERSION}`;
 
 // Assets to pre-cache on install
@@ -11,6 +11,10 @@ const PRECACHE_ASSETS = [
   './apps/bench-selecoes.html',
   './simulacoes/bench-copa2026.html',
   './simulacoes/bench-brasileirao2026.html',
+  './mundial-2026.html',
+  './bench-docs.html',
+  './shell/shell.js',
+  './shell/shell.css',
   './modelos/model.js',
   './modelos/selecoes-model.js',
   './i18n/i18n.js',
