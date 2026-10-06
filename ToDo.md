@@ -31,10 +31,10 @@
 ## App
 
 - [x] **Sassamaru 2026: shell de aplicativo** — barra de abas no topo (`shell/`), página inicial explicando o site, botão "Instalar app", manifest com novo nome e atalhos.
-- [x] **Rodada de hoje + contagem regressiva** — `modelos/competicoes.js` + `datasets/calendario.js`, comparados com o relógio do visitante (aba Rodada e página inicial).
+- [x] **Rodada de hoje + contagem regressiva** — `modelos/competicoes.js` + `datasets/calendario.js`, comparados com o relógio do visitante (abas Série A/B e página inicial).
 - [x] **Estrutura multi-competição (Série B)** — registro, abas Série A / Série B no topo, `scripts/dados_serie.py`, teste com liga de alta rotatividade.
 - [x] **Dados da Série B 2007–2026** — importados da Wikipedia (`scripts/importar_wikipedia_serie_b.py`), 7 531 jogos (2026 parcial), validados contra campeões/promovidos conhecidos e entre pt/en.
-- [ ] **Rodadas reais na Série B** — hoje a ordem dos jogos na temporada é sintética (a matriz da Wikipedia não tem datas). Fonte com data/rodada (CBF, ge, soccerway) tornaria o tempo do modelo real (a chave da api-futebol.com.br enviada não tinha campeonatos no plano — veja a resposta no chat).
+- [ ] **Rodadas reais na Série B** — hoje a ordem dos jogos na temporada é sintética (a matriz da Wikipedia não tem datas). Fonte com data/rodada (CBF, ge, soccerway) tornaria o tempo do modelo real.
 - [ ] **Série B 2006** — sem matriz completa na Wikipedia (en/pt); precisa de outra fonte.
 - [ ] **Ganho da Série B é pequeno** (log-loss 1,044 × 1,053): testar prior por divisão (Série A/B/C), `log γ` por time e meia-vida própria.
 - [ ] **Clubes sem histórico (promovidos/rebaixados)** — hoje entram como média da liga. Melhor: prior vindo da outra divisão com desconto (Série C→B→A), e `log γ` por time. Medir no backtest da Série B.
@@ -54,8 +54,7 @@
 - [ ] **Inclusão de dados de posse, chutes a gol e xG**  
   Expected Goals (xG) é substancialmente mais preditivo do que gols marcados para estimar a força real de um time. Datasets públicos como o Statsbomb Open Data ou a API do Understat contêm xG histórico.
 
-- [ ] **Séries B, C e estaduais para times recém-promovidos**  
-  Times que sobem da Série B chegam ao modelo com histórico apenas em divisões inferiores. Incluir dados da Série B com desconto de força (divisão inferior penaliza ataque/defesa estimados) melhoraria as previsões para times como Remo e Chapecoense.
+- [ ] **Séries C e estaduais** — a Série B já está no repositório; falta a Série C para o prior de clubes que sobem/descem (veja *Clubes sem histórico* em App).
 
 - [ ] **Datas reais no dataset do Brasileirão**  
   O CSV atual usa apenas o número da rodada, sem data. Com datas reais seria possível usar decay date-based (como no modelo de seleções), que é mais preciso durante a janela de transferências ou após longos períodos sem jogos.
@@ -91,27 +90,25 @@
   O CSV do Brasileirão ocupa ~400 KB e o de seleções ~3.7 MB inline no HTML. Comprimir com pako (gzip via JS) reduziria o tamanho dos arquivos em ~70% e aceleraria o carregamento inicial.
 
 
----
-
-*Gerado a partir de [bench-docs.html](bench-docs.html) · Março 2026*
-
-
 ## Dívida técnica conhecida
 
-- **`apps/index.html` está com o CSV embutido desatualizado** em relação a
-  `simulacoes/bench-brasileirao2026.html` e a `datasets/` (3 934 vs 3 994 jogos,
-  rodada 14 vs 20). Os três precisam ser atualizados juntos a cada rodada.
-- **Linha provavelmente errada no CSV:** na rodada 7 da temporada 2026 consta
-  `Mirassol x Fortaleza`, mas o Fortaleza não aparece em nenhum outro jogo da
-  temporada e o Coritiba é o único ausente daquela rodada (19 jogos contra 20
-  dos demais). Quase certamente deveria ser `Mirassol x Coritiba`. O modelo
-  ignora o time com jogos de menos e avisa na tela, mas o dado segue errado.
 - **`simulacoes/bench-copa2026.html` e `apps/bench-selecoes.html` ainda carregam
-  cópias inline do modelo de seleções.** Mesma unificação já feita no modelo de
-  clubes deveria ser aplicada a eles.
-- **`campeonatobrasileirolimpo_xg.csv` tem as colunas de xG 100% vazias**
-  (0 de 9 310 linhas) e `fetch_xg.py` nunca produziu dados. O esquema está
-  pronto; falta rodar a coleta.
+  cópias inline do modelo de seleções** (`buildModel` embutido). A mesma unificação já feita
+  no modelo de clubes (`modelos/selecoes-model.js`) deveria ser aplicada a elas.
+- **`mundial-2026.html` é uma página órfã**: fora da barra de abas e do cache offline,
+  substituída por `simulacoes/bench-copa2026.html`. Remover (e tirá-la de `tests/i18n.test.js`
+  e `modelos/readme.md`) ou religar. O `papaparse.min.js` da raiz só serve a ela.
+- **`campeonatobrasileirolimpo_xg.csv` tem as colunas de xG 100% vazias** e `fetch_xg.py`
+  nunca produziu dados. Rodar a coleta ou remover os dois da raiz.
 - **A coluna `data` foi descartada** ao gerar o CSV "limpo", mas existe em
   `datasets/campeonato-brasileiro-full_ate_2025.csv`. Recuperá-la permitiria
   decay por data em vez de assumir `roundsPerSeason = 38`.
+- **Os três CSVs do Brasileirão** (`datasets/` + dois blocos embutidos) precisam ser
+  atualizados juntos a cada rodada; hoje estão em sincronia (9 443 jogos), mas já divergiram antes.
+- **Números escritos à mão** em `index.html`, `README.md`, `CLAUDE.md` e `datasets/readme.md`
+  (veja *Home com números ao vivo*).
+- **`datasets/*.zip`** são cópias de fev 2026 (o do Brasileirão está desatualizado).
+
+### Resolvido
+- ~~Linha errada na rodada 7 (`Mirassol x Fortaleza`)~~ — corrigida para `Mirassol x Coritiba`.
+- ~~`apps/index.html` com CSV embutido atrasado~~ — em sincronia desde a rodada 28.

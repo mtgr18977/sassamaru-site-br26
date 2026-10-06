@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 # Run tests
-npm test                   # All four suites (model, selecoes, pwa, copa)
+npm test                   # Six suites (model, selecoes, pwa, copa, i18n, competicoes)
 npm run test:model         # Club model unit tests
 npm run test:backtest      # Walk-forward accuracy regression gate — run this
                            # after ANY change to the Brasileirão model math
@@ -66,14 +66,20 @@ Keep a club's name identical across divisions (the importer's `CANONICO` map) or
 
 ### Directory layout
 
-- `shell/` — app shell shared by all pages (tab bar, install button)
+- `shell/` — app shell shared by all pages (tab bar, theme toggle, install button)
+- `scripts/` — Python: Série B importer, `dados_serie.py` (see `scripts/readme.md`)
+- Root: `bench-docs.html` (technical docs, "Docs" tab), `service-worker.js`, `manifest.json`, `_headers`.
+  Per-folder READMEs (`apps/`, `datasets/`, `modelos/`, `simulacoes/`, `scripts/`, `tests/`) hold the detail.
+  **Legacy/unused:** `mundial-2026.html` (old Copa page, not in `TABS` nor the precache, still listed in `tests/i18n.test.js`),
+  `fetch_xg.py` + `campeonatobrasileirolimpo_xg.csv` (xG experiment, columns empty), `papaparse.min.js` (only `mundial-2026.html` uses the local copy)
 - `modelos/` — **single source of truth** for the models (pure JS, shared by browser and Node tests)
   - `model.js` — Brasileirão club model
   - `selecoes-model.js` — national teams model
+  - `competicoes.js` — division registry + `statusCalendario()`
 - `apps/` — Interactive prediction UIs. `apps/index.html` loads `../modelos/model.js` via `<script src>`
 - `simulacoes/` — Simulation pages with the dataset embedded inline. `bench-brasileirao2026.html`
-  also loads `../modelos/model.js`; `bench-copa2026.html` still carries its own inline copy of the
-  selections model
+  also loads `../modelos/model.js`; `bench-copa2026.html` (and `apps/bench-selecoes.html`) still carry
+  their own inline copy of the selections model — change `selecoes-model.js` and they do not follow
 - `datasets/` — CSV data files
 - `tests/` — Node tests: model math, walk-forward backtest, PWA compliance, Copa bracket
 
@@ -132,10 +138,9 @@ New match results go into the `window.__EMBEDDED_CSV__` block of **both**
 `simulacoes/bench-brasileirao2026.html` and `apps/index.html`, plus
 `datasets/campeonato-brasileiro-limpo.csv` (the file the Node backtest reads).
 These drift apart easily — `apps/index.html` has been left several rounds behind before.
-
-The CSV carries a duplicated 2025 block that `removeDuplicateBlock()` strips at runtime;
-`datasets/campeonato-brasileiro-full_ate_2025.csv` is a richer, unused variant that still has
-real dates, plus arena, coach and state columns.
+Then, in this order: update `datasets/calendario.js` (see *Competitions and calendar*), run `npm test` and
+`npm run test:backtest`, refresh the hand-written numbers (`index.html`, `README.md`, `datasets/readme.md`,
+the accuracy table below) and bump `CACHE_VERSION` in `service-worker.js`.
 
 ### Season simulation
 
@@ -152,12 +157,14 @@ became a 21st club in the table.
 ## Model accuracy
 
 `npm run test:backtest` is the regression gate. Current numbers (walk-forward, refit every 4
-rounds, last 3 seasons, n=1039, data through round 28 of 2026):
+rounds, last 3 seasons, n=1039 for Série A, data through round 28 of 2026):
 
 | | log-loss | RPS | accuracy |
 |---|---|---|---|
 | Model | 1.031 | 0.212 | 48.1% |
 | Constant 47/27/26 baseline | 1.058 | 0.222 | 47.1% |
+| Série B model (n=1,071) | 1.044 | 0.214 | 47.5% |
+| Série B constant 49/27/24 baseline | 1.053 | 0.217 | 47.9% |
 
 The constant baseline matters: before this gate existed, the shipped model scored 1.069 —
 **worse than predicting the same three numbers for every match**. Any model change that does
