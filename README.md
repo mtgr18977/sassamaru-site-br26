@@ -53,20 +53,26 @@ Precisão do modelo de clubes (backtest walk-forward, n = 1 039):
 
 ## Estrutura do repositório
 
-- `scripts/` — `importar_wikipedia_serie_b.py` (gera o CSV da Série B) e `dados_serie.py` (converter/validar CSVs de outras divisões)
-- `shell/` — Casca do app: barra de abas no topo e botão de instalação
-- `i18n/` — Traduções (en, zh-CN)
-- `apps/` — Webapps interativas de predição
-  - `apps/index.html` — Simulador do Brasileirão
-  - `apps/bench-selecoes.html` — Simulador da Copa do Mundo
-- `datasets/` — Dados históricos em CSV (compactados em `.zip`)
-- `modelos/` — Modelos estatísticos em JavaScript (Dixon-Coles + Poisson)
-- `simulacoes/` — Páginas autocontidas com modelo + dados embutidos (artefatos gerados)
-- `tests/` — Testes automatizados dos modelos
+| Pasta / arquivo | Conteúdo |
+|---|---|
+| `index.html` | Página inicial (números escritos à mão — atualize junto com os dados) |
+| `bench-docs.html` | Documentação técnica do modelo (aba **Docs**) |
+| `shell/` | Casca do app: barra de abas, tema claro/escuro e botão de instalação |
+| `modelos/` | **Fonte única** dos modelos (JS puro, usado pelo navegador e pelo Node) — [detalhes](modelos/readme.md) |
+| `apps/` | Webapps de previsão: Série A/B (`index.html`) e Seleções (`bench-selecoes.html`) — [detalhes](apps/readme.md) |
+| `simulacoes/` | Simulação da temporada (Brasileirão) e da Copa 2026, com dados embutidos — [detalhes](simulacoes/readme.md) |
+| `datasets/` | CSVs, calendário e `.zip` com as fontes originais (fev 2026) — [detalhes](datasets/readme.md) |
+| `scripts/` | Python: importador da Série B e validador de CSVs — [detalhes](scripts/readme.md) |
+| `tests/` | Testes em Node (modelo, backtest, PWA, i18n, calendário, Copa) — [detalhes](tests/readme.md) |
+| `i18n/` | Dicionários en / zh-CN |
+| `service-worker.js`, `manifest.json`, `_headers`, `icons/` | PWA (offline, instalação, cabeçalhos HTTP) |
+| `mundial-2026.html` | Versão **antiga** da página da Copa, fora da barra de abas e do cache offline; substituída por `simulacoes/bench-copa2026.html` (ainda coberta por `tests/i18n.test.js`) |
+| `fetch_xg.py`, `campeonatobrasileirolimpo_xg.csv` | Experimento de xG (FBref): o script nunca rodou com sucesso e as colunas de xG do CSV estão vazias |
+| `papaparse.min.js` | Cópia local do PapaParse, usada só por `mundial-2026.html` (as demais páginas carregam do CDN) |
 
 ## Como executar (local)
 
-Este projeto **não requer build** — são arquivos HTML estáticos. Abra direto no navegador ou use um servidor local para evitar restrições de CORS:
+Este projeto **não requer build** — são arquivos HTML estáticos. Use um servidor local (o service worker e o carregamento de CSVs não funcionam via `file://`):
 
 ```bash
 cd /caminho/para/o/repositorio
@@ -74,17 +80,24 @@ python -m http.server 8000
 # acesse http://localhost:8000/
 ```
 
+**Requisitos:** apenas um navegador para usar o site. Para rodar os testes, Node.js e `npm install` (a única dependência é o `papaparse`). Os scripts de `scripts/` usam Python 3 e só precisam de internet para o importador da Wikipedia.
+
 ## Testes
 
-```bash
-npm test                 # as quatro suítes (modelo, seleções, PWA, Copa)
-npm run test:backtest    # trava de regressão de acurácia do modelo de clubes (Série A)
-npm run test:backtest:b  # a mesma trava para a Série B
-npm run test:i18n        # traduções en/zh
-npm run test:competicoes # calendário, rodada de hoje, Série B e scripts/dados_serie.py
-npm run test:selecoes    # testes do modelo de seleções (110+ asserções)
-npm run test:pwa         # validação do PWA (manifest, service worker, ícones)
-```
+`npm test` roda **seis suítes** em sequência; o backtest é separado porque é mais lento.
+
+| Comando | O que verifica | Asserções |
+|---|---|---|
+| `npm run test:model` | Matemática do modelo de clubes (Poisson, τ de Dixon-Coles, pesos, MLE) | 51 |
+| `npm run test:selecoes` | Modelo de seleções | 111 |
+| `npm run test:pwa` | Manifest, service worker, ícones, `<head>` das páginas | 73 |
+| `npm run test:copa` | Chaveamento da Copa 2026 | 8 |
+| `npm run test:i18n` | Cobertura en/zh, `{placeholders}`, chaves `_t()`, blocos de docs | 59 |
+| `npm run test:competicoes` | Calendário, rodada de hoje, Série B e `scripts/dados_serie.py` | 55 |
+| `npm run test:backtest` | **Trava de acurácia** (Série A): walk-forward, falha se perder para a taxa-base | — |
+| `npm run test:backtest:b` | A mesma trava para a Série B | — |
+
+Rode o backtest depois de **qualquer** mudança na matemática do modelo.
 
 ## Idiomas
 
@@ -94,21 +107,27 @@ O site está disponível em **português (padrão), inglês e chinês simplifica
 
 Os modelos em `modelos/` implementam regressão de Poisson com correção de Dixon-Coles:
 
-- **Força de ataque/defesa** por equipe estimada via MLE (Adam optimizer, 400 iterações)
-- **Sistema Elo** com reset parcial por temporada (clubes) e decaimento por data (seleções)
-- **Vantagem em casa** (γ) estimada junto com ataque e defesa
-- **Sem fator de forma nem de descanso**: ambos pioravam o backtest e foram removidos (veja `CLAUDE.md`)
+| | Clubes (`model.js`) | Seleções (`selecoes-model.js`) |
+|---|---|---|
+| Unidade de tempo | rodadas (o CSV não tem datas) | datas reais |
+| Decaimento | exponencial por rodada, com piso | meia-vida mais longa + peso por importância do torneio |
+| ρ (Dixon-Coles) | estimado junto com os demais parâmetros | busca em grade |
+| Elo | reset parcial por temporada | decaimento por data |
+| Campo neutro | — | sim |
 
-## Webapps disponíveis
-
-| Webapp | Arquivo |
-|--------|---------|
-| Rodada do Brasileirão | `apps/index.html` |
-| Seleções | `apps/bench-selecoes.html` |
+Comum aos dois: ataque/defesa por equipe e vantagem de casa (γ) por MLE (Adam, 400 iterações). **Não há fator de forma nem de descanso**: ambos pioravam o backtest e foram removidos (veja `CLAUDE.md`).
 
 ## Atualização de dados
 
-Novos resultados do Brasileirão entram em **três lugares**, sempre iguais: `datasets/campeonato-brasileiro-limpo.csv` (lido pelo backtest) e o bloco `window.__EMBEDDED_CSV__` de `apps/index.html` e de `simulacoes/bench-brasileirao2026.html`. Depois rode `npm test` e `npm run test:backtest`, atualize os números da página inicial (`index.html`), do `CLAUDE.md` e do `README.md`, e suba o `CACHE_VERSION` em `service-worker.js`.
+Depois de cada rodada do Brasileirão:
+
+1. **Resultados** — acrescente-os em **três lugares, sempre iguais**: `datasets/campeonato-brasileiro-limpo.csv` (lido pelo backtest) e o bloco `window.__EMBEDDED_CSV__` de `apps/index.html` e de `simulacoes/bench-brasileirao2026.html`.
+2. **Calendário** — em `datasets/calendario.js`: mova a rodada para `concluida`, inclua datas e jogos das próximas, atualize `atualizadoEm` e remova de `pendentes` os jogos já disputados.
+3. **Verificação** — `npm test` e `npm run test:backtest`.
+4. **Números escritos à mão** — `index.html`, `README.md` (tabelas acima), `CLAUDE.md` e `datasets/readme.md`.
+5. **Cache** — suba `CACHE_VERSION` em `service-worker.js`.
+
+Série B: regere o CSV com `python scripts/importar_wikipedia_serie_b.py` (veja [scripts/readme.md](scripts/readme.md)).
 
 ## Contribuição
 
@@ -117,7 +136,7 @@ Novos resultados do Brasileirão entram em **três lugares**, sempre iguais: `da
 3. Abra um Pull Request descrevendo a mudança.
 
 > [!IMPORTANT]
-> Consulte o [ToDo.md](https://github.com/mtgr18977/sassamaru-site-br26/blob/main/ToDo.md) para a lista de melhorias planejadas.
+> Consulte o [ToDo.md](ToDo.md) para a lista de melhorias planejadas.
 
 ## Licença
 
