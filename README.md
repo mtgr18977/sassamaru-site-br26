@@ -10,7 +10,7 @@ A barra de abas no topo (`shell/shell.js` + `shell/shell.css`, injetada em todas
 |-----|--------|-----------|
 | Início | `index.html` | Apresenta o app, estado dos dados e precisão do modelo |
 | Série A | `apps/index.html?comp=serie-a` | Rodada de hoje e contagem regressiva; previsão 1X2, odds e placares. Sub-aba **Simulação da temporada** (`simulacoes/bench-brasileirao2026.html`): Monte Carlo do resto de 2026 |
-| Série B | `apps/index.html?comp=serie-b` | Mesma previsão de rodada para a Série B (estrutura pronta, dados pendentes) |
+| Série B | `apps/index.html?comp=serie-b` | Mesma previsão de rodada para a Série B (2007–2025) |
 | Seleções | `apps/bench-selecoes.html` | Previsão de partidas entre seleções |
 | Copa 2026 | `simulacoes/bench-copa2026.html` | Simulação do torneio completo |
 | Docs | `bench-docs.html` | Documentação técnica do modelo |
@@ -19,16 +19,17 @@ A barra de abas no topo (`shell/shell.js` + `shell/shell.css`, injetada em todas
 
 A aba **Série A** compara o dia do dispositivo com `datasets/calendario.js` e mostra a rodada em andamento (ou a próxima), as datas, quantos dias faltam e a faixa das 38 rodadas; um botão carrega os jogos da rodada para o simulador. O navegador não consegue ler ge.globo.com nem a Wikipedia (CORS/bloqueio) e o app precisa funcionar offline, então o calendário é um arquivo editado a cada atualização, a partir da tabela detalhada da CBF. Hoje: rodadas 29–32 confirmadas, 33–38 provisórias; jogos completos das rodadas 29 e 30.
 
-## Série B (estrutura pronta, dados pendentes)
+## Série B
 
-`modelos/competicoes.js` registra Série A e Série B (20 clubes, 38 rodadas, pontos corridos desde 2006, G4 de acesso e Z4). A aba **Série B** já existe; enquanto não houver CSV ela mostra o passo a passo. Para ativar:
+`modelos/competicoes.js` registra Série A e Série B (20 clubes, 38 rodadas, G4 de acesso e Z4). A aba **Série B** usa o mesmo modelo, com `datasets/campeonato-brasileiro-serie-b.csv`: **19 temporadas (2007–2025), 7 220 jogos**, gerado por `scripts/importar_wikipedia_serie_b.py` a partir da matriz de resultados de cada página "AAAA Campeonato Brasileiro Série B" da Wikipedia (2014 e 2015 vêm da página em português).
 
-```bash
-python scripts/dados_serie.py converter resultados_b.csv datasets/campeonato-brasileiro-serie-b.csv   # converte e valida
-# depois: troque dados: 'pendente' por 'disponivel' em modelos/competicoes.js
-```
+Limitações, de propósito explícitas:
+- **Rodadas sintéticas.** A fonte não traz data nem rodada; a ordem dos jogos dentro de cada temporada é inventada (método do círculo, perna de ida sorteada por temporada). Resultados e mandos são reais. A coluna `rodada_origem` marca isso.
+- **2006 e 2026 ficam de fora.** 2006 não tem matriz completa em nenhuma das duas Wikipedias; 2026 está em andamento e sem rodadas reais não dá para ordenar os jogos jogados.
+- **Ganho pequeno.** `npm run test:backtest:b` (n = 1 140, 2023–2025): log-loss 1,039 × 1,051 da taxa-base 49/27/24 (RPS 0,211 × 0,215). A Série B é mais parelha e troca de elenco todo ano; clubes sem histórico entram como média da liga.
+- O treino usa todo o histórico: janelas curtas pioraram o backtest.
 
-`python scripts/dados_serie.py validar <csv>` confere jogos por temporada, rodadas 1–38, 20 clubes e jogos por clube. O modelo trata clubes sem histórico como média da liga (com aviso), o que é o ponto fraco numa divisão de alta rotatividade — veja o `ToDo.md`.
+Para regerar: `python scripts/importar_wikipedia_serie_b.py` (precisa de internet; aceita `--cache DIR`). `python scripts/dados_serie.py validar <csv>` confere qualquer CSV no formato do modelo.
 
 ## Estado dos dados (6 out 2026)
 
@@ -36,7 +37,7 @@ python scripts/dados_serie.py converter resultados_b.csv datasets/campeonato-bra
 |------|-----------|-------|
 | Brasileirão (clubes) | 2003 – rodada 28 de 2026 (+ adiados da 21ª) | 9 444 |
 | Seleções | 1872 – 2026 | 49 000+ |
-| Série B (2006+) | estrutura pronta, sem dados | — |
+| Série B | 2007 – 2025 (rodadas sintéticas) | 7 220 |
 
 Faltam no Brasileirão 2026: 101 jogos (279 de 380 disputados), entre eles Chapecoense × Vasco, adiado da 21ª rodada.
 
@@ -44,12 +45,14 @@ Precisão do modelo de clubes (backtest walk-forward, n = 1 039):
 
 | | log-loss | RPS | acurácia |
 |---|---|---|---|
-| Modelo | 1,031 | 0,212 | 48,1% |
-| Taxa-base fixa 47/27/26 | 1,058 | 0,222 | 47,1% |
+| Série A — modelo | 1,031 | 0,212 | 48,1% |
+| Série A — taxa-base fixa 47/27/26 | 1,058 | 0,222 | 47,1% |
+| Série B — modelo | 1,039 | 0,211 | 47,3% |
+| Série B — taxa-base 49/27/24 | 1,051 | 0,215 | 48,1% |
 
 ## Estrutura do repositório
 
-- `scripts/` — `dados_serie.py` (converter/validar CSVs de outras divisões)
+- `scripts/` — `importar_wikipedia_serie_b.py` (gera o CSV da Série B) e `dados_serie.py` (converter/validar CSVs de outras divisões)
 - `shell/` — Casca do app: barra de abas no topo e botão de instalação
 - `i18n/` — Traduções (en, zh-CN)
 - `apps/` — Webapps interativas de predição
@@ -74,7 +77,8 @@ python -m http.server 8000
 
 ```bash
 npm test                 # as quatro suítes (modelo, seleções, PWA, Copa)
-npm run test:backtest    # trava de regressão de acurácia do modelo de clubes
+npm run test:backtest    # trava de regressão de acurácia do modelo de clubes (Série A)
+npm run test:backtest:b  # a mesma trava para a Série B
 npm run test:i18n        # traduções en/zh
 npm run test:competicoes # calendário, rodada de hoje, Série B e scripts/dados_serie.py
 npm run test:selecoes    # testes do modelo de seleções (110+ asserções)

@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-globals */
 'use strict';
 
-const CACHE_VERSION = 'v7';
+const CACHE_VERSION = 'v8';
 const CACHE_NAME = `br26-${CACHE_VERSION}`;
 
 // Assets to pre-cache on install
@@ -17,6 +17,7 @@ const PRECACHE_ASSETS = [
   './modelos/model.js',
   './modelos/competicoes.js',
   './datasets/calendario.js',
+  './datasets/campeonato-brasileiro-serie-b.csv',
   './modelos/selecoes-model.js',
   './i18n/i18n.js',
   './i18n/en.js',

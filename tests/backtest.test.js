@@ -14,14 +14,19 @@ const assert = require("assert");
 const fs = require("fs");
 const path = require("path");
 const { runBacktest, CONFIG } = require("../modelos/model.js");
+const Comp = require("../modelos/competicoes.js");
+
+// COMP=serie-b npm run test:backtest  →  mesma trava para outra divisão (padrão: serie-a)
+const comp = Comp.obter(process.env.COMP || "serie-a");
 
 // Limiar de regressão. O modelo atual fica em ~1.023; a folga cobre variação
 // de dados quando novas rodadas entram no CSV.
-const MAX_LOG_LOSS = 1.035;
+const MAX_LOG_LOSS = comp.limiteLogLoss;
 const TEST_SEASONS = 3;
 const REFIT_EVERY = 4;
 
-const CSV_PATH = path.join(__dirname, "..", "datasets", "campeonato-brasileiro-limpo.csv");
+const CSV_PATH = path.join(__dirname, "..", comp.csv);
+CONFIG.TRAIN_FROM_SEASON = Comp.indiceTreino(comp);
 
 function parseCsv(text) {
   const lines = text.split("\n");
@@ -46,6 +51,7 @@ function fmt(n, d = 4) {
   const rows = parseCsv(fs.readFileSync(CSV_PATH, "utf8"));
   assert.ok(rows.length > 1000, `dataset pequeno demais: ${rows.length} linhas`);
 
+  console.log(`competição: ${comp.nome}`);
   console.log(`backtest: ${rows.length} linhas, ${TEST_SEASONS} temporadas de teste, ` +
               `refit a cada ${REFIT_EVERY} rodadas`);
   console.log(`config: HALF_LIFE_POISSON_ROUNDS=${CONFIG.HALF_LIFE_POISSON_ROUNDS} ` +
@@ -56,6 +62,8 @@ function fmt(n, d = 4) {
     refitEvery: REFIT_EVERY,
     seasons: TEST_SEASONS,
     yield: false,
+    baseRates: comp.taxaBase,
+    lastYear: comp.ultimaTemporadaNoCsv,
   });
   const elapsed = ((Date.now() - started) / 1000).toFixed(1);
 
@@ -101,7 +109,7 @@ function fmt(n, d = 4) {
 
   assert.ok(
     o.logLoss < b.logLoss,
-    `REGRESSÃO: modelo (${fmt(o.logLoss)}) não vence a taxa-base fixa (${fmt(b.logLoss)})`
+    `REGRESSÃO: modelo (${fmt(o.logLoss)}) não vence a taxa-base (${fmt(b.logLoss)})`
   );
 
   assert.ok(

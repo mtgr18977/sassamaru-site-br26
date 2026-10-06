@@ -10,7 +10,8 @@
     "test:pwa": "node tests/pwa.test.js",
     "test:copa": "node tests/copa2026-bracket.test.js",
     "test:i18n": "node tests/i18n.test.js",
-    "test:competicoes": "node tests/competicoes.test.js"
+    "test:competicoes": "node tests/competicoes.test.js",
+    "test:backtest:b": "COMP=serie-b node tests/backtest.test.js"
   },
   "dependencies": {
     "papaparse": "^5.5.4"

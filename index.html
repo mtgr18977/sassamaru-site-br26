@@ -137,9 +137,9 @@ footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--border
       <span class="go">Abrir →</span>
     </a>
     <a class="card" href="apps/index.html?comp=serie-b" style="--c:#64748B">
-      <div class="top"><span class="ico">🥈</span><div><div class="t">Série B</div><div class="s">Em preparação</div></div></div>
-      <p>A mesma previsão de rodada para a Série B, em pontos corridos desde 2006. A estrutura e o importador de dados já estão prontos; falta carregar os resultados.</p>
-      <div class="tags"><span class="tag">20 clubes</span><span class="tag">2006+</span><span class="tag">G4 · Z4</span></div>
+      <div class="top"><span class="ico">🥈</span><div><div class="t">Série B</div><div class="s">Previsão de partidas</div></div></div>
+      <p>A mesma previsão de rodada para a Série B, com 19 temporadas de resultados (2007–2025) vindas da Wikipedia. As datas não existem na fonte, então a ordem dos jogos dentro de cada temporada é sintética.</p>
+      <div class="tags"><span class="tag">20 clubes</span><span class="tag">2007–2025</span><span class="tag">G4 · Z4</span></div>
       <span class="go">Abrir →</span>
     </a>
     <a class="card" href="apps/bench-selecoes.html" style="--c:#1E40AF">
@@ -167,7 +167,7 @@ footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--border
     <thead><tr><th>Base de dados</th><th>Cobertura</th><th class="num">Jogos</th><th>Atualização</th><th>Usada em</th></tr></thead>
     <tbody>
       <tr><td>Brasileirão (clubes)</td><td>2003 – rodada 28 de 2026</td><td class="num">9 444</td><td>6 out 2026</td><td>Série A (rodada e temporada)</td></tr>
-      <tr><td>Série B (2006+)</td><td>estrutura pronta</td><td class="num">—</td><td>aguardando dados</td><td>Série B (aba própria)</td></tr>
+      <tr><td>Série B</td><td>2007 – 2025 (rodadas sintéticas)</td><td class="num">7 220</td><td>6 out 2026</td><td>Série B (aba própria)</td></tr>
       <tr><td>Seleções</td><td>1872 – 2026</td><td class="num">49 000+</td><td>Copa 2026</td><td>Seleções, Copa 2026</td></tr>
     </tbody>
   </table></div>
@@ -177,11 +177,13 @@ footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--border
   <div class="tbl-wrap"><table>
     <thead><tr><th>Modelo</th><th class="num">Log-loss</th><th class="num">RPS</th><th class="num">Acurácia</th></tr></thead>
     <tbody>
-      <tr><td>Sassamaru (Dixon-Coles + Elo)</td><td class="num good">1,031</td><td class="num good">0,212</td><td class="num good">48,1%</td></tr>
-      <tr><td>Taxa-base fixa 47/27/26</td><td class="num">1,058</td><td class="num">0,222</td><td class="num">47,1%</td></tr>
+      <tr><td>Série A — Sassamaru</td><td class="num good">1,031</td><td class="num good">0,212</td><td class="num good">48,1%</td></tr>
+      <tr><td>Série A — taxa-base 47/27/26</td><td class="num">1,058</td><td class="num">0,222</td><td class="num">47,1%</td></tr>
+      <tr><td>Série B — Sassamaru</td><td class="num good">1,039</td><td class="num good">0,211</td><td class="num">47,3%</td></tr>
+      <tr><td>Série B — taxa-base 49/27/24</td><td class="num">1,051</td><td class="num">0,215</td><td class="num">48,1%</td></tr>
     </tbody>
   </table></div>
-  <p class="note">Backtest walk-forward em 1 039 jogos (2024, 2025 e 2026 até agora). Menor log-loss e RPS é melhor.</p>
+  <p class="note">Backtest walk-forward: Série A em 1 039 jogos (2024, 2025 e 2026 até agora); Série B em 1 140 jogos (2023–2025). Menor log-loss e RPS é melhor. Na Série B o ganho sobre a taxa-base é pequeno: a divisão é mais parelha e muda de elenco todo ano.</p>
   <div class="chart" style="margin-top:12px" aria-label="Log-loss por temporada">
     <div class="r"><span>2024</span><div class="bar" style="width:96.9%"></div><span>1,026</span></div>
     <div class="r"><span>2025</span><div class="bar" style="width:98%"></div><span>1,037</span></div>

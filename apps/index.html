@@ -11258,7 +11258,14 @@ function fmtDias(d) {
 
 function renderCalendario() {
   const card = $("calCard");
-  if (!CAL) { card.hidden = true; return; }
+  if (!CAL) {
+    // sem calendário (Série B): só o aviso sobre a origem dos dados
+    if (COMP.rodadasSinteticas) {
+      card.innerHTML = `<div class="cal-note warn" style="margin:0">${_t('Dados da {nome}: temporadas {de}–{ate} (Wikipedia). A fonte não traz datas, então a ordem dos jogos dentro de cada temporada é sintética — resultados e mandos são reais. A temporada {prox} ainda não está incluída e a {nome} ainda não tem calendário no app.', { nome: COMP.nome, de: COMP.primeiraTemporadaNoCsv, ate: COMP.ultimaTemporadaNoCsv, prox: COMP.ultimaTemporadaNoCsv + 1 })}</div>`;
+      card.hidden = false;
+    } else card.hidden = true;
+    return;
+  }
   const st = Comp.statusCalendario(CAL, new Date());
   const foco = st.foco;
   let titulo, sub, count, agora = false;
@@ -11375,6 +11382,11 @@ async function loadCSV(){
     recent.get(away).push({gf:ag,ga:hg});
   }
   window.__BENCH_RECENT__ = recent;
+  // nomes de clubes que não estão em DISPLAY_NAMES (Série B…) aparecem como no dataset, com acento e hífen
+  for (const r of parsed) for (const col of [CONFIG.HOME_TEAM_COL, CONFIG.AWAY_TEAM_COL]) {
+    const raw = (r[col] || '').trim(), n = normalizeTeam(raw);
+    if (n && !DISPLAY_NAMES[n]) DISPLAY_NAMES[n] = raw;
+  }
 
   _rawParsed = parsed;
 
@@ -11404,6 +11416,11 @@ async function loadCSV(){
     }
   } catch (e) {
     console.warn("Não foi possível pré-preencher os jogos restantes:", e.message);
+  }
+  if (COMP.id !== Comp.PADRAO) {
+    // o texto de exemplo é de clubes da Série A: usa os últimos jogos do dataset desta divisão
+    $("fixtures").value = parsed.slice(-10).map(r => `${r[CONFIG.HOME_TEAM_COL]} x ${r[CONFIG.AWAY_TEAM_COL]}`).join("\n");
+    $("fixtures").dispatchEvent(new Event('input', { bubbles: true }));
   }
   const cd = document.getElementById("calDados");
   if (cd) { try { const stt = computeSeasonState(parsed); cd.innerHTML = `<small>${_t('até a rodada {r} · {j} jogos em {t}', { r: stt.roundsPlayed, j: COMP.nTimes * (COMP.nTimes - 1) - stt.remaining.length, t: CAL ? CAL.temporada : '' })}</small>`; } catch (e) { cd.innerHTML = '<small>—</small>'; } }

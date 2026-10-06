@@ -9,6 +9,6 @@ Datasets used in the model.
 | `results.csv` | Jogos internacionais de seleções desde 1872 | 2026 |
 
 | `calendario.js` | Calendário 2026: janelas das 38 rodadas (status concluída/confirmada/provisória), jogos pendentes e confrontos das rodadas 29–30 | 6 out 2026 |
-| `campeonato-brasileiro-serie-b.csv` | **ainda não existe** — Série B 2006+, mesmo formato do arquivo da Série A (`scripts/dados_serie.py`) | — |
+| `campeonato-brasileiro-serie-b.csv` | Série B 2007–2025 (19×380 jogos), mesmo formato da Série A + coluna `rodada_origem` (**rodadas sintéticas**); gerado por `scripts/importar_wikipedia_serie_b.py` | 6 out 2026 |
 
 Ao acrescentar resultados em `campeonato-brasileiro-limpo.csv`, replique-os nos blocos `__EMBEDDED_CSV__` de `apps/index.html` e `simulacoes/bench-brasileirao2026.html`.

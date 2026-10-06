@@ -20,6 +20,7 @@
       nome: 'Série A',
       pontosCorridosDesde: 2003,   // índice 0 do dataset = 2003
       treinarAPartirDe: 2015,      // temporadas anteriores têm peso residual demais para valer o custo
+      ultimaTemporadaNoCsv: 2026,  // temporada em andamento
       nTimes: 20,
       rodadas: 38,
       csv: 'datasets/campeonato-brasileiro-limpo.csv',
@@ -28,19 +29,26 @@
       // faixas de posição final (1-indexado, inclusive) usadas na simulação de temporada
       zonas: { libertadores: [1, 6], sulamericana: [7, 12], rebaixamento: [17, 20] },
       promocao: null,
+      taxaBase: { pH: 0.47, pD: 0.27, pA: 0.26 },   // referência do backtest: prever sempre isto não pode ganhar do modelo
+      limiteLogLoss: 1.035,                          // trava de regressão (tests/backtest.test.js)
     },
     'serie-b': {
       id: 'serie-b',
       nome: 'Série B',
       pontosCorridosDesde: 2006,   // 20 clubes × 38 rodadas desde 2006
-      treinarAPartirDe: 2018,      // mesma janela de ~8 temporadas
+      primeiraTemporadaNoCsv: 2007, // 2006 não tem fonte com os 380 resultados
+      treinarAPartirDe: 2007,      // todo o histórico: no backtest, janelas curtas pioram (log-loss 1,039 com tudo × 1,046 desde 2018)
+      rodadasSinteticas: true,     // a fonte (Wikipedia) não traz data/rodada: a ordem dos jogos na temporada é inventada
+      ultimaTemporadaNoCsv: 2025,
       nTimes: 20,
       rodadas: 38,
-      csv: 'datasets/campeonato-brasileiro-serie-b.csv',
-      dados: 'pendente',           // 'pendente' = CSV ainda não importado → a UI mostra o passo a passo;
+      csv: 'datasets/campeonato-brasileiro-serie-b.csv',  // gerado por scripts/importar_wikipedia_serie_b.py
+      dados: 'disponivel',         // 'pendente' = CSV ainda não importado → a UI mostra o passo a passo;
                                    // 'disponivel' = CSV existe e é lido por fetch (lembre de pô-lo no precache do service-worker.js)
       calendario: null,
       zonas: { acesso: [1, 4], rebaixamento: [17, 20] },
+      taxaBase: { pH: 0.49, pD: 0.27, pA: 0.24 },   // frequência histórica 2007–2025 (7 220 jogos)
+      limiteLogLoss: 1.045,                          // medido: 1.039 (2007+); a Série B é mais parelha, o ganho sobre a taxa-base é pequeno
       promocao: 'serie-a',
       // Elenco muda muito mais que na Série A (4 sobem, 4 caem, 4 chegam da C todo ano): times sem
       // histórico entram na média da liga (α=β=1, Elo 1500) com aviso. Ver ToDo.md.
@@ -53,7 +61,7 @@
   function obter(id) { return COMPETICOES[id] || COMPETICOES[PADRAO]; }
   function lista() { return Object.keys(COMPETICOES).map(function (k) { return COMPETICOES[k]; }); }
   /** Índice (0 = primeira temporada do CSV) a partir do qual o modelo treina — vai em buildModel({trainFromSeason}). */
-  function indiceTreino(comp) { return comp.treinarAPartirDe - comp.pontosCorridosDesde; }
+  function indiceTreino(comp) { return comp.treinarAPartirDe - (comp.primeiraTemporadaNoCsv || comp.pontosCorridosDesde); }
 
   // ── datas ────────────────────────────────────────────────────────────────
   /** 'AAAA-MM-DD' → Date à meia-noite LOCAL (comparar dias civis sem depender do fuso/horário de verão). */

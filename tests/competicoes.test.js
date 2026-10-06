@@ -29,10 +29,11 @@ section('Registro de competições');
   ok(b.zonas.acesso[1] === 4 && b.zonas.rebaixamento[0] === 17, 'Série B: G4 de acesso e Z4');
   ok(C.obter('qualquer-coisa').id === 'serie-a', 'id desconhecido cai na Série A');
   ok(C.indiceTreino(a) === 12, 'índice de treino da Série A = 2015 − 2003');
-  ok(C.indiceTreino(b) === 12, 'índice de treino da Série B = 2018 − 2006');
+  ok(C.indiceTreino(b) === 0, 'Série B treina com todo o histórico (índice 0 = 2007)');
   ok(fs.existsSync(path.join(ROOT, a.csv)), 'CSV da Série A existe');
   ok(b.dados === 'pendente' ? !fs.existsSync(path.join(ROOT, b.csv)) : fs.existsSync(path.join(ROOT, b.csv)),
     'Série B: "dados" reflete se o CSV existe (troque para "disponivel" ao importar)');
+  ok(b.rodadasSinteticas === true, 'Série B: rodadas marcadas como sintéticas');
 }
 
 // ── status do calendário ────────────────────────────────────────────────────
@@ -94,6 +95,39 @@ section('Integridade do calendário 2026');
   const pend = cal.pendentes[0];
   ok(pend && !jogados.has(M.normalizeTeam(pend.mandante) + '|' + M.normalizeTeam(pend.visitante)),
     'jogo pendente (Chapecoense × Vasco) ainda não está no dataset — remova de "pendentes" quando for disputado');
+}
+
+// ── dataset da Série B ──────────────────────────────────────────────────────
+section('Dataset da Série B (Wikipedia, rodadas sintéticas)');
+{
+  const b = C.obter('serie-b');
+  const file = path.join(ROOT, b.csv);
+  if (!fs.existsSync(file)) {
+    console.log('  – CSV da Série B ausente; seção ignorada');
+  } else {
+    const [cab, ...ls] = fs.readFileSync(file, 'utf8').trim().split('\n');
+    const cols = cab.split(',');
+    const rows = ls.map((l) => Object.fromEntries(l.split(',').map((v, i) => [cols[i], v])));
+    ok(rows.length === 19 * 380, `19 temporadas × 380 jogos = ${rows.length}`);
+    ok(rows.every((r) => r.rodada_origem === 'sintetica'), 'toda linha marca a rodada como sintética');
+    // temporada 2025 (última): os 4 primeiros são os promovidos que estão na Série A 2026
+    const t25 = rows.slice(-380), pts = {}, sg = {};
+    for (const r of t25) {
+      const gm = +r.mandante_Placar, gv = +r.visitante_Placar;
+      pts[r.mandante] = (pts[r.mandante] || 0) + (gm > gv ? 3 : gm === gv ? 1 : 0);
+      pts[r.visitante] = (pts[r.visitante] || 0) + (gv > gm ? 3 : gm === gv ? 1 : 0);
+      sg[r.mandante] = (sg[r.mandante] || 0) + gm - gv; sg[r.visitante] = (sg[r.visitante] || 0) + gv - gm;
+    }
+    const top4 = Object.keys(pts).sort((x, y) => pts[y] - pts[x] || sg[y] - sg[x]).slice(0, 4).map(M.normalizeTeam).sort();
+    ok(JSON.stringify(top4) === JSON.stringify(['athletico paranaense', 'chapecoense', 'coritiba', 'remo']),
+      `2025: Coritiba, Athletico-PR, Chapecoense e Remo no G4 (${top4.join(', ')})`);
+    // mesmo clube = mesmo nome nas duas divisões (senão o modelo não reconhece o clube que subiu)
+    const A = new Set(fs.readFileSync(path.join(ROOT, C.obter('serie-a').csv), 'utf8').split('\n').slice(-300).flatMap((l) => [l.split(',')[2], l.split(',')[3]]).map(M.normalizeTeam));
+    const doB = new Set(t25.flatMap((r) => [r.mandante, r.visitante]).map(M.normalizeTeam));
+    ok(['athletico paranaense', 'chapecoense', 'coritiba', 'remo'].every((c) => A.has(c) && doB.has(c)), 'clubes promovidos têm o mesmo nome na Série A e na Série B');
+    const py = spawnSync('python3', ['-I', path.join(ROOT, 'scripts/dados_serie.py'), 'validar', file], { encoding: 'utf8' });
+    if (!py.error) ok(py.status === 0 && /19 temporadas, 7220 jogos, 0 com problema/.test(py.stdout), 'scripts/dados_serie.py validar aprova o CSV da Série B');
+  }
 }
 
 // ── rotatividade alta (Série B) ─────────────────────────────────────────────

@@ -936,7 +936,7 @@
     const N = seasons.length;
     const numTest   = Math.min(numSeasonsWanted, N - 2);
     const firstTest = N - numTest;
-    const currentYear = new Date().getFullYear();
+    const currentYear = opts.lastYear ?? new Date().getFullYear(); // ano da última temporada do CSV
     const yearOf = (si) => currentYear - (N - 1 - si);
 
     const toRows = (games) => games.map(g => ({
@@ -952,7 +952,7 @@
     // Referência: prever sempre a taxa-base histórica do Brasileirão.
     // Se o modelo não vencer isto, ele não tem valor preditivo nenhum.
     const baseline = createScorer();
-    const BASE_RATES = { pH: 0.47, pD: 0.27, pA: 0.26 };
+    const BASE_RATES = opts.baseRates ?? { pH: 0.47, pD: 0.27, pA: 0.26 };
 
     for (let si = firstTest; si < N; si++) {
       const priorGames = valid.filter(p => p.season < si && p.season >= CONFIG.TRAIN_FROM_SEASON);
