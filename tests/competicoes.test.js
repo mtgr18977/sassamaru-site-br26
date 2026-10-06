@@ -108,10 +108,13 @@ section('Dataset da Série B (Wikipedia, rodadas sintéticas)');
     const [cab, ...ls] = fs.readFileSync(file, 'utf8').trim().split('\n');
     const cols = cab.split(',');
     const rows = ls.map((l) => Object.fromEntries(l.split(',').map((v, i) => [cols[i], v])));
-    ok(rows.length === 19 * 380, `19 temporadas × 380 jogos = ${rows.length}`);
+    ok(rows.length === 19 * 380 + 311, `19 temporadas completas + 311 jogos de 2026 = ${rows.length}`);
     ok(rows.every((r) => r.rodada_origem === 'sintetica'), 'toda linha marca a rodada como sintética');
-    // temporada 2025 (última): os 4 primeiros são os promovidos que estão na Série A 2026
-    const t25 = rows.slice(-380), pts = {}, sg = {};
+    const r26 = rows.slice(-311), cont = {};
+    for (const r of r26) { cont[r.mandante] = (cont[r.mandante] || 0) + 1; cont[r.visitante] = (cont[r.visitante] || 0) + 1; }
+    ok(Object.values(cont).filter((v) => v === 31).length === 18 && Object.values(cont).filter((v) => v === 32).length === 2, '2026: 18 clubes com 31 jogos e 2 com 32 (um jogo adiado já disputado)');
+    // temporada 2025: os 4 primeiros são os promovidos que estão na Série A 2026
+    const t25 = rows.slice(-691, -311), pts = {}, sg = {};
     for (const r of t25) {
       const gm = +r.mandante_Placar, gv = +r.visitante_Placar;
       pts[r.mandante] = (pts[r.mandante] || 0) + (gm > gv ? 3 : gm === gv ? 1 : 0);
@@ -126,7 +129,7 @@ section('Dataset da Série B (Wikipedia, rodadas sintéticas)');
     const doB = new Set(t25.flatMap((r) => [r.mandante, r.visitante]).map(M.normalizeTeam));
     ok(['athletico paranaense', 'chapecoense', 'coritiba', 'remo'].every((c) => A.has(c) && doB.has(c)), 'clubes promovidos têm o mesmo nome na Série A e na Série B');
     const py = spawnSync('python3', ['-I', path.join(ROOT, 'scripts/dados_serie.py'), 'validar', file], { encoding: 'utf8' });
-    if (!py.error) ok(py.status === 0 && /19 temporadas, 7220 jogos, 0 com problema/.test(py.stdout), 'scripts/dados_serie.py validar aprova o CSV da Série B');
+    if (!py.error) ok(py.status === 0 && /20 temporadas, 7531 jogos, 0 com problema/.test(py.stdout), 'scripts/dados_serie.py validar aprova o CSV da Série B');
   }
 }
 

@@ -37,9 +37,9 @@
       nome: 'Série B',
       pontosCorridosDesde: 2006,   // 20 clubes × 38 rodadas desde 2006
       primeiraTemporadaNoCsv: 2007, // 2006 não tem fonte com os 380 resultados
-      treinarAPartirDe: 2007,      // todo o histórico: no backtest, janelas curtas pioram (log-loss 1,039 com tudo × 1,046 desde 2018)
+      treinarAPartirDe: 2007,      // todo o histórico (no backtest a janela muda pouco: 1,042–1,044 entre 2007 e 2020)
       rodadasSinteticas: true,     // a fonte (Wikipedia) não traz data/rodada: a ordem dos jogos na temporada é inventada
-      ultimaTemporadaNoCsv: 2025,
+      ultimaTemporadaNoCsv: 2026,  // 2026 parcial: só os jogos já disputados
       nTimes: 20,
       rodadas: 38,
       csv: 'datasets/campeonato-brasileiro-serie-b.csv',  // gerado por scripts/importar_wikipedia_serie_b.py
@@ -48,7 +48,7 @@
       calendario: null,
       zonas: { acesso: [1, 4], rebaixamento: [17, 20] },
       taxaBase: { pH: 0.49, pD: 0.27, pA: 0.24 },   // frequência histórica 2007–2025 (7 220 jogos)
-      limiteLogLoss: 1.045,                          // medido: 1.039 (2007+); a Série B é mais parelha, o ganho sobre a taxa-base é pequeno
+      limiteLogLoss: 1.050,                          // medido: 1.044 (2007+); a Série B é mais parelha, o ganho sobre a taxa-base é pequeno
       promocao: 'serie-a',
       // Elenco muda muito mais que na Série A (4 sobem, 4 caem, 4 chegam da C todo ano): times sem
       // histórico entram na média da liga (α=β=1, Elo 1500) com aviso. Ver ToDo.md.

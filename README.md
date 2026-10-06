@@ -10,7 +10,7 @@ A barra de abas no topo (`shell/shell.js` + `shell/shell.css`, injetada em todas
 |-----|--------|-----------|
 | Início | `index.html` | Apresenta o app, estado dos dados e precisão do modelo |
 | Série A | `apps/index.html?comp=serie-a` | Rodada de hoje e contagem regressiva; previsão 1X2, odds e placares. Sub-aba **Simulação da temporada** (`simulacoes/bench-brasileirao2026.html`): Monte Carlo do resto de 2026 |
-| Série B | `apps/index.html?comp=serie-b` | Mesma previsão de rodada para a Série B (2007–2025) |
+| Série B | `apps/index.html?comp=serie-b` | Mesma previsão de rodada para a Série B (2007–2026) |
 | Seleções | `apps/bench-selecoes.html` | Previsão de partidas entre seleções |
 | Copa 2026 | `simulacoes/bench-copa2026.html` | Simulação do torneio completo |
 | Docs | `bench-docs.html` | Documentação técnica do modelo |
@@ -21,13 +21,14 @@ A aba **Série A** compara o dia do dispositivo com `datasets/calendario.js` e m
 
 ## Série B
 
-`modelos/competicoes.js` registra Série A e Série B (20 clubes, 38 rodadas, G4 de acesso e Z4). A aba **Série B** usa o mesmo modelo, com `datasets/campeonato-brasileiro-serie-b.csv`: **19 temporadas (2007–2025), 7 220 jogos**, gerado por `scripts/importar_wikipedia_serie_b.py` a partir da matriz de resultados de cada página "AAAA Campeonato Brasileiro Série B" da Wikipedia (2014 e 2015 vêm da página em português).
+`modelos/competicoes.js` registra Série A e Série B (20 clubes, 38 rodadas, G4 de acesso e Z4). A aba **Série B** usa o mesmo modelo, com `datasets/campeonato-brasileiro-serie-b.csv`: **20 temporadas (2007–2025 completas + 2026 em andamento), 7 531 jogos**, gerado por `scripts/importar_wikipedia_serie_b.py` a partir da matriz de resultados de cada página "AAAA Campeonato Brasileiro Série B" da Wikipedia (2014 e 2015 vêm da página em português).
 
 Limitações, de propósito explícitas:
 - **Rodadas sintéticas.** A fonte não traz data nem rodada; a ordem dos jogos dentro de cada temporada é inventada (método do círculo, perna de ida sorteada por temporada). Resultados e mandos são reais. A coluna `rodada_origem` marca isso.
-- **2006 e 2026 ficam de fora.** 2006 não tem matriz completa em nenhuma das duas Wikipedias; 2026 está em andamento e sem rodadas reais não dá para ordenar os jogos jogados.
-- **Ganho pequeno.** `npm run test:backtest:b` (n = 1 140, 2023–2025): log-loss 1,039 × 1,051 da taxa-base 49/27/24 (RPS 0,211 × 0,215). A Série B é mais parelha e troca de elenco todo ano; clubes sem histórico entram como média da liga.
-- O treino usa todo o histórico: janelas curtas pioraram o backtest.
+- **2006 fica de fora**: não tem matriz completa em nenhuma das duas Wikipedias.
+- **2026 é parcial** (311 jogos, até 3 out): vem da página em português e foi conferida com a em inglês (310 resultados idênticos; a em inglês ainda não tinha Fortaleza × CRB, jogo adiado). Os jogos disputados são repartidos em 31 rodadas completas mais 1 jogo adiado, em ordem sintética.
+- **Ganho pequeno.** `npm run test:backtest:b` (n = 1 071: 2024, 2025 e 2026 até agora): log-loss 1,044 × 1,053 da taxa-base 49/27/24 (RPS 0,214 × 0,217). A Série B é mais parelha e troca de elenco todo ano; clubes sem histórico entram como média da liga.
+- O treino usa todo o histórico (a janela muda pouco o resultado).
 
 Para regerar: `python scripts/importar_wikipedia_serie_b.py` (precisa de internet; aceita `--cache DIR`). `python scripts/dados_serie.py validar <csv>` confere qualquer CSV no formato do modelo.
 
@@ -37,7 +38,7 @@ Para regerar: `python scripts/importar_wikipedia_serie_b.py` (precisa de interne
 |------|-----------|-------|
 | Brasileirão (clubes) | 2003 – rodada 28 de 2026 (+ adiados da 21ª) | 9 444 |
 | Seleções | 1872 – 2026 | 49 000+ |
-| Série B | 2007 – 2025 (rodadas sintéticas) | 7 220 |
+| Série B | 2007 – rodada 31 de 2026 (rodadas sintéticas) | 7 531 |
 
 Faltam no Brasileirão 2026: 101 jogos (279 de 380 disputados), entre eles Chapecoense × Vasco, adiado da 21ª rodada.
 
@@ -47,8 +48,8 @@ Precisão do modelo de clubes (backtest walk-forward, n = 1 039):
 |---|---|---|---|
 | Série A — modelo | 1,031 | 0,212 | 48,1% |
 | Série A — taxa-base fixa 47/27/26 | 1,058 | 0,222 | 47,1% |
-| Série B — modelo | 1,039 | 0,211 | 47,3% |
-| Série B — taxa-base 49/27/24 | 1,051 | 0,215 | 48,1% |
+| Série B — modelo | 1,044 | 0,214 | 47,5% |
+| Série B — taxa-base 49/27/24 | 1,053 | 0,217 | 47,9% |
 
 ## Estrutura do repositório
 

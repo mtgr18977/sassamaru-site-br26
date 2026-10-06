@@ -33,10 +33,10 @@
 - [x] **Sassamaru 2026: shell de aplicativo** — barra de abas no topo (`shell/`), página inicial explicando o site, botão "Instalar app", manifest com novo nome e atalhos.
 - [x] **Rodada de hoje + contagem regressiva** — `modelos/competicoes.js` + `datasets/calendario.js`, comparados com o relógio do visitante (aba Rodada e página inicial).
 - [x] **Estrutura multi-competição (Série B)** — registro, abas Série A / Série B no topo, `scripts/dados_serie.py`, teste com liga de alta rotatividade.
-- [x] **Dados da Série B 2007–2025** — importados da Wikipedia (`scripts/importar_wikipedia_serie_b.py`), 7 220 jogos, validados contra campeões/promovidos conhecidos.
-- [ ] **Rodadas reais na Série B** — hoje a ordem dos jogos na temporada é sintética (a matriz da Wikipedia não tem datas). Fonte com data/rodada (CBF, ge, soccerway) tornaria o tempo do modelo real e permitiria incluir a temporada 2026 em andamento.
+- [x] **Dados da Série B 2007–2026** — importados da Wikipedia (`scripts/importar_wikipedia_serie_b.py`), 7 531 jogos (2026 parcial), validados contra campeões/promovidos conhecidos e entre pt/en.
+- [ ] **Rodadas reais na Série B** — hoje a ordem dos jogos na temporada é sintética (a matriz da Wikipedia não tem datas). Fonte com data/rodada (CBF, ge, soccerway) tornaria o tempo do modelo real (a chave da api-futebol.com.br enviada não tinha campeonatos no plano — veja a resposta no chat).
 - [ ] **Série B 2006** — sem matriz completa na Wikipedia (en/pt); precisa de outra fonte.
-- [ ] **Ganho da Série B é pequeno** (log-loss 1,039 × 1,051): testar prior por divisão (Série A/B/C), `log γ` por time e meia-vida própria.
+- [ ] **Ganho da Série B é pequeno** (log-loss 1,044 × 1,053): testar prior por divisão (Série A/B/C), `log γ` por time e meia-vida própria.
 - [ ] **Clubes sem histórico (promovidos/rebaixados)** — hoje entram como média da liga. Melhor: prior vindo da outra divisão com desconto (Série C→B→A), e `log γ` por time. Medir no backtest da Série B.
 - [ ] **Simulação de temporada para a Série B** — `bench-brasileirao2026.html` tem as zonas da Série A fixas; ler de `Competicoes.zonas` (acesso G4 / Z4).
 - [ ] **Calendário automático** — hoje editado à mão após cada divulgação da CBF; um script que leia a tabela da CBF e gere `calendario.js`.
