@@ -36,7 +36,6 @@ const ZH_DOCS = require('../i18n/zh-docs.js');
 const PAGES = [
   'index.html',
   'bench-docs.html',
-  'mundial-2026.html',
   'apps/index.html',
   'apps/bench-selecoes.html',
   'simulacoes/bench-brasileirao2026.html',
@@ -139,12 +138,15 @@ section('Chaves não colidem com nomes de times');
   assert(clubNorm.size > 30, `${clubNorm.size} nomes de clubes lidos`);
   assert(clash.length === 0, `nenhuma chave coincide com nome de clube${clash.length ? ' — ' + clash.join(' | ') : ''}`);
 
-  const selecoes = [...read('mundial-2026.html').matchAll(/name:'([^']+)',flag/g)].map((m) => m[1]);
+  // as 48 seleções da Copa 2026 (nomes em português, como aparecem nas páginas)
+  const selecoes = [
+    'México', 'África do Sul', 'Coreia do Sul', 'Tchéquia', 'Canadá', 'Catar', 'Suíça', 'Bósnia-Herz.', 'Brasil', 'Marrocos', 'Haiti', 'Escócia', 'EUA', 'Paraguai', 'Austrália', 'Turquia', 'Alemanha', 'Curaçao', 'Costa do Marfim', 'Equador', 'Holanda', 'Japão', 'Suécia', 'Tunísia', 'Bélgica', 'Egito', 'Irã', 'Nova Zelândia', 'Espanha', 'Cabo Verde', 'Arábia Saudita', 'Uruguai', 'França', 'Senegal', 'Iraque', 'Noruega', 'Argentina', 'Argélia', 'Áustria', 'Jordânia', 'Portugal', 'Rep. D. Congo', 'Colômbia', 'Uzbequistão', 'Inglaterra', 'Croácia', 'Gana', 'Panamá',
+  ];
   const selClash = [];
   for (const [name, dict] of [['en', EN], ['zh', ZH]]) {
     // nomes das 48 seleções TÊM de estar no dicionário (é como são traduzidos)…
     const lacking = selecoes.filter((s) => !(s in dict));
-    assert(selecoes.length === 48 && lacking.length === 0, `${name}: as 48 seleções de mundial-2026.html estão traduzidas${lacking.length ? ' — faltam ' + lacking.join(', ') : ''}`);
+    assert(selecoes.length === 48 && lacking.length === 0, `${name}: as 48 seleções da Copa 2026 estão traduzidas${lacking.length ? ' — faltam ' + lacking.join(', ') : ''}`);
   }
   assert(selClash.length === 0, 'ok');
 }

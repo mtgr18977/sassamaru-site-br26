@@ -8,7 +8,7 @@ Rodam em Node, sem framework: `npm test` (seis suítes) e `npm run test:backtest
 | `selecoes-model.test.js` | `test:selecoes` | 111 | `modelos/selecoes-model.js` |
 | `pwa.test.js` | `test:pwa` | 73 | Manifest, service worker, ícones e `<head>` de cada página |
 | `copa2026-bracket.test.js` | `test:copa` | 8 | Chaveamento da Copa (lógica copiada de `bench-copa2026.html`) |
-| `i18n.test.js` | `test:i18n` | 59 | Dicionários en/zh, placeholders, chaves `_t()`, blocos de docs, choque com nomes de clubes |
+| `i18n.test.js` | `test:i18n` | 57 | Dicionários en/zh, placeholders, chaves `_t()`, blocos de docs, choque com nomes de clubes |
 | `competicoes.test.js` | `test:competicoes` | 55 | Calendário, rodada de hoje, integridade com o CSV, Série B, `scripts/dados_serie.py` |
 | `backtest.test.js` | `test:backtest` / `test:backtest:b` | — | Walk-forward sobre dados reais; falha se o modelo não superar a taxa-base em log-loss **e** RPS |
 

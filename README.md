@@ -66,9 +66,6 @@ Precisão do modelo de clubes (backtest walk-forward, n = 1 039):
 | `tests/` | Testes em Node (modelo, backtest, PWA, i18n, calendário, Copa) — [detalhes](tests/readme.md) |
 | `i18n/` | Dicionários en / zh-CN |
 | `service-worker.js`, `manifest.json`, `_headers`, `icons/` | PWA (offline, instalação, cabeçalhos HTTP) |
-| `mundial-2026.html` | Versão **antiga** da página da Copa, fora da barra de abas e do cache offline; substituída por `simulacoes/bench-copa2026.html` (ainda coberta por `tests/i18n.test.js`) |
-| `fetch_xg.py`, `campeonatobrasileirolimpo_xg.csv` | Experimento de xG (FBref): o script nunca rodou com sucesso e as colunas de xG do CSV estão vazias |
-| `papaparse.min.js` | Cópia local do PapaParse, usada só por `mundial-2026.html` (as demais páginas carregam do CDN) |
 
 ## Como executar (local)
 
@@ -92,7 +89,7 @@ python -m http.server 8000
 | `npm run test:selecoes` | Modelo de seleções | 111 |
 | `npm run test:pwa` | Manifest, service worker, ícones, `<head>` das páginas | 73 |
 | `npm run test:copa` | Chaveamento da Copa 2026 | 8 |
-| `npm run test:i18n` | Cobertura en/zh, `{placeholders}`, chaves `_t()`, blocos de docs | 59 |
+| `npm run test:i18n` | Cobertura en/zh, `{placeholders}`, chaves `_t()`, blocos de docs | 57 |
 | `npm run test:competicoes` | Calendário, rodada de hoje, Série B e `scripts/dados_serie.py` | 55 |
 | `npm run test:backtest` | **Trava de acurácia** (Série A): walk-forward, falha se perder para a taxa-base | — |
 | `npm run test:backtest:b` | A mesma trava para a Série B | — |
