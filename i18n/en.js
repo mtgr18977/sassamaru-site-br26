@@ -99,6 +99,8 @@
   "Dataset insuficiente após filtros ({n} jogos). Verifique as colunas.": "Not enough data after filtering ({n} matches). Check the columns.",
   /* ── index.html — página inicial ── */
   /* Sassamaru 2026: página inicial redesenhada + barra de abas (shell/shell.js) */
+  "Modo escuro": "Dark mode",
+  "Modo claro": "Light mode",
   "Início@@aba": "Home",
   "Rodada@@aba": "Round",
   "Brasileirão@@aba": "Brasileirão",

@@ -16,6 +16,22 @@
     { href: 'mundial-2026.html',                    key: 'Grupos@@aba',      ico: '📋' },
     { href: 'bench-docs.html',                      key: 'Docs@@aba',        ico: '📄' },
   ];
+  // ── tema claro/escuro ── aplicado já no <head>, antes da primeira pintura (sem "flash" branco)
+  var THEME_KEY = 'br26-theme', html = document.documentElement;
+  var mq = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : { matches: false };
+  function savedTheme() { try { var v = localStorage.getItem(THEME_KEY); return v === 'dark' || v === 'light' ? v : null; } catch (e) { return null; } }
+  function currentTheme() { return savedTheme() || (mq.matches ? 'dark' : 'light'); }
+  function applyTheme() {
+    var th = currentTheme();
+    html.setAttribute('data-theme', th);
+    var m = document.querySelector('meta[name="theme-color"]');
+    if (m) m.setAttribute('content', th === 'dark' ? '#12261B' : '#1A4731');
+  }
+  var pageName = (location.pathname.split('/').pop() || 'index.html').replace(/\.html$/, '');
+  html.setAttribute('data-page', pageName === 'bench-docs' ? 'docs' : pageName);
+  applyTheme();
+  if (mq.addEventListener) mq.addEventListener('change', function () { if (!savedTheme()) applyTheme(); });
+
   var T = function (k) { return typeof window._t === 'function' ? window._t(k) : k.replace(/@@.*$/, ''); };
 
   function here() {
@@ -39,7 +55,7 @@
         '<a class="app-brand" href="' + root + 'index.html"><img src="' + root + 'icons/icon.svg" alt="" width="28" height="28">' +
           '<span>Sassamaru 2026</span></a>' +
         '<nav class="app-tabs" aria-label="Sassamaru 2026">' + tabs + '</nav>' +
-        '<div class="app-tools"><button type="button" class="app-install" hidden>' + T('Instalar app') + '</button></div>' +
+        '<div class="app-tools"><button type="button" class="app-theme"></button><button type="button" class="app-install" hidden>' + T('Instalar app') + '</button></div>' +
       '</div>';
     document.body.insertBefore(bar, document.body.firstChild);
 
@@ -51,6 +67,20 @@
       var nav = bar.querySelector('.app-tabs');
       nav.scrollLeft = Math.max(0, active.offsetLeft - nav.clientWidth / 2 + active.clientWidth / 2);
     }
+
+    var tb = bar.querySelector('.app-theme');
+    function paintToggle() {
+      var dark = html.getAttribute('data-theme') === 'dark';
+      tb.textContent = dark ? '☀️' : '🌙';
+      var lbl = dark ? T('Modo claro') : T('Modo escuro');
+      tb.title = lbl; tb.setAttribute('aria-label', lbl);
+    }
+    tb.addEventListener('click', function () {
+      var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      try { localStorage.setItem(THEME_KEY, next); } catch (e) { /* modo privado */ }
+      applyTheme(); paintToggle();
+    });
+    paintToggle();
 
     var btn = bar.querySelector('.app-install'), ev = null;
     window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); ev = e; btn.hidden = false; });

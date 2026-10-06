@@ -181,7 +181,7 @@ h3 {
 }
 p {
   font-size: 14px;
-  color: #2A2A26;
+  color: var(--s-text2);
   margin-bottom: 14px;
   line-height: 1.75;
 }
@@ -203,7 +203,7 @@ p:last-child { margin-bottom: 0; }
   color: var(--text);
   line-height: 1.9;
   overflow-x: auto;
-  background: #FAFAF8;
+  background: var(--s-sunk);
 }
 .formula-eq .eq-line {
   display: block;
@@ -214,7 +214,7 @@ p:last-child { margin-bottom: 0; }
   font-weight: 500;
   color: var(--accent);
 }
-.formula-eq .eq-sub  { color: #3A3A36; }
+.formula-eq .eq-sub  { color: var(--s-text2); }
 .formula-vars {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -249,7 +249,7 @@ p:last-child { margin-bottom: 0; }
 }
 /* Legacy one-liner formulas */
 .formula {
-  background: #FAFAF8;
+  background: var(--s-sunk);
   border: 1px solid var(--border);
   border-left: 3px solid var(--accent);
   border-radius: var(--radius);
@@ -276,7 +276,7 @@ p:last-child { margin-bottom: 0; }
   letter-spacing: .07em;
   text-transform: uppercase;
   color: var(--muted);
-  background: #F9F8F5;
+  background: var(--s-sunk);
   padding: 8px 12px;
   border-bottom: 1px solid var(--border);
   text-align: left;
@@ -309,9 +309,9 @@ p:last-child { margin-bottom: 0; }
   font-size: 13px;
   line-height: 1.65;
 }
-.callout.note    { background: var(--accent-lt); border: 1px solid #a7c7b5; color: #1A3D2B; }
-.callout.warn    { background: #FEF3C7; border: 1px solid #fcd34d; color: #78350F; }
-.callout.insight { background: #EFF6FF; border: 1px solid #BFDBFE; color: #1E3A5F; }
+.callout.note    { background: var(--accent-lt); border: 1px solid var(--s-accent-bd); color: var(--s-accent-fg2); }
+.callout.warn    { background: var(--s-warn-bg); border: 1px solid var(--s-warn-bd); color: var(--s-warn-fg); }
+.callout.insight { background: var(--s-blue-bg); border: 1px solid var(--s-blue-bd); color: var(--s-blue-fg); }
 .callout strong  { font-weight: 600; }
 
 /* ── Figure / diagram ── */
@@ -413,10 +413,10 @@ p:last-child { margin-bottom: 0; }
   margin-top: 2px;
 }
 .todo-tag.model   { background: var(--accent-lt); color: var(--accent); }
-.todo-tag.dados   { background: #EFF6FF; color: #1E40AF; }
-.todo-tag.ui      { background: #F0EEE8; color: var(--muted); }
-.todo-tag.infra   { background: #FEF3C7; color: #92400E; }
-.todo-tag.done    { background: #F0F0EC; color: #9A9892; }
+.todo-tag.dados   { background: var(--s-blue-bg); color: var(--s-blue-fg); }
+.todo-tag.ui      { background: var(--s-chip); color: var(--muted); }
+.todo-tag.infra   { background: var(--s-warn-bg); color: var(--s-warn-fg); }
+.todo-tag.done    { background: var(--s-chip); color: var(--s-faint); }
 .todo-text strong { font-weight: 600; }
 .todo-text small  { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; }
 .todo-done-item   { opacity: 0.6; }

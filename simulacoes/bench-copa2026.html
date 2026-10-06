@@ -44,7 +44,7 @@ header{display:flex;align-items:center;justify-content:space-between;
 .brand-text p{font-size:11px;color:var(--muted);font-family:var(--mono)}
 .pill{font-family:var(--mono);font-size:11px;padding:4px 10px;border-radius:99px;
   border:1px solid var(--border);color:var(--muted);background:var(--surface);white-space:nowrap}
-.pill.accent{background:var(--accent-lt);border-color:#a7c7b5;color:var(--accent);font-weight:500}
+.pill.accent{background:var(--accent-lt);border-color:var(--s-accent-bd);color:var(--accent);font-weight:500}
 
 /* Loading */
 #loading{text-align:center;padding:60px 20px}
@@ -105,7 +105,7 @@ header{display:flex;align-items:center;justify-content:space-between;
 /* Groups grid */
 .groups-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:32px}
 .group-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
-.group-header{background:#F9F8F5;padding:8px 12px;border-bottom:1px solid var(--border);
+.group-header{background:var(--s-sunk);padding:8px 12px;border-bottom:1px solid var(--border);
   display:flex;align-items:center;justify-content:space-between}
 .group-letter{font-size:12px;font-weight:600;color:var(--accent)}
 .group-label{font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:500}
@@ -131,8 +131,8 @@ header{display:flex;align-items:center;justify-content:space-between;
 .finalist-pct{font-family:var(--mono);font-size:13px;color:var(--muted)}
 
 /* Playoff note */
-.playoff-note{background:var(--warn-lt);border:1px solid #fcd34d;border-radius:var(--radius);
-  padding:10px 14px;font-size:11.5px;color:#92400E;margin-bottom:20px;line-height:1.5}
+.playoff-note{background:var(--warn-lt);border:1px solid var(--s-warn-bd);border-radius:var(--radius);
+  padding:10px 14px;font-size:11.5px;color:var(--s-warn-fg);margin-bottom:20px;line-height:1.5}
 .playoff-note strong{font-weight:600}
 
 /* Tabs */
@@ -50106,10 +50106,10 @@ function pct(count,N){return count/N;}
 
 function color3(p){
   // Returns a color on a green→amber→red gradient
-  if(p>0.2) return '#1A4731';
+  if(p>0.2) return 'var(--accent)';
   if(p>0.08) return '#D97706';
-  if(p>0.03) return '#5A5750';
-  return '#C9C6BC';
+  if(p>0.03) return 'var(--s-text2)';
+  return 'var(--s-line)';
 }
 
 function renderPodium(stats){
@@ -50164,7 +50164,7 @@ function renderGroups(stats){
       </div>`;
 
     ranked.forEach((x,i)=>{
-      const barColor = x.qp>0.7?'#1A4731':x.qp>0.4?'#D97706':'#C9C6BC';
+      const barColor = x.qp>0.7?'var(--accent)':x.qp>0.4?'#D97706':'var(--s-line)';
       const rowClass = i<2&&x.qp>0.5?'qualified':i===2&&x.qp>0.25?'third':'';
       html+=`<div class="group-team-row ${rowClass}">
         <div class="team-flag-name">

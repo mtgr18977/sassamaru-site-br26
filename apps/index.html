@@ -211,13 +211,13 @@
     }
     .pill.accent {
       background: var(--accent-lt);
-      border-color: #a7c7b5;
+      border-color: var(--s-accent-bd);
       color: var(--accent);
       font-weight: 500;
     }
     .pill.danger {
       background: var(--bad-lt);
-      border-color: #fca5a5;
+      border-color: var(--s-bad-bd);
       color: var(--bad);
     }
 
@@ -257,7 +257,7 @@
       letter-spacing: .07em;
       text-transform: uppercase;
       color: var(--muted);
-      background: #F9F8F5;
+      background: var(--s-sunk);
       padding: 9px 10px;
       border-bottom: 1px solid var(--border);
       white-space: nowrap;
@@ -271,7 +271,7 @@
       vertical-align: middle;
     }
     tbody tr:last-child td { border-bottom: none; }
-    tbody tr:hover td { background: #F9F8F5; }
+    tbody tr:hover td { background: var(--s-sunk); }
 
     .num  { font-family: var(--mono); text-align: right; }
 
@@ -288,7 +288,7 @@
       white-space: nowrap;
     }
     .tag.home { background: var(--accent-lt); color: var(--accent); }
-    .tag.draw { background: #F0EEE8; color: #5A5750; }
+    .tag.draw { background: var(--s-chip); color: var(--s-text2); }
     .tag.away { background: var(--warn-lt); color: var(--warn); }
     .odd-inline { font-weight: 400; opacity: .7; }
 
@@ -309,8 +309,8 @@
       border-radius: 3px; overflow: hidden;
       margin-bottom: 3px;
     }
-    .prob-h { background: #1A4731; }
-    .prob-d { background: #C9C6BC; }
+    .prob-h { background: var(--accent); }
+    .prob-d { background: var(--s-line); }
     .prob-a { background: #D97706; }
     .prob-labels {
       display: flex; justify-content: space-between;
@@ -319,9 +319,9 @@
 
     /* ── Expandable score row ── */
     tr.match-row { cursor: pointer; }
-    tr.match-row:hover td { background: #F9F8F5; }
+    tr.match-row:hover td { background: var(--s-sunk); }
     tr.match-row.open td  { background: var(--accent-lt); }
-    tr.detail-row td { padding: 0; border-bottom: 1px solid var(--border); background: #FAFAF8; }
+    tr.detail-row td { padding: 0; border-bottom: 1px solid var(--border); background: var(--s-sunk); }
 
     .detail-panel {
       padding: 16px 14px;
@@ -339,7 +339,7 @@
       font-family: var(--mono);
     }
     .score-matrix th {
-      background: #F0EEE8;
+      background: var(--s-chip);
       color: var(--muted);
       font-weight: 500;
       padding: 3px 6px;
@@ -382,8 +382,8 @@
     .di-bar-lbl { font-size: 11px; color: var(--muted); width: 90px; flex-shrink: 0; }
     .pct-bar-bg  { flex: 1; background: var(--border); border-radius: 3px; height: 6px; overflow: hidden; }
     .pct-bar-fill { height: 6px; border-radius: 3px; }
-    .pct-bar-home { background: #1A4731; }
-    .pct-bar-draw { background: #C9C6BC; }
+    .pct-bar-home { background: var(--accent); }
+    .pct-bar-draw { background: var(--s-line); }
     .pct-bar-away { background: #D97706; }
     .di-bar-val { font-family: var(--mono); font-size: 11px; width: 38px; text-align: right; }
 
@@ -425,11 +425,11 @@
       border-radius: 3px; overflow: hidden;
       margin: 6px 0 5px; gap: 1px;
     }
-    .s-dist-h { background: #1A4731; }
-    .s-dist-d { background: #C9C6BC; }
+    .s-dist-h { background: var(--accent); }
+    .s-dist-d { background: var(--s-line); }
     .s-dist-a { background: #D97706; }
     .s-dist-legend { display: flex; gap: 12px; font-size: 11px; font-family: var(--mono); }
-    .s-dist-legend .dh { color: #1A4731; font-weight: 600; }
+    .s-dist-legend .dh { color: var(--accent); font-weight: 600; }
     .s-dist-legend .dd { color: #7A786F; font-weight: 600; }
     .s-dist-legend .da { color: #D97706; font-weight: 600; }
 
@@ -486,7 +486,7 @@
       display: flex; align-items: center; gap: 6px;
     }
     .cfg-group-title::after {
-      content: ''; flex: 1; height: 1px; background: #a7c7b5;
+      content: ''; flex: 1; height: 1px; background: var(--s-accent-bd);
     }
     .cfg-row {
       display: flex; justify-content: space-between; align-items: baseline;
@@ -529,10 +529,10 @@
     .val-line.err  .val-icon { color: var(--bad);  }
     .val-teams { display: flex; align-items: center; gap: 5px; flex: 1; flex-wrap: wrap; }
     .val-team  { font-weight: 500; font-size: 12px; }
-    .val-team.unknown { text-decoration: underline wavy #D97706; color: #92400E; }
+    .val-team.unknown { text-decoration: underline wavy #D97706; color: var(--s-warn-fg); }
     .val-sep   { color: var(--muted); font-size: 11px; }
     .val-msg   { font-size: 10.5px; color: var(--muted); font-family: var(--mono); }
-    .warn-msg  { color: #92400E; }
+    .warn-msg  { color: var(--s-warn-fg); }
     #valSummary { font-family: var(--mono); font-size: 11px; color: var(--muted); }
     .val-summary-ok  { color: var(--good); font-weight: 500; }
     .val-summary-wrn { color: var(--warn); font-weight: 500; }
@@ -588,8 +588,8 @@
     .mc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     .mc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 10px; margin-top: 14px; }
     .mc-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; }
-    .mc-card-title { border-color: #a7c7b5; background: var(--accent-lt); }
-    .mc-card-rel   { border-color: #fca5a5; background: var(--bad-lt); }
+    .mc-card-title { border-color: var(--s-accent-bd); background: var(--accent-lt); }
+    .mc-card-rel   { border-color: var(--s-bad-bd); background: var(--bad-lt); }
     .mc-pos  { font-size: 10px; color: var(--muted); margin-bottom: 4px; }
     .mc-team { font-size: 12px; font-weight: 600; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .mc-row { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; font-size: 10.5px; }
@@ -601,7 +601,7 @@
     .mc-bar-rel { background: var(--bad); }
     .mc-pct { font-family: var(--mono); font-size: 10px; font-weight: 600; min-width: 38px; text-align: right; }
     .mc-pct-t   { color: var(--good); }
-    .mc-pct-g4  { color: #2e7d32; }
+    .mc-pct-g4  { color: var(--s-ok-fg); }
     .mc-pct-rel { color: var(--bad); }
     .mc-note { font-size: 10.5px; color: var(--muted); margin-top: 10px; line-height: 1.5; }
 
@@ -621,9 +621,9 @@
       font-family: var(--mono); font-size: 10.5px;
       padding: 3px 9px; border-radius: 99px; border: 1px solid var(--border);
     }
-    .elo-hi { border-color: #a7c7b5; color: var(--accent); background: var(--accent-lt); }
-    .elo-lo { border-color: #fca5a5; color: var(--bad); background: var(--bad-lt); }
-    .elo-md { border-color: #fcd34d; color: #92400E; background: var(--warn-lt); }
+    .elo-hi { border-color: var(--s-accent-bd); color: var(--accent); background: var(--accent-lt); }
+    .elo-lo { border-color: var(--s-bad-bd); color: var(--bad); background: var(--bad-lt); }
+    .elo-md { border-color: var(--s-warn-bd); color: var(--s-warn-fg); background: var(--warn-lt); }
 
     .cmp-section {
       font-size: 10px; color: var(--muted); text-transform: uppercase;
@@ -633,7 +633,7 @@
     .bar-lbl { font-size: 11px; color: var(--muted); width: 116px; flex-shrink: 0; }
     .bar-bg  { flex: 1; background: var(--border); border-radius: 3px; height: 6px; overflow: hidden; }
     .bar-fill { height: 6px; border-radius: 3px; transition: width .3s; }
-    .bar-atk { background: #1A4731; }
+    .bar-atk { background: var(--accent); }
     .bar-def { background: #2563EB; }
     .bar-val { font-family: var(--mono); font-size: 11px; width: 32px; text-align: right; }
 
@@ -642,9 +642,9 @@
       font-size: 10px; font-weight: 600; padding: 2px 7px;
       border-radius: 99px;
     }
-    .fp-v { background: var(--accent-lt); color: var(--accent); border: 1px solid #a7c7b5; }
-    .fp-e { background: #F0EEE8; color: #5A5750; border: 1px solid var(--border); }
-    .fp-d { background: var(--bad-lt); color: var(--bad); border: 1px solid #fca5a5; }
+    .fp-v { background: var(--accent-lt); color: var(--accent); border: 1px solid var(--s-accent-bd); }
+    .fp-e { background: var(--s-chip); color: var(--s-text2); border: 1px solid var(--border); }
+    .fp-d { background: var(--bad-lt); color: var(--bad); border: 1px solid var(--s-bad-bd); }
 
     .form-avg { font-size: 11px; color: var(--muted); margin-top: 6px; display: flex; gap: 14px; }
     .form-avg span b { color: var(--text); }
@@ -10438,8 +10438,8 @@ function probBar(pH, pD, pA){
     +'<div class="prob-a" style="flex:'+pA+'"></div>'
     +'</div>'
     +'<div class="prob-labels">'
-    +'<span style="color:#1A4731">'+h+'%</span>'
-    +'<span style="color:#7A786F">'+d+'%</span>'
+    +'<span style="color:var(--accent)">'+h+'%</span>'
+    +'<span style="color:var(--muted)">'+d+'%</span>'
     +'<span style="color:#D97706">'+a+'%</span>'
     +'</div></div>';
 }
@@ -10558,7 +10558,7 @@ function renderSummary(results){
   mEl.innerHTML =
     '<div class="s-metric"><div class="s-metric-lbl">Confiança média</div><div class="s-metric-val">'+(avgConf*100).toFixed(0)+'%</div><div class="s-metric-sub">probabilidade máxima<br>média por jogo</div></div>'
     +'<div class="s-metric"><div class="s-metric-lbl">λ médio</div><div class="s-metric-val">'+avgLam.toFixed(2)+'</div><div class="s-metric-sub">gols esperados<br>por time</div></div>'
-    +'<div class="s-metric"><div class="s-metric-lbl">Jogos na rodada</div><div class="s-metric-val">'+n+'</div><div class="s-metric-sub"><span style="color:#1A4731;">'+_t('{n} casa',{n:countH})+'</span> · <span style="color:#7A786F;">'+_t('{n} empate',{n:countD})+'</span> · <span style="color:#D97706;">'+_t('{n} fora',{n:countA})+'</span></div></div>'
+    +'<div class="s-metric"><div class="s-metric-lbl">Jogos na rodada</div><div class="s-metric-val">'+n+'</div><div class="s-metric-sub"><span style="color:var(--accent);">'+_t('{n} casa',{n:countH})+'</span> · <span style="color:var(--muted);">'+_t('{n} empate',{n:countD})+'</span> · <span style="color:#D97706;">'+_t('{n} fora',{n:countA})+'</span></div></div>'
     +'<div class="s-metric"><div class="s-metric-lbl">Distribuição H / D / A</div><div class="s-dist-bar"><div class="s-dist-h" style="flex:'+countH+'"></div><div class="s-dist-d" style="flex:'+countD+'"></div><div class="s-dist-a" style="flex:'+countA+'"></div></div><div class="s-dist-legend"><span class="dh">'+_t('{n} Casa',{n:countH})+'</span><span class="dd">'+_t('{n} Empate',{n:countD})+'</span><span class="da">'+_t('{n} Fora',{n:countA})+'</span></div></div>';
   function hlCard(r,conf,label,fillClass){ return '<div class="s-hl"><div class="s-hl-lbl">'+label+'</div><div class="s-hl-match">'+displayName(r.home)+' × '+displayName(r.away)+'</div><div class="s-hl-pick">'+pickTag(r,conf)+'</div><div class="s-conf-track"><div class="s-conf-fill '+fillClass+'" style="width:'+(conf*100).toFixed(0)+'%"></div></div><div class="s-conf-pct">'+_t('{p}% de confiança',{p:(conf*100).toFixed(1)})+'</div></div>'; }
   hlEl.innerHTML = hlCard(best,bestConf,"Palpite mais confiante","hi")+hlCard(worst,worstConf,"Jogo mais incerto","lo");
@@ -10826,8 +10826,8 @@ function buildCalibrationPlot(bins) {
 
   // Eixos
   const axes = `
-    <line x1="${PAD}" y1="${PAD}" x2="${PAD}" y2="${PAD+iH}" stroke="#E2E0D9" stroke-width="1"/>
-    <line x1="${PAD}" y1="${PAD+iH}" x2="${PAD+iW}" y2="${PAD+iH}" stroke="#E2E0D9" stroke-width="1"/>`;
+    <line x1="${PAD}" y1="${PAD}" x2="${PAD}" y2="${PAD+iH}" stroke="var(--border)" stroke-width="1"/>
+    <line x1="${PAD}" y1="${PAD+iH}" x2="${PAD+iW}" y2="${PAD+iH}" stroke="var(--border)" stroke-width="1"/>`;
 
   // Labels eixos
   const xLabels = [0, 0.25, 0.5, 0.75, 1.0].map(v => {

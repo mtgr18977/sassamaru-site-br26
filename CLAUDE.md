@@ -32,6 +32,14 @@ after `i18n/i18n.js`. To add a section: add it to `TABS` in `shell/shell.js`, ad
 `i18n/{en,zh}.js`, precache the page in `service-worker.js`. `index.html` is the home page (what the
 site contains, data status, backtest numbers) — its figures are hand-written, update them with the data.
 
+**Theme (light/dark).** `shell/shell.js` sets `data-theme` on `<html>` before first paint (stored in
+`localStorage` as `br26-theme`, defaulting to the OS preference); the toggle sits in the app bar.
+`shell/shell.css` holds the shared identity (header, pills, footer, page width) and the dark palette: it
+overrides each page's own tokens (`--bg`, `--surface`, `--accent`…) plus the shared `--s-*` tokens.
+**Never hard-code a neutral/tinted color in a page** — use a token (`var(--surface)`, `--s-sunk`, `--s-chip`,
+`--s-line`, `--s-text2`, `--s-warn-*`, `--s-bad-*`, `--s-ok-*`, `--s-blue-*`) or the page looks broken in dark mode.
+White text on `var(--accent)` fills stays `#fff`.
+
 ### Directory layout
 
 - `shell/` — app shell shared by all pages (tab bar, install button)

@@ -99,6 +99,8 @@
   "Dataset insuficiente após filtros ({n} jogos). Verifique as colunas.": "过滤后数据不足（{n} 场比赛）。请检查列名。",
   /* ── index.html — página inicial ── */
   /* Sassamaru 2026: página inicial redesenhada + barra de abas (shell/shell.js) */
+  "Modo escuro": "深色模式",
+  "Modo claro": "浅色模式",
   "Início@@aba": "首页",
   "Rodada@@aba": "轮次",
   "Brasileirão@@aba": "巴甲",
