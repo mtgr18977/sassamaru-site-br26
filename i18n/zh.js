@@ -99,7 +99,13 @@
   "Dataset insuficiente após filtros ({n} jogos). Verifique as colunas.": "过滤后数据不足（{n} 场比赛）。请检查列名。",
   /* ── index.html — página inicial ── */
   /* Sassamaru 2026: página inicial redesenhada + barra de abas (shell/shell.js) */
-  "Dados da {nome}: temporadas {de}–{ate} (Wikipedia; a de {ate} está em andamento, só com os jogos já disputados). A fonte não traz datas, então a ordem dos jogos dentro de cada temporada é sintética — resultados e mandos são reais. A {nome} ainda não tem calendário no app.": "{nome}数据：{de}–{ate} 赛季（维基百科；{ate} 赛季仍在进行，仅含已赛场次）。数据源没有日期，因此每个赛季内比赛的先后顺序是合成的——赛果和主客场均为真实。应用中还没有{nome}的赛程。",
+  "{j} jogos em {t} (rodadas sintéticas)": "{t} 年共 {j} 场（合成轮次）",
+  "Sem datas para as próximas rodadas": "后续轮次尚无日期",
+  "O calendário do app vai até a rodada {n}; as datas seguintes ainda não foram divulgadas.": "应用中的赛程只到第 {n} 轮；后续日期尚未公布。",
+  "Simular os {n} jogos da rodada {r}": "模拟第 {r} 轮的 {n} 场比赛",
+  "Os jogos da rodada {n} ainda não estão no calendário do app — cole-os no campo abaixo (um por linha).": "第 {n} 轮的比赛尚未收录进应用赛程——请粘贴到下方输入框（每行一场）。",
+  "Dados da {nome}: temporadas {de}–{ate} (Wikipedia; a de {ate} está em andamento, só com os jogos já disputados). A fonte não traz datas, então a ordem dos jogos dentro de cada temporada é sintética — resultados e mandos são reais.": "{nome}数据：{de}–{ate} 赛季（维基百科；{ate} 赛季仍在进行，仅含已赛场次）。数据源没有日期，因此每个赛季内比赛的先后顺序是合成的——赛果和主客场均为真实。",
+  "Mandante x Visitante — um jogo por linha": "主队 x 客队 — 每行一场比赛",
   "A mesma previsão de rodada para a Série B, com 20 temporadas de resultados (2007 a 2026, esta em andamento) vindas da Wikipedia. As datas não existem na fonte, então a ordem dos jogos dentro de cada temporada é sintética.": "针对乙级的同款轮次预测，包含来自维基百科的 20 个赛季（2007 至 2026，后者仍在进行）赛果。数据源没有日期，因此每个赛季内比赛的先后顺序是合成的。",
   "2007 – rodada 31 de 2026 (rodadas sintéticas)": "2007 – 2026 年第 31 轮（合成轮次）",
   "Backtest walk-forward: Série A em 1 039 jogos (2024, 2025 e 2026 até agora); Série B em 1 071 jogos (2024, 2025 e 2026 até agora). Menor log-loss e RPS é melhor. Na Série B o ganho sobre a taxa-base é pequeno: a divisão é mais parelha e muda de elenco todo ano.": "滚动回测：甲级 1,039 场（2024、2025 及 2026 年至今）；乙级 1,071 场（2024、2025 及 2026 年至今）。对数损失和 RPS 越低越好。乙级相对基准的提升很小：该级别实力更均衡，且每年阵容变动很大。",
@@ -135,8 +141,6 @@
   "Hoje (seu dispositivo)": "今天（你的设备）",
   "Dados do modelo": "模型数据",
   "Rodada atual": "当前轮次",
-  "Brasileirão {ano}": "{ano} 年巴甲",
-  "Carregar os {n} jogos da rodada {r}": "载入第 {r} 轮的 {n} 场比赛",
   "Rodadas da temporada": "赛季轮次",
   "disputada@@cal": "已赛",
   "em foco@@cal": "当前关注",

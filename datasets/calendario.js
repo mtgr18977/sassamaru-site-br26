@@ -8,6 +8,7 @@
  * status:  concluida   → rodada encerrada (datas só se forem confiáveis; rodadas com jogos adiados ficam sem data)
  *          confirmada  → datas detalhadas pela CBF
  *          provisoria  → datas ainda sujeitas a mudança (Copa do Brasil, Libertadores, Sul-Americana)
+ *          semdata     → rodada por jogar cuja data ainda não foi divulgada
  * Datas em 'AAAA-MM-DD' (dia civil de Brasília; o app compara com o dia civil local do visitante).
  */
 (function (root, factory) {
@@ -15,7 +16,7 @@
   if (typeof module === 'object' && module.exports) module.exports = data;
   if (root) root.CALENDARIOS = data;
 })(typeof window !== 'undefined' ? window : globalThis, function () {
-  var C = 'concluida', K = 'confirmada', P = 'provisoria';
+  var C = 'concluida', K = 'confirmada', P = 'provisoria', S = 'semdata';
   return {
     'serie-a-2026': {
       competicao: 'serie-a',
@@ -88,6 +89,66 @@
         { rodada: 30, data: '2026-10-11', hora: '19:30', mandante: 'Bahia',            visitante: 'Mirassol' },
         { rodada: 30, data: '2026-10-12', hora: '19:30', mandante: 'Chapecoense',      visitante: 'Athletico Paranaense' },
         { rodada: 30, data: '2026-10-12', hora: '21:00', mandante: 'Bragantino',       visitante: 'Cruzeiro' },
+      ],
+    },
+    'serie-b-2026': {
+      competicao: 'serie-b',
+      temporada: 2026,
+      atualizadoEm: '2026-10-06',
+      fonte: 'O Tempo e Gazeta Esportiva (programação da 32ª rodada); CBF',
+      rodadas: [
+        { n: 1, inicio: null, fim: null, status: C },
+        { n: 2, inicio: null, fim: null, status: C },
+        { n: 3, inicio: null, fim: null, status: C },
+        { n: 4, inicio: null, fim: null, status: C },
+        { n: 5, inicio: null, fim: null, status: C },
+        { n: 6, inicio: null, fim: null, status: C },
+        { n: 7, inicio: null, fim: null, status: C },
+        { n: 8, inicio: null, fim: null, status: C },
+        { n: 9, inicio: null, fim: null, status: C },
+        { n: 10, inicio: null, fim: null, status: C },
+        { n: 11, inicio: null, fim: null, status: C },
+        { n: 12, inicio: null, fim: null, status: C },
+        { n: 13, inicio: null, fim: null, status: C },
+        { n: 14, inicio: null, fim: null, status: C },
+        { n: 15, inicio: null, fim: null, status: C },
+        { n: 16, inicio: null, fim: null, status: C },
+        { n: 17, inicio: null, fim: null, status: C },
+        { n: 18, inicio: null, fim: null, status: C },
+        { n: 19, inicio: null, fim: null, status: C },
+        { n: 20, inicio: null, fim: null, status: C },
+        { n: 21, inicio: null, fim: null, status: C },
+        { n: 22, inicio: null, fim: null, status: C },
+        { n: 23, inicio: null, fim: null, status: C },
+        { n: 24, inicio: null, fim: null, status: C },
+        { n: 25, inicio: null, fim: null, status: C },
+        { n: 26, inicio: null, fim: null, status: C },
+        { n: 27, inicio: null, fim: null, status: C },
+        { n: 28, inicio: null, fim: null, status: C },
+        { n: 29, inicio: null, fim: null, status: C },
+        { n: 30, inicio: null, fim: null, status: C },
+        { n: 31, inicio: null, fim: null, status: C },
+        { n: 32, inicio: '2026-10-06', fim: '2026-10-08', status: K },
+        { n: 33, inicio: null, fim: null, status: S },   // datas ainda não divulgadas
+        { n: 34, inicio: null, fim: null, status: S },   // datas ainda não divulgadas
+        { n: 35, inicio: null, fim: null, status: S },   // datas ainda não divulgadas
+        { n: 36, inicio: null, fim: null, status: S },   // datas ainda não divulgadas
+        { n: 37, inicio: null, fim: null, status: S },   // datas ainda não divulgadas
+        { n: 38, inicio: null, fim: null, status: S },   // datas ainda não divulgadas
+      ],
+      pendentes: [],
+      // só a rodada 32 tem a programação completa; as seguintes ainda não foram divulgadas para todos os jogos
+      jogos: [
+        { rodada: 32, data: '2026-10-06', hora: '19:30', mandante: 'Sport', visitante: 'São Bernardo' },
+        { rodada: 32, data: '2026-10-06', hora: '20:30', mandante: 'Goiás', visitante: 'Athletic' },
+        { rodada: 32, data: '2026-10-06', hora: '21:35', mandante: 'Ponte Preta', visitante: 'Juventude' },
+        { rodada: 32, data: '2026-10-07', hora: '19:30', mandante: 'Operário Ferroviário', visitante: 'Botafogo-SP' },
+        { rodada: 32, data: '2026-10-07', hora: '19:30', mandante: 'Avaí', visitante: 'Londrina' },
+        { rodada: 32, data: '2026-10-07', hora: '20:30', mandante: 'Vila Nova', visitante: 'Cuiabá' },
+        { rodada: 32, data: '2026-10-07', hora: '20:30', mandante: 'CRB', visitante: 'Atlético-GO' },
+        { rodada: 32, data: '2026-10-07', hora: '20:30', mandante: 'América-MG', visitante: 'Fortaleza' },
+        { rodada: 32, data: '2026-10-08', hora: '19:30', mandante: 'Ceará', visitante: 'Criciúma' },
+        { rodada: 32, data: '2026-10-08', hora: '19:30', mandante: 'Náutico', visitante: 'Novorizontino' },
       ],
     },
   };

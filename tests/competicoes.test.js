@@ -31,6 +31,7 @@ section('Registro de competições');
   ok(C.indiceTreino(a) === 12, 'índice de treino da Série A = 2015 − 2003');
   ok(C.indiceTreino(b) === 0, 'Série B treina com todo o histórico (índice 0 = 2007)');
   ok(fs.existsSync(path.join(ROOT, a.csv)), 'CSV da Série A existe');
+  ok(b.calendario === 'serie-b-2026', 'Série B tem calendário');
   ok(b.dados === 'pendente' ? !fs.existsSync(path.join(ROOT, b.csv)) : fs.existsSync(path.join(ROOT, b.csv)),
     'Série B: "dados" reflete se o CSV existe (troque para "disponivel" ao importar)');
   ok(b.rodadasSinteticas === true, 'Série B: rodadas marcadas como sintéticas');
@@ -60,6 +61,26 @@ section('statusCalendario — rodada de hoje');
   // meia-noite × fim do dia não muda o dia civil
   const a = C.statusCalendario(cal, new Date(2026, 9, 6, 0, 5)), b = C.statusCalendario(cal, new Date(2026, 9, 6, 23, 55));
   ok(a.diasAteFoco === 1 && b.diasAteFoco === 1, 'dias contados em dias civis (00:05 e 23:55 dão o mesmo)');
+}
+
+// ── calendário da Série B ───────────────────────────────────────────────────
+section('Calendário da Série B 2026 — rodada 32');
+{
+  const cal = CALS['serie-b-2026'];
+  let s = C.statusCalendario(cal, at('2026-10-06'));
+  ok(s.estado === 'em-andamento' && s.foco.n === 32, '6 out: 32ª rodada da Série B em andamento');
+  s = C.statusCalendario(cal, at('2026-10-09'));
+  ok(s.estado === 'sem-calendario' && s.ultima.n === 32, '9 out: acabaram as datas conhecidas → "sem calendário" (não "temporada encerrada")');
+  ok(cal.rodadas.length === 38 && cal.rodadas.filter((r) => r.status === 'semdata').length === 6, 'rodadas 33–38 marcadas como sem data');
+  const j = C.jogosDaRodada(cal, 32);
+  const nomes = new Set(j.flatMap((x) => [M.normalizeTeam(x.mandante), M.normalizeTeam(x.visitante)]));
+  ok(j.length === 10 && nomes.size === 20, 'rodada 32: 10 jogos, 20 clubes distintos');
+  const csvB = path.join(ROOT, C.obter('serie-b').csv);
+  if (fs.existsSync(csvB)) {
+    const doDataset = new Set(fs.readFileSync(csvB, 'utf8').trim().split('\n').slice(-311).flatMap((l) => [l.split(',')[2], l.split(',')[3]]).map(M.normalizeTeam));
+    ok([...nomes].every((n) => doDataset.has(n)), 'rodada 32: os nomes batem com os clubes da Série B 2026 do dataset');
+  }
+  ok(j.every((x) => x.data >= cal.rodadas[31].inicio && x.data <= cal.rodadas[31].fim), 'rodada 32: datas dentro da janela');
 }
 
 // ── integridade do calendário ───────────────────────────────────────────────

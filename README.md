@@ -17,7 +17,7 @@ A barra de abas no topo (`shell/shell.js` + `shell/shell.css`, injetada em todas
 
 ## Calendário e rodada atual
 
-A aba **Série A** compara o dia do dispositivo com `datasets/calendario.js` e mostra a rodada em andamento (ou a próxima), as datas, quantos dias faltam e a faixa das 38 rodadas; um botão carrega os jogos da rodada para o simulador. O navegador não consegue ler ge.globo.com nem a Wikipedia (CORS/bloqueio) e o app precisa funcionar offline, então o calendário é um arquivo editado a cada atualização, a partir da tabela detalhada da CBF. Hoje: rodadas 29–32 confirmadas, 33–38 provisórias; jogos completos das rodadas 29 e 30.
+As abas **Série A** e **Série B** comparam o dia do dispositivo com `datasets/calendario.js`, mostram a rodada em andamento (ou a próxima), as datas, quantos dias faltam e a faixa das 38 rodadas, e **já deixam o campo de jogos preenchido com a rodada em foco**; um botão simula a rodada. O navegador não consegue ler ge.globo.com nem a Wikipedia (CORS/bloqueio) e o app precisa funcionar offline, então o calendário é um arquivo editado a cada atualização, a partir da tabela detalhada da CBF. Série A: rodadas 29–32 confirmadas, 33–38 provisórias; jogos completos das rodadas 29 e 30. Série B: só a rodada 32 (6–8 out, 10 jogos) tem programação completa; as demais ainda não têm data (a tela diz isso em vez de "temporada encerrada"). Sem os jogos da rodada no calendário, o campo fica vazio com um aviso para colar.
 
 ## Série B
 

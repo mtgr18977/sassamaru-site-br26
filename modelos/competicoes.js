@@ -45,7 +45,7 @@
       csv: 'datasets/campeonato-brasileiro-serie-b.csv',  // gerado por scripts/importar_wikipedia_serie_b.py
       dados: 'disponivel',         // 'pendente' = CSV ainda não importado → a UI mostra o passo a passo;
                                    // 'disponivel' = CSV existe e é lido por fetch (lembre de pô-lo no precache do service-worker.js)
-      calendario: null,
+      calendario: 'serie-b-2026',
       zonas: { acesso: [1, 4], rebaixamento: [17, 20] },
       taxaBase: { pH: 0.49, pD: 0.27, pA: 0.24 },   // frequência histórica 2007–2025 (7 220 jogos)
       limiteLogLoss: 1.050,                          // medido: 1.044 (2007+); a Série B é mais parelha, o ganho sobre a taxa-base é pequeno
@@ -76,6 +76,7 @@
   /**
    * Situação do calendário num dado dia (o "hoje" do visitante).
    *   estado: 'em-andamento' (hoje cai dentro de uma rodada) | 'entre-rodadas' | 'antes' | 'encerrada'
+   *           | 'sem-calendario' (acabaram as datas conhecidas, mas ainda há rodadas por jogar sem data)
    *   atual:   rodada em andamento hoje (ou null)
    *   proxima: primeira rodada que ainda não começou (ou null)
    *   ultima:  última rodada já encerrada com data conhecida (ou null)
@@ -96,6 +97,8 @@
     if (atual) datadas.forEach(function (r) { if (r.inicio > atual.fim && (!seguinte || r.inicio < seguinte.inicio)) seguinte = r; });
     var alvo = atual ? seguinte : proxima;
     var estado = atual ? 'em-andamento' : proxima ? (ultima ? 'entre-rodadas' : 'antes') : 'encerrada';
+    // acabaram as rodadas COM data, mas o calendário ainda lista rodadas por jogar sem data (a CBF divulga em blocos)
+    if (estado === 'encerrada' && cal.rodadas.some(function (r) { return r.status !== 'concluida' && !(r.inicio && r.fim); })) estado = 'sem-calendario';
     return {
       estado: estado,
       hoje: h,

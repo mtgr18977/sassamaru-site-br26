@@ -10188,16 +10188,7 @@
       <div class="card">
         <label for="fixtures">Rodada (uma por linha — Mandante x Visitante)</label>
         <div style="position:relative;">
-          <textarea id="fixtures" spellcheck="false">mirassol x santos
-atletico-mg x internacional
-bahia x vitoria
-flamengo x cruzeiro
-corinthians x coritiba
-remo x fluminense
-vasco x palmeiras
-sao paulo x chapecoense
-gremio x bragantino
-athletico-pr x botafogo</textarea>
+          <textarea id="fixtures" spellcheck="false" placeholder="Mandante x Visitante — um jogo por linha"></textarea>
         </div>
 
         <div id="validationPanel" style="display:none;margin-top:8px;">
@@ -11258,14 +11249,7 @@ function fmtDias(d) {
 
 function renderCalendario() {
   const card = $("calCard");
-  if (!CAL) {
-    // sem calendário (Série B): só o aviso sobre a origem dos dados
-    if (COMP.rodadasSinteticas) {
-      card.innerHTML = `<div class="cal-note warn" style="margin:0">${_t('Dados da {nome}: temporadas {de}–{ate} (Wikipedia; a de {ate} está em andamento, só com os jogos já disputados). A fonte não traz datas, então a ordem dos jogos dentro de cada temporada é sintética — resultados e mandos são reais. A {nome} ainda não tem calendário no app.', { nome: COMP.nome, de: COMP.primeiraTemporadaNoCsv, ate: COMP.ultimaTemporadaNoCsv })}</div>`;
-      card.hidden = false;
-    } else card.hidden = true;
-    return;
-  }
+  if (!CAL) { card.hidden = true; return; }
   const st = Comp.statusCalendario(CAL, new Date());
   const foco = st.foco;
   let titulo, sub, count, agora = false;
@@ -11277,6 +11261,9 @@ function renderCalendario() {
     titulo = _t('Rodada {n}', { n: foco.n });
     count = fmtDias(st.diasAteFoco);
     sub = _t('começa {dia}', { dia: fmtLongo(foco.inicioStr) }) + (foco.fimStr !== foco.inicioStr ? ' · ' + _t('termina {dia}', { dia: fmtLongo(foco.fimStr) }) : '');
+  } else if (st.estado === 'sem-calendario') {
+    titulo = _t('Sem datas para as próximas rodadas'); count = '';
+    sub = _t('O calendário do app vai até a rodada {n}; as datas seguintes ainda não foram divulgadas.', { n: st.ultima ? st.ultima.n : '—' });
   } else {
     titulo = _t('Temporada encerrada'); count = ''; sub = _t('Não há mais rodadas no calendário.');
   }
@@ -11306,11 +11293,11 @@ function renderCalendario() {
 
   card.innerHTML =
     `<div class="cal-grid"><div class="cal-main">`
-    + `<div class="eyebrow">${st.estado === 'em-andamento' ? _t('Rodada atual') : _t('Próxima rodada')} · ${_t('Brasileirão {ano}', { ano: CAL.temporada })}</div>`
+    + `<div class="eyebrow">${st.estado === 'em-andamento' ? _t('Rodada atual') : _t('Próxima rodada')} · ${COMP.nome} ${CAL.temporada}</div>`
     + `<div class="big"><b>${titulo}</b>${count ? `<span class="count${agora ? ' now' : ''}">${count}</span>` : ''}</div>`
     + `<div class="sub">${sub}</div>`
     + `<div class="cal-actions">`
-    + (jogos.length ? `<button type="button" id="calLoad">${_t('Carregar os {n} jogos da rodada {r}', { n: jogos.length, r: foco.n })}</button>` : '')
+    + (jogos.length ? `<button type="button" id="calLoad">${_t('Simular os {n} jogos da rodada {r}', { n: jogos.length, r: foco.n })}</button>` : '')
     + `</div></div>`
     + `<div class="cal-side">${lado.map(([k, v]) => `<div><div class="k">${k}</div><div class="v">${v}</div></div>`).join('')}</div></div>`
     + `<div class="cal-strip" aria-label="${_t('Rodadas da temporada')}">${strip}</div>`
@@ -11320,14 +11307,19 @@ function renderCalendario() {
     + _t('Calendário atualizado em {data}. Fonte: {fonte}.', { data: Comp.dia(CAL.atualizadoEm).toLocaleDateString(LOC, { day: 'numeric', month: 'long' }), fonte: CAL.fonte })
     + (provisorio ? ' ' + _t('As datas desta rodada ainda são provisórias.') : '')
     + (velho ? ' ' + _t('Faz mais de 3 semanas — as datas podem ter mudado.') : '')
-    + `</div>`;
+    + `</div>`
+    + (foco && !jogos.length ? `<div class="cal-note warn">${_t('Os jogos da rodada {n} ainda não estão no calendário do app — cole-os no campo abaixo (um por linha).', { n: foco.n })}</div>` : '')
+    + (COMP.rodadasSinteticas ? `<div class="cal-note warn">${_t('Dados da {nome}: temporadas {de}–{ate} (Wikipedia; a de {ate} está em andamento, só com os jogos já disputados). A fonte não traz datas, então a ordem dos jogos dentro de cada temporada é sintética — resultados e mandos são reais.', { nome: COMP.nome, de: COMP.primeiraTemporadaNoCsv, ate: COMP.ultimaTemporadaNoCsv })}</div>` : '');
   card.hidden = false;
+
+  // o campo de jogos já vem com a rodada em foco (a atual, ou a próxima se hoje não há rodada)
+  const campo = $("fixtures");
+  campo.value = jogos.map(j => `${j.mandante} x ${j.visitante}`).join("\n");
+  if (foco) $("upcomingRound").value = foco.n;
+  campo.dispatchEvent(new Event('input', { bubbles: true }));
 
   const btn = $("calLoad");
   if (btn) btn.addEventListener('click', () => {
-    $("fixtures").value = jogos.map(j => `${j.mandante} x ${j.visitante}`).join("\n");
-    $("upcomingRound").value = foco.n;
-    $("fixtures").dispatchEvent(new Event('input', { bubbles: true }));
     if (!runBtn.disabled) runBtn.click();
   });
 }
@@ -11417,13 +11409,9 @@ async function loadCSV(){
   } catch (e) {
     console.warn("Não foi possível pré-preencher os jogos restantes:", e.message);
   }
-  if (COMP.id !== Comp.PADRAO) {
-    // o texto de exemplo é de clubes da Série A: usa os últimos jogos do dataset desta divisão
-    $("fixtures").value = parsed.slice(-10).map(r => `${r[CONFIG.HOME_TEAM_COL]} x ${r[CONFIG.AWAY_TEAM_COL]}`).join("\n");
-    $("fixtures").dispatchEvent(new Event('input', { bubbles: true }));
-  }
   const cd = document.getElementById("calDados");
-  if (cd) { try { const stt = computeSeasonState(parsed); cd.innerHTML = `<small>${_t('até a rodada {r} · {j} jogos em {t}', { r: stt.roundsPlayed, j: COMP.nTimes * (COMP.nTimes - 1) - stt.remaining.length, t: CAL ? CAL.temporada : '' })}</small>`; } catch (e) { cd.innerHTML = '<small>—</small>'; } }
+  if (cd) { try { const stt = computeSeasonState(parsed); const jj = COMP.nTimes * (COMP.nTimes - 1) - stt.remaining.length;
+      cd.innerHTML = `<small>${COMP.rodadasSinteticas ? _t('{j} jogos em {t} (rodadas sintéticas)', { j: jj, t: CAL ? CAL.temporada : '' }) : _t('até a rodada {r} · {j} jogos em {t}', { r: stt.roundsPlayed, j: jj, t: CAL ? CAL.temporada : '' })}</small>`; } catch (e) { cd.innerHTML = '<small>—</small>'; } }
   runValidation();
   setModelPill(_t('Modelo pronto • {n} times', { n: MODEL.teamCount }), "");
   metaEl.textContent = _t('dataset: {g} jogos • {s} temporadas • build: {ms} ms', { g: MODEL.parsedCount, s: MODEL.seasonCount, ms: (t1-t0).toFixed(0) });

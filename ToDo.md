@@ -39,6 +39,7 @@
 - [ ] **Ganho da Série B é pequeno** (log-loss 1,044 × 1,053): testar prior por divisão (Série A/B/C), `log γ` por time e meia-vida própria.
 - [ ] **Clubes sem histórico (promovidos/rebaixados)** — hoje entram como média da liga. Melhor: prior vindo da outra divisão com desconto (Série C→B→A), e `log γ` por time. Medir no backtest da Série B.
 - [ ] **Simulação de temporada para a Série B** — `bench-brasileirao2026.html` tem as zonas da Série A fixas; ler de `Competicoes.zonas` (acesso G4 / Z4).
+- [ ] **Calendário da Série B** — só a rodada 32 tem programação; preencher as próximas conforme a CBF divulgar (mesmo arquivo `datasets/calendario.js`).
 - [ ] **Calendário automático** — hoje editado à mão após cada divulgação da CBF; um script que leia a tabela da CBF e gere `calendario.js`.
 - [ ] **Navegação sem recarregar a página** — hoje cada aba é uma página; um roteador leve manteria o modelo em memória entre abas.
 - [ ] **Home com números ao vivo** — a página inicial (`index.html`) usa números escritos à mão; gerá-los do CSV evitaria divergência.

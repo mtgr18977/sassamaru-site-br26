@@ -99,7 +99,13 @@
   "Dataset insuficiente após filtros ({n} jogos). Verifique as colunas.": "Not enough data after filtering ({n} matches). Check the columns.",
   /* ── index.html — página inicial ── */
   /* Sassamaru 2026: página inicial redesenhada + barra de abas (shell/shell.js) */
-  "Dados da {nome}: temporadas {de}–{ate} (Wikipedia; a de {ate} está em andamento, só com os jogos já disputados). A fonte não traz datas, então a ordem dos jogos dentro de cada temporada é sintética — resultados e mandos são reais. A {nome} ainda não tem calendário no app.": "{nome} data: seasons {de}–{ate} (Wikipedia; the {ate} season is in progress, with only the matches already played). The source has no dates, so the order of matches within each season is synthetic — results and home/away are real. {nome} has no calendar in the app yet.",
+  "{j} jogos em {t} (rodadas sintéticas)": "{j} matches in {t} (synthetic rounds)",
+  "Sem datas para as próximas rodadas": "No dates for the next rounds",
+  "O calendário do app vai até a rodada {n}; as datas seguintes ainda não foram divulgadas.": "The app's calendar goes up to round {n}; the following dates have not been announced yet.",
+  "Simular os {n} jogos da rodada {r}": "Simulate the {n} matches of round {r}",
+  "Os jogos da rodada {n} ainda não estão no calendário do app — cole-os no campo abaixo (um por linha).": "The matches of round {n} are not in the app's calendar yet — paste them in the field below (one per line).",
+  "Dados da {nome}: temporadas {de}–{ate} (Wikipedia; a de {ate} está em andamento, só com os jogos já disputados). A fonte não traz datas, então a ordem dos jogos dentro de cada temporada é sintética — resultados e mandos são reais.": "{nome} data: seasons {de}–{ate} (Wikipedia; the {ate} season is in progress, with only the matches already played). The source has no dates, so the order of matches within each season is synthetic — results and home/away are real.",
+  "Mandante x Visitante — um jogo por linha": "Home x Away — one match per line",
   "A mesma previsão de rodada para a Série B, com 20 temporadas de resultados (2007 a 2026, esta em andamento) vindas da Wikipedia. As datas não existem na fonte, então a ordem dos jogos dentro de cada temporada é sintética.": "The same round prediction for Série B, with 20 seasons of results (2007 to 2026, the latter in progress) from Wikipedia. The source has no dates, so the order of matches within each season is synthetic.",
   "2007 – rodada 31 de 2026 (rodadas sintéticas)": "2007 – round 31 of 2026 (synthetic rounds)",
   "Backtest walk-forward: Série A em 1 039 jogos (2024, 2025 e 2026 até agora); Série B em 1 071 jogos (2024, 2025 e 2026 até agora). Menor log-loss e RPS é melhor. Na Série B o ganho sobre a taxa-base é pequeno: a divisão é mais parelha e muda de elenco todo ano.": "Walk-forward backtest: Série A on 1,039 matches (2024, 2025 and 2026 so far); Série B on 1,071 matches (2024, 2025 and 2026 so far). Lower log-loss and RPS is better. In Série B the gain over the baseline is small: the division is more even and its squads change every year.",
@@ -135,8 +141,6 @@
   "Hoje (seu dispositivo)": "Today (your device)",
   "Dados do modelo": "Model data",
   "Rodada atual": "Current round",
-  "Brasileirão {ano}": "Brasileirão {ano}",
-  "Carregar os {n} jogos da rodada {r}": "Load the {n} matches of round {r}",
   "Rodadas da temporada": "Season rounds",
   "disputada@@cal": "played",
   "em foco@@cal": "in focus",
