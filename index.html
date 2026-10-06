@@ -10,6 +10,8 @@
   <script src="i18n/i18n.js"></script>
   <link rel="stylesheet" href="shell/shell.css"/>
   <script src="shell/shell.js"></script>
+  <script src="modelos/competicoes.js"></script>
+  <script src="datasets/calendario.js"></script>
   <link rel="manifest" href="manifest.json"/>
   <meta name="theme-color" content="#1A4731"/>
   <meta name="mobile-web-app-capable" content="yes"/>
@@ -110,7 +112,8 @@ footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--border
 
   <div class="kpis">
     <div class="kpi"><b>279/380</b><span>jogos do Brasileirão disputados</span></div>
-    <div class="kpi"><b>28</b><span>rodadas completas</span></div>
+    <div class="kpi"><b id="kpiRodada">28</b><span id="kpiRodadaSub">rodadas completas</span></div>
+    <div class="kpi"><b id="kpiProx">—</b><span id="kpiProxSub">próxima rodada</span></div>
     <div class="kpi"><b>20</b><span>clubes na Série A</span></div>
     <div class="kpi"><b>49 mil+</b><span>jogos de seleções desde 1872</span></div>
   </div>
@@ -145,12 +148,6 @@ footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--border
       <div class="tags"><span class="tag">48 seleções</span><span class="tag">12 grupos</span><span class="tag">Monte Carlo</span></div>
       <span class="go">Abrir →</span>
     </a>
-    <a class="card" href="mundial-2026.html" style="--c:#B45309">
-      <div class="top"><span class="ico">📋</span><div><div class="t">Grupos</div><div class="s">Resultados da Copa</div></div></div>
-      <p>Grupos A–L com classificações, resultados, agenda, estatísticas de cada partida e ranking dos melhores 3ºs colocados (critérios FIFA).</p>
-      <div class="tags"><span class="tag">12 grupos</span><span class="tag">Melhores 3ºs</span><span class="tag">Mata-mata</span></div>
-      <span class="go">Abrir →</span>
-    </a>
     <a class="card" href="bench-docs.html" style="--c:#7A786F">
       <div class="top"><span class="ico">📄</span><div><div class="t">Docs</div><div class="s">Como o modelo funciona?</div></div></div>
       <p>Poisson bivariado, Elo, Dixon-Coles, decay temporal, Monte Carlo — arquitetura completa, fórmulas, parâmetros, limitações e próximos passos.</p>
@@ -164,6 +161,7 @@ footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--border
     <thead><tr><th>Base de dados</th><th>Cobertura</th><th class="num">Jogos</th><th>Atualização</th><th>Usada em</th></tr></thead>
     <tbody>
       <tr><td>Brasileirão (clubes)</td><td>2003 – rodada 28 de 2026</td><td class="num">9 444</td><td>6 out 2026</td><td>Rodada, Brasileirão</td></tr>
+      <tr><td>Série B (2006+)</td><td>estrutura pronta</td><td class="num">—</td><td>aguardando dados</td><td>Rodada (seletor Série A | Série B)</td></tr>
       <tr><td>Seleções</td><td>1872 – 2026</td><td class="num">49 000+</td><td>Copa 2026</td><td>Seleções, Copa 2026</td></tr>
     </tbody>
   </table></div>
@@ -210,6 +208,20 @@ footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--border
   </footer>
 </div>
 <script>
+  // "Próxima rodada" calculada com o dia do dispositivo do visitante (ver modelos/competicoes.js)
+  (function () {
+    try {
+      var C = window.Competicoes, cal = window.CALENDARIOS['serie-a-2026'];
+      var st = C.statusCalendario(cal, new Date()), r = st.foco;
+      if (!r) { document.getElementById('kpiProx').textContent = '—'; return; }
+      var loc = (window.I18N && I18N.LANGS[I18N.lang].locale) || 'pt-BR';
+      var d = C.dia(r.inicioStr).toLocaleDateString(loc, { day: 'numeric', month: 'short' });
+      var quando = st.estado === 'em-andamento' ? _t('acontecendo agora')
+        : st.diasAteFoco === 0 ? _t('hoje@@cal') : st.diasAteFoco === 1 ? _t('amanhã@@cal') : _t('em {n} dias', { n: st.diasAteFoco });
+      document.getElementById('kpiProx').textContent = _t('Rodada {n}', { n: r.n });
+      document.getElementById('kpiProxSub').textContent = d + ' · ' + quando;
+    } catch (e) { /* mantém o traço */ }
+  })();
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./service-worker.js');
   }

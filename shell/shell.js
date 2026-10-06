@@ -13,7 +13,6 @@
     { href: 'simulacoes/bench-brasileirao2026.html', key: 'Brasileirão@@aba', ico: '🏆' },
     { href: 'apps/bench-selecoes.html',             key: 'Seleções@@aba',    ico: '🌍' },
     { href: 'simulacoes/bench-copa2026.html',       key: 'Copa 2026@@aba',   ico: '🌐' },
-    { href: 'mundial-2026.html',                    key: 'Grupos@@aba',      ico: '📋' },
     { href: 'bench-docs.html',                      key: 'Docs@@aba',        ico: '📄' },
   ];
   // ── tema claro/escuro ── aplicado já no <head>, antes da primeira pintura (sem "flash" branco)

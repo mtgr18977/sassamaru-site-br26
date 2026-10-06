@@ -23,6 +23,8 @@
   <script src="../shell/shell.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script src="../modelos/model.js"></script>
+  <script src="../modelos/competicoes.js"></script>
+  <script src="../datasets/calendario.js"></script>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -673,7 +675,45 @@
     .cmp-table tr:last-child td { border-bottom: none; }
     .val-better { color: var(--good); font-weight: 700; }
     .val-worse  { color: var(--bad); }
-  </style>
+  
+    /* ── Calendário da rodada + seletor de competição ── */
+    [hidden] { display: none !important; }
+    .comp-switch { display: inline-flex; border: 1px solid var(--border); border-radius: 99px; overflow: hidden; background: var(--surface); }
+    .comp-switch button { all: unset; cursor: pointer; padding: 6px 14px; font: 500 12px var(--mono); color: var(--muted); }
+    .comp-switch button[aria-selected="true"] { background: var(--accent); color: #fff; }
+    .comp-switch button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+    .cal { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; margin-bottom: 18px; }
+    .cal-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 18px; align-items: stretch; }
+    .cal-main .eyebrow { font: 500 10.5px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+    .cal-main .big { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin: 4px 0 2px; }
+    .cal-main .big b { font-size: 30px; letter-spacing: -1px; line-height: 1.1; }
+    .cal-main .count { font: 500 13px var(--mono); padding: 3px 10px; border-radius: 99px; background: var(--accent-lt); color: var(--accent); }
+    .cal-main .count.now { background: #D4AF37; color: #1b1b12; }
+    .cal-main .sub { font-size: 13px; color: var(--muted); }
+    .cal-side { border-left: 1px solid var(--border); padding-left: 18px; display: grid; gap: 10px; align-content: center; }
+    .cal-side .k { font: 500 10px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+    .cal-side .v { font-size: 14px; font-weight: 600; }
+    .cal-side .v small { font-weight: 400; color: var(--muted); font-size: 12px; }
+    .cal-strip { display: grid; grid-template-columns: repeat(38, 1fr); gap: 2px; margin-top: 16px; }
+    .cal-strip i { height: 10px; border-radius: 2px; background: var(--accent); opacity: .85; }
+    .cal-strip i.now { background: #D4AF37; opacity: 1; box-shadow: 0 0 0 2px rgba(212,175,55,.35); }
+    .cal-strip i.conf { background: var(--s-line); opacity: 1; }
+    .cal-strip i.prov { background: transparent; border: 1px dashed var(--s-line); }
+    .cal-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 8px; font: 400 10.5px var(--mono); color: var(--muted); }
+    .cal-legend span::before { content: ''; display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; background: var(--accent); }
+    .cal-legend .l-now::before { background: #D4AF37; }
+    .cal-legend .l-conf::before { background: var(--s-line); }
+    .cal-legend .l-prov::before { background: transparent; border: 1px dashed var(--s-line); }
+    .cal-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+    .cal-note { font-size: 11.5px; color: var(--muted); margin-top: 10px; }
+    .cal-note.warn { color: var(--s-warn-fg); }
+    .sem-dados { margin-bottom: 18px; border-style: dashed; }
+    .sem-dados h3 { font-size: 15px; margin-bottom: 6px; }
+    .sem-dados p, .sem-dados li { font-size: 13px; color: var(--muted); }
+    .sem-dados ol { margin: 8px 0 0 18px; display: grid; gap: 4px; }
+    .sem-dados code { font-family: var(--mono); font-size: 11.5px; background: var(--s-chip); padding: 1px 5px; border-radius: 3px; }
+    @media (max-width: 720px) { .cal-grid { grid-template-columns: 1fr; } .cal-side { border-left: 0; border-top: 1px solid var(--border); padding: 12px 0 0; } }
+</style>
 <script>window.__EMBEDDED_CSV__ = `ID,rodata,mandante,visitante,vencedor,mandante_Placar,visitante_Placar
 1,1.0,Guarani,Vasco,Guarani,4,2
 2,1.0,Athletico-PR,Gremio,Athletico-PR,2,0
@@ -10130,6 +10170,7 @@
           <p>Poisson · Elo · Dixon-Coles · MLE</p>
         </div>
       </div>
+      <div class="comp-switch" id="compSwitch" role="tablist" aria-label="Competição"></div>
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
         <span class="pill" id="hdrMatches">—</span>
         <span class="pill" id="hdrSeason">—</span>
@@ -10137,6 +10178,10 @@
         <span class="pill" id="modelState">Carregando…</span>
       </div>
     </header>
+
+    <!-- Calendário: qual rodada é a de hoje (dia do dispositivo) -->
+    <section class="cal" id="calCard" aria-live="polite" hidden></section>
+    <div class="card sem-dados" id="semDados" hidden></div>
 
     <!-- Config colapsável -->
     <details class="cfg-details" id="cfgDetails">
@@ -11191,11 +11236,138 @@ function renderConfig(){
     + `</div>`;
 }
 
+
+// ── Competição + calendário ────────────────────────────────────────────────
+const Comp = window.Competicoes;
+const _safeLS = { get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* modo privado */ } } };
+const COMP = Comp.obter(new URLSearchParams(location.search).get('comp') || _safeLS.get('br26-comp') || Comp.PADRAO);
+CONFIG.TRAIN_FROM_SEASON = Comp.indiceTreino(COMP);
+const LOC = (window.I18N && I18N.LANGS[I18N.lang].locale) || 'pt-BR';
+const CAL = COMP.calendario ? (window.CALENDARIOS || {})[COMP.calendario] : null;
+
+function renderSeletorCompeticao() {
+  const box = $("compSwitch");
+  box.innerHTML = Comp.lista().map(c =>
+    `<button type="button" role="tab" data-comp="${c.id}" aria-selected="${c.id === COMP.id}">${c.nome}</button>`).join('');
+  box.addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-comp]');
+    if (!b || b.dataset.comp === COMP.id) return;
+    _safeLS.set('br26-comp', b.dataset.comp);
+    const u = new URL(location.href); u.searchParams.set('comp', b.dataset.comp); location.href = u.toString();
+  });
+}
+
+const fmtCurto = (s) => Comp.dia(s).toLocaleDateString(LOC, { day: 'numeric', month: 'short' });
+const fmtLongo = (s) => Comp.dia(s).toLocaleDateString(LOC, { weekday: 'long', day: 'numeric', month: 'long' });
+function fmtFaixa(r) {
+  if (!r) return '—';
+  if (r.inicioStr === r.fimStr) return fmtLongo(r.inicioStr);
+  const a = Comp.dia(r.inicioStr), b = Comp.dia(r.fimStr);
+  try { return new Intl.DateTimeFormat(LOC, { day: 'numeric', month: 'short' }).formatRange(a, b); }
+  catch (e) { return fmtCurto(r.inicioStr) + ' – ' + fmtCurto(r.fimStr); }
+}
+function fmtDias(d) {
+  if (d === 0) return _t('hoje@@cal');
+  if (d === 1) return _t('amanhã@@cal');
+  return _t('em {n} dias', { n: d });
+}
+
+function renderCalendario() {
+  const card = $("calCard");
+  if (!CAL) { card.hidden = true; return; }
+  const st = Comp.statusCalendario(CAL, new Date());
+  const foco = st.foco;
+  let titulo, sub, count, agora = false;
+  if (st.estado === 'em-andamento') {
+    titulo = _t('Rodada {n}', { n: foco.n }); agora = true;
+    count = _t('acontecendo agora');
+    sub = _t('{faixa} · termina {quando}', { faixa: fmtFaixa(foco), quando: st.diasParaFimAtual === 0 ? _t('hoje@@cal') : fmtDias(st.diasParaFimAtual) });
+  } else if (foco) {
+    titulo = _t('Rodada {n}', { n: foco.n });
+    count = fmtDias(st.diasAteFoco);
+    sub = _t('começa {dia}', { dia: fmtLongo(foco.inicioStr) }) + (foco.fimStr !== foco.inicioStr ? ' · ' + _t('termina {dia}', { dia: fmtLongo(foco.fimStr) }) : '');
+  } else {
+    titulo = _t('Temporada encerrada'); count = ''; sub = _t('Não há mais rodadas no calendário.');
+  }
+
+  // painel lateral: próxima rodada (se já há uma em andamento) e última encerrada
+  const lado = [];
+  const prox = st.estado === 'em-andamento' ? st.proxima : null;
+  if (prox) lado.push([_t('Próxima rodada'), `${prox.n} <small>· ${fmtFaixa(prox)} · ${fmtDias(st.diasAteProxima)}</small>`]);
+  if (st.ultima) lado.push([_t('Última rodada encerrada'), `${st.ultima.n} <small>· ${fmtFaixa(st.ultima)}</small>`]);
+  lado.push([_t('Hoje (seu dispositivo)'), `<small>${new Date().toLocaleDateString(LOC, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</small>`]);
+  lado.push([_t('Dados do modelo'), `<span id="calDados"><small>…</small></span>`]);
+
+  // faixa das 38 rodadas
+  const strip = CAL.rodadas.map(r => {
+    const cls = foco && r.n === foco.n && st.estado === 'em-andamento' ? 'now'
+      : foco && r.n === foco.n ? 'now'
+      : r.status === 'concluida' ? '' : r.status === 'confirmada' ? 'conf' : 'prov';
+    const datas = r.inicio ? (r.inicio === r.fim ? fmtCurto(r.inicio) : fmtCurto(r.inicio) + ' – ' + fmtCurto(r.fim)) : '';
+    return `<i class="${cls}" title="${_t('Rodada {n}', { n: r.n })}${datas ? ' · ' + datas : ''}"></i>`;
+  }).join('');
+
+  const jogos = foco ? Comp.jogosDaRodada(CAL, foco.n) : [];
+  const pend = CAL.pendentes || [];
+  const provisorio = foco && foco.status === 'provisoria';
+  const atualizado = Comp.dia(CAL.atualizadoEm);
+  const velho = Comp.diasEntre(atualizado, st.hoje) > 21;
+
+  card.innerHTML =
+    `<div class="cal-grid"><div class="cal-main">`
+    + `<div class="eyebrow">${st.estado === 'em-andamento' ? _t('Rodada atual') : _t('Próxima rodada')} · ${_t('Brasileirão {ano}', { ano: CAL.temporada })}</div>`
+    + `<div class="big"><b>${titulo}</b>${count ? `<span class="count${agora ? ' now' : ''}">${count}</span>` : ''}</div>`
+    + `<div class="sub">${sub}</div>`
+    + `<div class="cal-actions">`
+    + (jogos.length ? `<button type="button" id="calLoad">${_t('Carregar os {n} jogos da rodada {r}', { n: jogos.length, r: foco.n })}</button>` : '')
+    + `</div></div>`
+    + `<div class="cal-side">${lado.map(([k, v]) => `<div><div class="k">${k}</div><div class="v">${v}</div></div>`).join('')}</div></div>`
+    + `<div class="cal-strip" aria-label="${_t('Rodadas da temporada')}">${strip}</div>`
+    + `<div class="cal-legend"><span>${_t('disputada@@cal')}</span><span class="l-now">${_t('em foco@@cal')}</span><span class="l-conf">${_t('confirmada pela CBF')}</span><span class="l-prov">${_t('data provisória')}</span></div>`
+    + (pend.length ? `<div class="cal-note">${_t('Jogo atrasado da {r}ª rodada ainda sem data: {jogos}.', { r: pend[0].rodada, jogos: pend.map(p => displayName(normalizeTeam(p.mandante)) + ' × ' + displayName(normalizeTeam(p.visitante))).join(', ') })}</div>` : '')
+    + `<div class="cal-note${provisorio || velho ? ' warn' : ''}">`
+    + _t('Calendário atualizado em {data}. Fonte: {fonte}.', { data: Comp.dia(CAL.atualizadoEm).toLocaleDateString(LOC, { day: 'numeric', month: 'long' }), fonte: CAL.fonte })
+    + (provisorio ? ' ' + _t('As datas desta rodada ainda são provisórias.') : '')
+    + (velho ? ' ' + _t('Faz mais de 3 semanas — as datas podem ter mudado.') : '')
+    + `</div>`;
+  card.hidden = false;
+
+  const btn = $("calLoad");
+  if (btn) btn.addEventListener('click', () => {
+    $("fixtures").value = jogos.map(j => `${j.mandante} x ${j.visitante}`).join("\n");
+    $("upcomingRound").value = foco.n;
+    $("fixtures").dispatchEvent(new Event('input', { bubbles: true }));
+    if (!runBtn.disabled) runBtn.click();
+  });
+}
+
+function mostrarSemDados() {
+  const box = $("semDados");
+  box.innerHTML =
+    `<h3>${_t('Os dados da {nome} ainda não foram importados', { nome: COMP.nome })}</h3>`
+    + `<p>${_t('O modelo já está preparado para a {nome} (a partir de {ano}, 20 clubes, 38 rodadas), mas o arquivo de resultados ainda não existe.', { nome: COMP.nome, ano: COMP.pontosCorridosDesde })}</p>`
+    + `<ol><li>${_t('Reúna os resultados em um CSV com uma linha por jogo, em ordem cronológica.')}</li>`
+    + `<li>${_t('Converta e valide: {cmd}', { cmd: '<code>python scripts/dados_serie.py converter …</code>' })}</li>`
+    + `<li>${_t('Salve o resultado como {arq} e troque {flag} em {arq2}.', { arq: `<code>${COMP.csv}</code>`, flag: '<code>dados: \'pendente\'</code>', arq2: '<code>modelos/competicoes.js</code>' })}</li></ol>`;
+  box.hidden = false;
+  // sem dados não há o que simular: esconde tudo que vem depois do aviso (menos rodapé/scripts)
+  for (let el = box.nextElementSibling; el; el = el.nextElementSibling) {
+    if (!['FOOTER', 'SCRIPT'].includes(el.tagName)) el.hidden = true;
+  }
+}
+
 async function loadCSV(){
+  renderSeletorCompeticao();
+  renderCalendario();
+  if (COMP.dados === 'pendente') {
+    setModelPill(_t('Sem dados da {nome}', { nome: COMP.nome }), "danger");
+    mostrarSemDados();
+    return;
+  }
   renderConfig();
   setModelPill("Carregando dataset…");
   setStatus(_t('Carregando <b>{path}</b>…', { path: CONFIG.CSV_PATH }));
-  const text = window.__EMBEDDED_CSV__ || await fetch(CONFIG.CSV_PATH, {cache:"no-store"}).then(r => {
+  const text = (COMP.dados === 'embutido' && window.__EMBEDDED_CSV__) || await fetch("../" + COMP.csv, {cache:"no-store"}).then(r => {
     if (!r.ok) throw new Error(_t('Falha ao carregar CSV ({status}).', { status: r.status }));
     return r.text();
   });
@@ -11250,6 +11422,8 @@ async function loadCSV(){
   } catch (e) {
     console.warn("Não foi possível pré-preencher os jogos restantes:", e.message);
   }
+  const cd = document.getElementById("calDados");
+  if (cd) { try { const stt = computeSeasonState(parsed); cd.innerHTML = `<small>${_t('até a rodada {r} · {j} jogos em {t}', { r: stt.roundsPlayed, j: COMP.nTimes * (COMP.nTimes - 1) - stt.remaining.length, t: CAL ? CAL.temporada : '' })}</small>`; } catch (e) { cd.innerHTML = '<small>—</small>'; } }
   runValidation();
   setModelPill(_t('Modelo pronto • {n} times', { n: MODEL.teamCount }), "");
   metaEl.textContent = _t('dataset: {g} jogos • {s} temporadas • build: {ms} ms', { g: MODEL.parsedCount, s: MODEL.seasonCount, ms: (t1-t0).toFixed(0) });

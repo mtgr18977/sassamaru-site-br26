@@ -9,12 +9,26 @@ A barra de abas no topo (`shell/shell.js` + `shell/shell.css`, injetada em todas
 | Aba | Página | O que faz |
 |-----|--------|-----------|
 | Início | `index.html` | Apresenta o app, estado dos dados e precisão do modelo |
-| Rodada | `apps/index.html` | Previsão 1X2, odds e placares de uma rodada do Brasileirão |
+| Rodada | `apps/index.html` | Rodada de hoje e contagem regressiva para a próxima (pelo relógio do dispositivo); previsão 1X2, odds e placares; seletor Série A \| Série B |
 | Brasileirão | `simulacoes/bench-brasileirao2026.html` | Monte Carlo do resto da temporada 2026 |
 | Seleções | `apps/bench-selecoes.html` | Previsão de partidas entre seleções |
 | Copa 2026 | `simulacoes/bench-copa2026.html` | Simulação do torneio completo |
-| Grupos | `mundial-2026.html` | Grupos, resultados e melhores terceiros |
 | Docs | `bench-docs.html` | Documentação técnica do modelo |
+
+## Calendário e rodada atual
+
+A aba **Rodada** compara o dia do dispositivo com `datasets/calendario.js` e mostra a rodada em andamento (ou a próxima), as datas, quantos dias faltam e a faixa das 38 rodadas; um botão carrega os jogos da rodada para o simulador. O navegador não consegue ler ge.globo.com nem a Wikipedia (CORS/bloqueio) e o app precisa funcionar offline, então o calendário é um arquivo editado a cada atualização, a partir da tabela detalhada da CBF. Hoje: rodadas 29–32 confirmadas, 33–38 provisórias; jogos completos das rodadas 29 e 30.
+
+## Série B (estrutura pronta, dados pendentes)
+
+`modelos/competicoes.js` registra Série A e Série B (20 clubes, 38 rodadas, pontos corridos desde 2006, G4 de acesso e Z4). O seletor **Série A | Série B** da aba Rodada já existe; enquanto não houver CSV ele mostra o passo a passo. Para ativar:
+
+```bash
+python scripts/dados_serie.py converter resultados_b.csv datasets/campeonato-brasileiro-serie-b.csv   # converte e valida
+# depois: troque dados: 'pendente' por 'disponivel' em modelos/competicoes.js
+```
+
+`python scripts/dados_serie.py validar <csv>` confere jogos por temporada, rodadas 1–38, 20 clubes e jogos por clube. O modelo trata clubes sem histórico como média da liga (com aviso), o que é o ponto fraco numa divisão de alta rotatividade — veja o `ToDo.md`.
 
 ## Estado dos dados (6 out 2026)
 
@@ -22,6 +36,7 @@ A barra de abas no topo (`shell/shell.js` + `shell/shell.css`, injetada em todas
 |------|-----------|-------|
 | Brasileirão (clubes) | 2003 – rodada 28 de 2026 (+ adiados da 21ª) | 9 444 |
 | Seleções | 1872 – 2026 | 49 000+ |
+| Série B (2006+) | estrutura pronta, sem dados | — |
 
 Faltam no Brasileirão 2026: 101 jogos (279 de 380 disputados), entre eles Chapecoense × Vasco, adiado da 21ª rodada.
 
@@ -34,6 +49,7 @@ Precisão do modelo de clubes (backtest walk-forward, n = 1 039):
 
 ## Estrutura do repositório
 
+- `scripts/` — `dados_serie.py` (converter/validar CSVs de outras divisões)
 - `shell/` — Casca do app: barra de abas no topo e botão de instalação
 - `i18n/` — Traduções (en, zh-CN)
 - `apps/` — Webapps interativas de predição
@@ -60,6 +76,7 @@ python -m http.server 8000
 npm test                 # as quatro suítes (modelo, seleções, PWA, Copa)
 npm run test:backtest    # trava de regressão de acurácia do modelo de clubes
 npm run test:i18n        # traduções en/zh
+npm run test:competicoes # calendário, rodada de hoje, Série B e scripts/dados_serie.py
 npm run test:selecoes    # testes do modelo de seleções (110+ asserções)
 npm run test:pwa         # validação do PWA (manifest, service worker, ícones)
 ```

@@ -26,7 +26,7 @@ Static HTML + vanilla JavaScript PWA — no build process, no framework.
 ### App shell (Sassamaru 2026)
 
 The product is called **Sassamaru 2026**. `shell/shell.js` + `shell/shell.css` inject the sticky top tab
-bar (Início · Rodada · Brasileirão · Seleções · Copa 2026 · Grupos · Docs), move the `PT | EN | 中文`
+bar (Início · Rodada · Brasileirão · Seleções · Copa 2026 · Docs), move the `PT | EN | 中文`
 switcher into it and show an "Instalar app" button on `beforeinstallprompt`. Every page loads them right
 after `i18n/i18n.js`. To add a section: add it to `TABS` in `shell/shell.js`, add `Nome@@aba` to
 `i18n/{en,zh}.js`, precache the page in `service-worker.js`. `index.html` is the home page (what the
@@ -39,6 +39,19 @@ overrides each page's own tokens (`--bg`, `--surface`, `--accent`…) plus the s
 **Never hard-code a neutral/tinted color in a page** — use a token (`var(--surface)`, `--s-sunk`, `--s-chip`,
 `--s-line`, `--s-text2`, `--s-warn-*`, `--s-bad-*`, `--s-ok-*`, `--s-blue-*`) or the page looks broken in dark mode.
 White text on `var(--accent)` fills stays `#fff`.
+
+### Competitions and calendar
+
+`modelos/competicoes.js` (pure, shared by browser and Node) holds the registry (`serie-a`, `serie-b`: team count,
+rounds, first round-robin year, training window, zones, CSV path, `dados: 'embutido' | 'pendente' | 'disponivel'`)
+and `statusCalendario(cal, hoje)`, which turns the **visitor's local day** into current round / next round / days
+left. `datasets/calendario.js` is the hand-edited calendar (`concluida | confirmada | provisoria`, a `pendentes`
+list for postponed games and the fixtures of the detailed rounds). The browser cannot read ge.globo.com or
+Wikipedia (CORS) and the app must work offline, hence a file. **After each round**: move the round to
+`concluida`, add the next detailed rounds' dates/fixtures, bump `atualizadoEm`, remove played games from `pendentes`.
+`tests/competicoes.test.js` pins the rules (and fails if a pending game is already in the CSV).
+Série B: no CSV yet. `scripts/dados_serie.py converter|validar` prepares one; flip `dados` when it lands. The model
+is division-agnostic (`buildModel(rows, {trainFromSeason})`); unseen clubs fall back to α=β=1, Elo 1500 with a warning.
 
 ### Directory layout
 
