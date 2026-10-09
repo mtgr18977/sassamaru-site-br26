@@ -33,7 +33,7 @@
 - [x] **Sassamaru 2026: shell de aplicativo** — barra de abas no topo (`shell/`), página inicial explicando o site, botão "Instalar app", manifest com novo nome e atalhos.
 - [x] **Rodada de hoje + contagem regressiva** — `modelos/competicoes.js` + `datasets/calendario.js`, comparados com o relógio do visitante (abas Série A/B e página inicial).
 - [x] **Estrutura multi-competição (Série B)** — registro, abas Série A / Série B no topo, `scripts/dados_serie.py`, teste com liga de alta rotatividade.
-- [x] **Dados da Série B 2007–2026** — importados da Wikipedia (`scripts/importar_wikipedia_serie_b.py`), 7 531 jogos (2026 parcial), validados contra campeões/promovidos conhecidos e entre pt/en.
+- [x] **Dados da Série B 2007–2026** — importados da Wikipedia (`scripts/importar_wikipedia_serie_b.py`), 7 540 jogos (2026 parcial), validados contra campeões/promovidos conhecidos e entre pt/en.
 - [ ] **Rodadas reais na Série B** — hoje a ordem dos jogos na temporada é sintética (a matriz da Wikipedia não tem datas). Fonte com data/rodada (CBF, ge, soccerway) tornaria o tempo do modelo real.
 - [ ] **Série B 2006** — sem matriz completa na Wikipedia (en/pt); precisa de outra fonte.
 - [ ] **Ganho da Série B é pequeno** (log-loss 1,044 × 1,053): testar prior por divisão (Série A/B/C), `log γ` por time e meia-vida própria.
@@ -46,7 +46,7 @@
 
 ## Dados
 
-- [x] **Dados do Brasileirão atualizados até 6 out 2026** — rodada 28 completa + adiados da 21ª (São Paulo 1×2 Santos, Atlético-MG 1×0 Bragantino). Pendente: Chapecoense × Vasco.
+- [x] **Dados do Brasileirão atualizados até 9 out 2026** — rodada 29 completa + adiados da 21ª (São Paulo 1×2 Santos, Atlético-MG 1×0 Bragantino). Pendente: Chapecoense × Vasco.
 
 - [ ] **Atualização automática do CSV via API**  
   Integrar com APIs públicas (Sofascore, ESPN, football-data.org) para atualizar o dataset automaticamente após cada rodada, sem necessidade de atualização manual do arquivo.
@@ -99,7 +99,7 @@
   `datasets/campeonato-brasileiro-full_ate_2025.csv`. Recuperá-la permitiria
   decay por data em vez de assumir `roundsPerSeason = 38`.
 - **Os três CSVs do Brasileirão** (`datasets/` + dois blocos embutidos) precisam ser
-  atualizados juntos a cada rodada; hoje estão em sincronia (9 443 jogos), mas já divergiram antes.
+  atualizados juntos a cada rodada; hoje estão em sincronia (9 454 jogos), mas já divergiram antes.
 - **Números escritos à mão** em `index.html`, `README.md`, `CLAUDE.md` e `datasets/readme.md`
   (veja *Home com números ao vivo*).
 - **`datasets/selecoes.zip`** é uma cópia de fev 2026 (só `results.csv` é usado).
@@ -107,4 +107,4 @@
 ### Resolvido
 - ~~Arquivos órfãos~~ — removidos `mundial-2026.html`, `fetch_xg.py`, `campeonatobrasileirolimpo_xg.csv`, `papaparse.min.js` e `datasets/brasileirao-26.zip`. A coleta de xG (item em *Dados*) recomeça do zero se for retomada.
 - ~~Linha errada na rodada 7 (`Mirassol x Fortaleza`)~~ — corrigida para `Mirassol x Coritiba`.
-- ~~`apps/index.html` com CSV embutido atrasado~~ — em sincronia desde a rodada 28.
+- ~~`apps/index.html` com CSV embutido atrasado~~ — em sincronia desde a rodada 29.

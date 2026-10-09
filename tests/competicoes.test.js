@@ -64,23 +64,25 @@ section('statusCalendario — rodada de hoje');
 }
 
 // ── calendário da Série B ───────────────────────────────────────────────────
-section('Calendário da Série B 2026 — rodada 32');
+section('Calendário da Série B 2026 — rodada 33');
 {
   const cal = CALS['serie-b-2026'];
   let s = C.statusCalendario(cal, at('2026-10-06'));
   ok(s.estado === 'em-andamento' && s.foco.n === 32, '6 out: 32ª rodada da Série B em andamento');
   s = C.statusCalendario(cal, at('2026-10-09'));
-  ok(s.estado === 'sem-calendario' && s.ultima.n === 32, '9 out: acabaram as datas conhecidas → "sem calendário" (não "temporada encerrada")');
-  ok(cal.rodadas.length === 38 && cal.rodadas.filter((r) => r.status === 'semdata').length === 6, 'rodadas 33–38 marcadas como sem data');
-  const j = C.jogosDaRodada(cal, 32);
+  ok(s.estado === 'entre-rodadas' && s.foco.n === 33 && s.ultima.n === 32, '9 out: entre a 32 e a 33');
+  s = C.statusCalendario(cal, at('2026-10-14'));
+  ok(s.estado === 'sem-calendario' && s.ultima.n === 33, '14 out: acabaram as datas conhecidas → "sem calendário" (não "temporada encerrada")');
+  ok(cal.rodadas.length === 38 && cal.rodadas.filter((r) => r.status === 'semdata').length === 5, 'rodadas 34–38 marcadas como sem data');
+  const j = C.jogosDaRodada(cal, 33);
   const nomes = new Set(j.flatMap((x) => [M.normalizeTeam(x.mandante), M.normalizeTeam(x.visitante)]));
-  ok(j.length === 10 && nomes.size === 20, 'rodada 32: 10 jogos, 20 clubes distintos');
+  ok(j.length === 10 && nomes.size === 20, 'rodada 33: 10 jogos, 20 clubes distintos');
   const csvB = path.join(ROOT, C.obter('serie-b').csv);
   if (fs.existsSync(csvB)) {
-    const doDataset = new Set(fs.readFileSync(csvB, 'utf8').trim().split('\n').slice(-311).flatMap((l) => [l.split(',')[2], l.split(',')[3]]).map(M.normalizeTeam));
-    ok([...nomes].every((n) => doDataset.has(n)), 'rodada 32: os nomes batem com os clubes da Série B 2026 do dataset');
+    const doDataset = new Set(fs.readFileSync(csvB, 'utf8').trim().split('\n').slice(-320).flatMap((l) => [l.split(',')[2], l.split(',')[3]]).map(M.normalizeTeam));
+    ok([...nomes].every((n) => doDataset.has(n)), 'rodada 33: os nomes batem com os clubes da Série B 2026 do dataset');
   }
-  ok(j.every((x) => x.data >= cal.rodadas[31].inicio && x.data <= cal.rodadas[31].fim), 'rodada 32: datas dentro da janela');
+  ok(j.every((x) => x.data >= cal.rodadas[32].inicio && x.data <= cal.rodadas[32].fim), 'rodada 33: datas dentro da janela');
 }
 
 // ── integridade do calendário ───────────────────────────────────────────────
@@ -94,9 +96,9 @@ section('Integridade do calendário 2026');
   for (let i = 1; i < datadas.length; i++) if (datadas[i].inicio <= datadas[i - 1].fim) ordenado = false;
   ok(ordenado, 'rodadas datadas não se sobrepõem e estão em ordem');
   ok(cal.rodadas.filter((r) => r.status !== 'concluida').every((r) => r.inicio && r.fim), 'rodadas futuras sempre têm datas');
-  ok(cal.rodadas.filter((r) => r.status === 'concluida').every((r) => r.n <= 28), 'só as 28 primeiras estão concluídas');
+  ok(cal.rodadas.filter((r) => r.status === 'concluida').every((r) => r.n <= 29), 'só as 29 primeiras estão concluídas');
 
-  // coerência com o dataset: os confrontos da rodada 29/30 existem e usam nomes que o modelo reconhece
+  // coerência com o dataset: os confrontos da rodada 30–34 existem e usam nomes que o modelo reconhece
   const csv = fs.readFileSync(path.join(ROOT, 'datasets/campeonato-brasileiro-limpo.csv'), 'utf8').split('\n').slice(1);
   const norm = new Set();
   const jogados = new Set();
@@ -106,7 +108,7 @@ section('Integridade do calendário 2026');
     norm.add(M.normalizeTeam(p[2])); norm.add(M.normalizeTeam(p[3]));
     jogados.add(M.normalizeTeam(p[2]) + '|' + M.normalizeTeam(p[3]));
   }
-  for (const r of [29, 30]) {
+  for (const r of [30, 31, 32, 33, 34]) {
     const j = C.jogosDaRodada(cal, r);
     const times = new Set(j.flatMap((x) => [M.normalizeTeam(x.mandante), M.normalizeTeam(x.visitante)]));
     ok(j.length === 10 && times.size === 20, `rodada ${r}: 10 jogos, 20 clubes distintos`);
@@ -129,13 +131,14 @@ section('Dataset da Série B (Wikipedia, rodadas sintéticas)');
     const [cab, ...ls] = fs.readFileSync(file, 'utf8').trim().split('\n');
     const cols = cab.split(',');
     const rows = ls.map((l) => Object.fromEntries(l.split(',').map((v, i) => [cols[i], v])));
-    ok(rows.length === 19 * 380 + 311, `19 temporadas completas + 311 jogos de 2026 = ${rows.length}`);
+    ok(rows.length === 19 * 380 + 320, `19 temporadas completas + 320 jogos de 2026 = ${rows.length}`);
     ok(rows.every((r) => r.rodada_origem === 'sintetica'), 'toda linha marca a rodada como sintética');
-    const r26 = rows.slice(-311), cont = {};
+    const r26 = rows.slice(-320), cont = {};
     for (const r of r26) { cont[r.mandante] = (cont[r.mandante] || 0) + 1; cont[r.visitante] = (cont[r.visitante] || 0) + 1; }
-    ok(Object.values(cont).filter((v) => v === 31).length === 18 && Object.values(cont).filter((v) => v === 32).length === 2, '2026: 18 clubes com 31 jogos e 2 com 32 (um jogo adiado já disputado)');
+    ok(Object.values(cont).filter((v) => v === 32).length === 20, '2026: os 20 clubes com 32 jogos (32 rodadas completas)');
+    ok(!r26.some((r) => r.mandante === 'Fortaleza' && r.visitante === 'CRB' && r.mandante_Placar === '1' && r.visitante_Placar === '1'), '2026: sem o Fortaleza 1×1 CRB fantasma (o returno é só em 12 out)');
     // temporada 2025: os 4 primeiros são os promovidos que estão na Série A 2026
-    const t25 = rows.slice(-691, -311), pts = {}, sg = {};
+    const t25 = rows.slice(-700, -320), pts = {}, sg = {};
     for (const r of t25) {
       const gm = +r.mandante_Placar, gv = +r.visitante_Placar;
       pts[r.mandante] = (pts[r.mandante] || 0) + (gm > gv ? 3 : gm === gv ? 1 : 0);
@@ -150,7 +153,7 @@ section('Dataset da Série B (Wikipedia, rodadas sintéticas)');
     const doB = new Set(t25.flatMap((r) => [r.mandante, r.visitante]).map(M.normalizeTeam));
     ok(['athletico paranaense', 'chapecoense', 'coritiba', 'remo'].every((c) => A.has(c) && doB.has(c)), 'clubes promovidos têm o mesmo nome na Série A e na Série B');
     const py = spawnSync('python3', ['-I', path.join(ROOT, 'scripts/dados_serie.py'), 'validar', file], { encoding: 'utf8' });
-    if (!py.error) ok(py.status === 0 && /20 temporadas, 7531 jogos, 0 com problema/.test(py.stdout), 'scripts/dados_serie.py validar aprova o CSV da Série B');
+    if (!py.error) ok(py.status === 0 && /20 temporadas, 7540 jogos, 0 com problema/.test(py.stdout), 'scripts/dados_serie.py validar aprova o CSV da Série B');
   }
 }
 

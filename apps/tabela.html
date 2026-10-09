@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Classificação — Sassamaru 2026</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="../manifest.json" />
+  <meta name="theme-color" content="#1A4731" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Sassamaru" />
+  <link rel="apple-touch-icon" href="../icons/icon-192.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <script src="../i18n/i18n.js"></script>
+  <link rel="stylesheet" href="../shell/shell.css"/>
+  <script src="../shell/shell.js"></script>
+  <script src="../modelos/model.js"></script>
+  <script src="../modelos/competicoes.js"></script>
+  <script src="../datasets/calendario.js"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:#F7F6F2; --surface:#FFFFFF; --border:#E2E0D9; --text:#141412; --muted:#7A786F;
+      --accent:#1A4731; --accent-lt:#EBF3EE;
+      --lib:#1A4731; --lib-lt:#EBF3EE; --sul:#1E40AF; --sul-lt:#EFF6FF; --rel:#991B1B; --rel-lt:#FEE2E2;
+      --warn:#D97706; --warn-lt:#FEF3C7; --bad:#991B1B; --bad-lt:#FEE2E2;
+      --shadow:0 1px 3px rgba(0,0,0,.08); --radius:6px;
+      --mono:'IBM Plex Mono', ui-monospace, monospace; --sans:'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+    }
+    html { font-size: 15px; }
+    body { font-family: var(--sans); background: var(--bg); color: var(--text); line-height: 1.5; }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 0 20px 64px; }
+    header { padding: 26px 0 20px; margin-bottom: 20px; border-bottom: 1px solid var(--border); }
+    header h1 { font-size: 22px; font-weight: 600; letter-spacing: -.5px; }
+    header p { font: 400 12px/1.4 var(--mono); color: var(--muted); margin-top: 3px; }
+    .legend { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-bottom: 14px; font: 400 12px var(--mono); color: var(--muted); }
+    .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { padding: 9px 10px; text-align: right; white-space: nowrap; }
+    th { font: 500 11px var(--mono); color: var(--muted); border-bottom: 1px solid var(--border); text-transform: uppercase; letter-spacing: .04em; }
+    td { border-bottom: 1px solid var(--border); font-variant-numeric: tabular-nums; }
+    tr:last-child td { border-bottom: 0; }
+    th.l, td.l { text-align: left; }
+    td.pos { width: 44px; font: 500 13px var(--mono); border-left: 4px solid transparent; }
+    td.club { font-weight: 500; width: 100%; }
+    td.pts { font-weight: 600; }
+    tr.z-lib td.pos { border-left-color: var(--lib); }
+    tr.z-lib td.pos, tr.z-lib td.pts { color: var(--lib); }
+    tr.z-sul td.pos { border-left-color: var(--sul); }
+    tr.z-sul td.pos { color: var(--sul); }
+    tr.z-rel td.pos { border-left-color: var(--rel); }
+    tr.z-rel td.pos { color: var(--rel); }
+    tr.z-rel { background: var(--rel-lt); }
+    .pos-neg { color: var(--bad); }
+    .bar { display: inline-block; width: 54px; height: 6px; background: var(--border); border-radius: 3px; margin-left: 8px; vertical-align: middle; overflow: hidden; }
+    .bar b { display: block; height: 100%; background: var(--accent); }
+    .notes { margin-top: 16px; font: 400 12px/1.6 var(--mono); color: var(--muted); }
+    .notes p + p { margin-top: 4px; }
+    .err { background: var(--bad-lt); color: var(--bad); border-radius: var(--radius); padding: 12px 14px; font: 400 13px var(--mono); }
+    @media (max-width: 640px) {
+      th, td { padding: 8px 6px; }
+      .opt { display: none; }
+      .bar { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1 id="titulo">Classificação</h1>
+    <p id="sub"></p>
+  </header>
+  <div id="legenda" class="legend"></div>
+  <div class="card"><div id="tabela" style="min-height:120px"></div></div>
+  <div id="notas" class="notes"></div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var Model = window.BenchModel, Comp = window.Competicoes;
+  var q = new URLSearchParams(location.search);
+  var COMP = Comp.obter(q.get('comp') === 'serie-b' ? 'serie-b' : 'serie-a');
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+
+  // faixas de posição a destacar, na ordem em que aparecem; `cls` casa com as cores do CSS
+  var ZONAS = COMP.id === 'serie-b'
+    ? [{ cls: 'z-lib', faixa: COMP.zonas.acesso, rot: _t('Acesso à Série A@@zona'), cor: 'var(--lib)' },
+       { cls: 'z-rel', faixa: COMP.zonas.rebaixamento, rot: _t('Rebaixamento@@zona'), cor: 'var(--rel)' }]
+    : [{ cls: 'z-lib', faixa: COMP.zonas.libertadores, rot: _t('Libertadores@@zona'), cor: 'var(--lib)' },
+       { cls: 'z-sul', faixa: COMP.zonas.sulamericana, rot: _t('Sul-Americana@@zona'), cor: 'var(--sul)' },
+       { cls: 'z-rel', faixa: COMP.zonas.rebaixamento, rot: _t('Rebaixamento@@zona'), cor: 'var(--rel)' }];
+  function zonaDe(pos) {
+    for (var i = 0; i < ZONAS.length; i++) if (pos >= ZONAS[i].faixa[0] && pos <= ZONAS[i].faixa[1]) return ZONAS[i].cls;
+    return '';
+  }
+
+  function parseCsv(texto) {
+    var linhas = texto.trim().split(/\r?\n/), cab = linhas[0].split(',');
+    return linhas.slice(1).filter(Boolean).map(function (l) {
+      var v = l.split(','), o = {};
+      cab.forEach(function (c, i) { o[c] = v[i]; });
+      return o;
+    });
+  }
+
+  function render(rows) {
+    var st = Model.computeSeasonState(rows);
+    // nome de exibição = grafia do CSV (a última vence), indexada pelo nome normalizado do modelo
+    var nomes = {};
+    rows.forEach(function (r) { nomes[Model.normalizeTeam(r.mandante)] = r.mandante; nomes[Model.normalizeTeam(r.visitante)] = r.visitante; });
+    // critérios da CBF: pontos, vitórias, saldo de gols, gols pró (computeSeasonState não desempata por vitórias)
+    var tabela = st.teams.map(function (t) { var s = st.standings.get(t); return { t: t, s: s }; }).sort(function (a, b) {
+      return b.s.pts - a.s.pts || b.s.w - a.s.w || b.s.gd - a.s.gd || b.s.gf - a.s.gf || a.t.localeCompare(b.t, 'pt');
+    });
+    var cal = (window.CALENDARIOS || {})[COMP.calendario];
+    var total = COMP.nTimes * (COMP.nTimes - 1), jogos = tabela.reduce(function (n, x) { return n + x.s.played; }, 0) / 2;
+
+    $('titulo').textContent = _t('Classificação — {nome}', { nome: COMP.nome });
+    $('sub').textContent = _t('Temporada {ano} · {n} de {total} jogos disputados · dados até {data}', { ano: cal ? cal.temporada : '', n: _n(jogos), total: _n(total), data: cal ? cal.atualizadoEm.split('-').reverse().join('/') : '—' });
+    document.title = _t('Classificação — {nome}', { nome: COMP.nome }) + ' · Sassamaru 2026';
+
+    $('legenda').innerHTML = ZONAS.map(function (z) {
+      return '<span><i style="background:' + z.cor + '"></i>' + esc(z.rot) + ' (' + z.faixa[0] + 'º–' + z.faixa[1] + 'º)</span>';
+    }).join('');
+
+    var th = function (txt, cls) { return '<th' + (cls ? ' class="' + cls + '"' : '') + '>' + esc(txt) + '</th>'; };
+    var html = '<table><thead><tr>' + th('#', 'l') + th(_t('Clube@@coluna'), 'l') + th(_t('Pts@@pontos')) + th(_t('J@@jogos')) +
+      th(_t('V@@vitórias'), 'opt') + th(_t('E@@empates'), 'opt') + th(_t('D@@derrotas'), 'opt') + th(_t('GP@@gols pró'), 'opt') + th(_t('GC@@gols contra'), 'opt') +
+      th(_t('SG@@saldo de gols')) + th(_t('Aprov.@@coluna')) + '</tr></thead><tbody>';
+    tabela.forEach(function (x, i) {
+      var s = x.s, ap = s.played ? s.pts / (3 * s.played) : 0;
+      html += '<tr class="' + zonaDe(i + 1) + '"><td class="pos l">' + (i + 1) + '</td><td class="club l">' + esc(nomes[x.t] || x.t) + '</td>' +
+        '<td class="pts">' + s.pts + '</td><td>' + s.played + '</td>' +
+        '<td class="opt">' + s.w + '</td><td class="opt">' + s.d + '</td><td class="opt">' + s.l + '</td><td class="opt">' + s.gf + '</td><td class="opt">' + s.ga + '</td>' +
+        '<td' + (s.gd < 0 ? ' class="pos-neg"' : '') + '>' + (s.gd > 0 ? '+' : '') + s.gd + '</td>' +
+        '<td>' + (ap * 100).toFixed(0) + '%<span class="bar"><b style="width:' + (ap * 100).toFixed(0) + '%"></b></span></td></tr>';
+    });
+    $('tabela').innerHTML = html + '</tbody></table>';
+
+    var notas = [_t('Critérios de desempate: pontos, vitórias, saldo de gols e gols pró.')];
+    var min = Math.min.apply(null, tabela.map(function (x) { return x.s.played; })), max = Math.max.apply(null, tabela.map(function (x) { return x.s.played; }));
+    if (min !== max) notas.push(_t('Clubes com número de jogos diferente têm partidas adiadas já disputadas (ou ainda por jogar).'));
+    if (COMP.rodadasSinteticas) notas.push(_t('Série B: a ordem das rodadas é sintética (a fonte não traz datas); a tabela usa só os resultados reais.'));
+    $('notas').innerHTML = notas.map(function (n) { return '<p>' + esc(n) + '</p>'; }).join('');
+  }
+
+  fetch('../' + COMP.csv, { cache: 'no-store' }).then(function (r) {
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.text();
+  }).then(function (t) { render(parseCsv(t)); }).catch(function (e) {
+    $('titulo').textContent = _t('Classificação — {nome}', { nome: COMP.nome });
+    $('tabela').innerHTML = '<div class="err">' + esc(_t('Não foi possível carregar os dados.')) + ' (' + esc(e.message) + ')</div>';
+  });
+
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('../service-worker.js').catch(function () {});
+})();
+</script>
+</body>
+</html>

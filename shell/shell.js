@@ -8,8 +8,8 @@
 
   // Chaves de tradução com contexto "@@aba": nomes curtos que não podem colidir com texto solto do DOM.
   // `on(página, parâmetros)` decide se a aba está ativa; as duas divisões usam a mesma página (apps/index.html) com ?comp=
-  var SERIE_A = function (p, q) { return (p === 'apps/index.html' && q.comp !== 'serie-b') || p === 'simulacoes/bench-brasileirao2026.html'; };
-  var SERIE_B = function (p, q) { return p === 'apps/index.html' && q.comp === 'serie-b'; };
+  var SERIE_A = function (p, q) { return ((p === 'apps/index.html' || p === 'apps/tabela.html') && q.comp !== 'serie-b') || p === 'simulacoes/bench-brasileirao2026.html'; };
+  var SERIE_B = function (p, q) { return (p === 'apps/index.html' || p === 'apps/tabela.html') && q.comp === 'serie-b'; };
   var TABS = [
     { href: 'index.html',                           key: 'Início@@aba',    ico: '🏠', on: function (p) { return p === 'index.html' || p === ''; } },
     { href: 'apps/index.html?comp=serie-a',         key: 'Série A@@aba',   ico: '🏆', on: SERIE_A },
@@ -22,10 +22,12 @@
   var SUBTABS = {
     a: [
       { href: 'apps/index.html?comp=serie-a',          key: 'Previsão da rodada@@sub',     on: function (p) { return p === 'apps/index.html'; } },
+      { href: 'apps/tabela.html?comp=serie-a',         key: 'Classificação@@sub',          on: function (p) { return p === 'apps/tabela.html'; } },
       { href: 'simulacoes/bench-brasileirao2026.html', key: 'Simulação da temporada@@sub', on: function (p) { return p === 'simulacoes/bench-brasileirao2026.html'; } },
     ],
     b: [
-      { href: 'apps/index.html?comp=serie-b',          key: 'Previsão da rodada@@sub',     on: function () { return true; } },
+      { href: 'apps/index.html?comp=serie-b',          key: 'Previsão da rodada@@sub',     on: function (p) { return p === 'apps/index.html'; } },
+      { href: 'apps/tabela.html?comp=serie-b',         key: 'Classificação@@sub',          on: function (p) { return p === 'apps/tabela.html'; } },
     ],
   };
   // ── tema claro/escuro ── aplicado já no <head>, antes da primeira pintura (sem "flash" branco)

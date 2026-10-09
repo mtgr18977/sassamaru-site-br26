@@ -84,6 +84,7 @@ section('HTML files have PWA meta tags');
 const htmlFiles = [
   'apps/index.html',
   'apps/bench-selecoes.html',
+  'apps/tabela.html',
   'simulacoes/bench-copa2026.html',
   'simulacoes/bench-brasileirao2026.html',
 ];

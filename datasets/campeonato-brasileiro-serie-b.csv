@@ -7220,313 +7220,322 @@ ID,rodata,mandante,visitante,vencedor,mandante_Placar,visitante_Placar,rodada_or
 7219,38.0,Goiás,Coritiba,Goiás,1,0,sintetica
 7220,38.0,Novorizontino,Remo,Empate,1,1,sintetica
 7221,1.0,América-MG,Ceará,Empate,1,1,sintetica
-7222,1.0,Athletic,Sport,Sport,1,2,sintetica
-7223,1.0,Avaí,Cuiabá,Avaí,1,0,sintetica
-7224,1.0,CRB,Juventude,Juventude,0,1,sintetica
-7225,1.0,Fortaleza,Ponte Preta,Fortaleza,2,0,sintetica
-7226,1.0,Goiás,Operário Ferroviário,Operário Ferroviário,0,3,sintetica
-7227,1.0,Londrina,Criciúma,Criciúma,0,2,sintetica
-7228,1.0,Novorizontino,Atlético-GO,Novorizontino,3,0,sintetica
-7229,1.0,Náutico,São Bernardo,São Bernardo,0,3,sintetica
-7230,1.0,Vila Nova,Botafogo-SP,Vila Nova,1,0,sintetica
-7231,2.0,Athletic,Goiás,Empate,1,1,sintetica
-7232,2.0,Atlético-GO,São Bernardo,São Bernardo,0,1,sintetica
-7233,2.0,Botafogo-SP,Avaí,Botafogo-SP,3,1,sintetica
-7234,2.0,CRB,Criciúma,CRB,2,1,sintetica
-7235,2.0,Cuiabá,Fortaleza,Empate,1,1,sintetica
-7236,2.0,Londrina,Ceará,Empate,0,0,sintetica
-7237,2.0,Novorizontino,Sport,Novorizontino,2,1,sintetica
-7238,2.0,Náutico,Juventude,Empate,0,0,sintetica
-7239,2.0,Operário Ferroviário,América-MG,Operário Ferroviário,1,0,sintetica
-7240,2.0,Vila Nova,Ponte Preta,Vila Nova,6,0,sintetica
-7241,3.0,Botafogo-SP,Cuiabá,Cuiabá,1,2,sintetica
-7242,3.0,CRB,Goiás,Empate,2,2,sintetica
-7243,3.0,Criciúma,Athletic,Empate,1,1,sintetica
-7244,3.0,Novorizontino,Londrina,Londrina,1,3,sintetica
-7245,3.0,Náutico,Fortaleza,Fortaleza,0,1,sintetica
-7246,3.0,Operário Ferroviário,Atlético-GO,Operário Ferroviário,1,0,sintetica
-7247,3.0,Ponte Preta,América-MG,Ponte Preta,1,0,sintetica
-7248,3.0,Sport,Ceará,Sport,2,0,sintetica
-7249,3.0,São Bernardo,Juventude,Juventude,0,1,sintetica
-7250,3.0,Vila Nova,Avaí,Vila Nova,2,0,sintetica
-7251,4.0,Athletic,São Bernardo,Athletic,2,1,sintetica
-7252,4.0,Avaí,Vila Nova,Empate,1,1,sintetica
-7253,4.0,Ceará,Botafogo-SP,Botafogo-SP,0,1,sintetica
-7254,4.0,Cuiabá,Atlético-GO,Atlético-GO,0,1,sintetica
-7255,4.0,Fortaleza,Sport,Fortaleza,2,1,sintetica
-7256,4.0,Juventude,Criciúma,Empate,0,0,sintetica
-7257,4.0,Novorizontino,CRB,Empate,1,1,sintetica
-7258,4.0,Náutico,América-MG,Náutico,4,0,sintetica
-7259,4.0,Operário Ferroviário,Londrina,Operário Ferroviário,3,0,sintetica
-7260,4.0,Ponte Preta,Goiás,Goiás,1,2,sintetica
-7261,5.0,Botafogo-SP,Vila Nova,Vila Nova,0,1,sintetica
-7262,5.0,CRB,Avaí,Avaí,0,1,sintetica
-7263,5.0,Ceará,Atlético-GO,Atlético-GO,0,1,sintetica
-7264,5.0,Cuiabá,América-MG,Cuiabá,1,0,sintetica
-7265,5.0,Fortaleza,Athletic,Empate,2,2,sintetica
-7266,5.0,Goiás,Criciúma,Goiás,1,0,sintetica
-7267,5.0,Juventude,Ponte Preta,Juventude,3,0,sintetica
-7268,5.0,Londrina,Operário Ferroviário,Operário Ferroviário,1,2,sintetica
-7269,5.0,Novorizontino,Náutico,Empate,2,2,sintetica
-7270,5.0,São Bernardo,Sport,Empate,0,0,sintetica
-7271,6.0,América-MG,Botafogo-SP,Botafogo-SP,1,2,sintetica
-7272,6.0,Atlético-GO,Ponte Preta,Atlético-GO,2,0,sintetica
+7222,1.0,Atlético-GO,Criciúma,Atlético-GO,4,0,sintetica
+7223,1.0,Botafogo-SP,São Bernardo,São Bernardo,1,2,sintetica
+7224,1.0,CRB,Náutico,CRB,2,1,sintetica
+7225,1.0,Cuiabá,Goiás,Empate,1,1,sintetica
+7226,1.0,Fortaleza,Athletic,Empate,2,2,sintetica
+7227,1.0,Londrina,Juventude,Empate,0,0,sintetica
+7228,1.0,Operário Ferroviário,Ponte Preta,Operário Ferroviário,3,2,sintetica
+7229,1.0,Sport,Novorizontino,Sport,1,0,sintetica
+7230,1.0,Vila Nova,Avaí,Vila Nova,2,0,sintetica
+7231,2.0,América-MG,Juventude,Juventude,0,1,sintetica
+7232,2.0,Athletic,Botafogo-SP,Empate,1,1,sintetica
+7233,2.0,Avaí,CRB,CRB,0,1,sintetica
+7234,2.0,Ceará,Novorizontino,Ceará,2,1,sintetica
+7235,2.0,Criciúma,Goiás,Criciúma,1,0,sintetica
+7236,2.0,Cuiabá,Ponte Preta,Cuiabá,2,0,sintetica
+7237,2.0,Náutico,Fortaleza,Fortaleza,0,1,sintetica
+7238,2.0,Sport,Operário Ferroviário,Empate,2,2,sintetica
+7239,2.0,São Bernardo,Atlético-GO,São Bernardo,1,0,sintetica
+7240,2.0,Vila Nova,Londrina,Vila Nova,2,0,sintetica
+7241,3.0,América-MG,Vila Nova,Vila Nova,1,2,sintetica
+7242,3.0,Botafogo-SP,Operário Ferroviário,Botafogo-SP,2,1,sintetica
+7243,3.0,CRB,Athletic,Athletic,2,3,sintetica
+7244,3.0,Criciúma,Cuiabá,Criciúma,2,0,sintetica
+7245,3.0,Fortaleza,Novorizontino,Fortaleza,1,0,sintetica
+7246,3.0,Juventude,Ceará,Juventude,2,0,sintetica
+7247,3.0,Náutico,Londrina,Náutico,2,1,sintetica
+7248,3.0,Ponte Preta,Goiás,Goiás,1,2,sintetica
+7249,3.0,Sport,Atlético-GO,Empate,1,1,sintetica
+7250,3.0,São Bernardo,Avaí,Empate,1,1,sintetica
+7251,4.0,Athletic,Novorizontino,Novorizontino,1,4,sintetica
+7252,4.0,Atlético-GO,São Bernardo,São Bernardo,0,1,sintetica
+7253,4.0,Avaí,Ceará,Ceará,0,1,sintetica
+7254,4.0,Botafogo-SP,Juventude,Botafogo-SP,4,2,sintetica
+7255,4.0,Criciúma,CRB,Criciúma,3,1,sintetica
+7256,4.0,Fortaleza,Londrina,Fortaleza,3,0,sintetica
+7257,4.0,Goiás,América-MG,Goiás,3,1,sintetica
+7258,4.0,Operário Ferroviário,Cuiabá,Empate,0,0,sintetica
+7259,4.0,Sport,Náutico,Sport,2,0,sintetica
+7260,4.0,Vila Nova,Ponte Preta,Vila Nova,6,0,sintetica
+7261,5.0,Atlético-GO,Athletic,Empate,0,0,sintetica
+7262,5.0,Avaí,Náutico,Avaí,2,0,sintetica
+7263,5.0,Ceará,Vila Nova,Empate,3,3,sintetica
+7264,5.0,Fortaleza,Cuiabá,Empate,0,0,sintetica
+7265,5.0,Goiás,Novorizontino,Novorizontino,0,4,sintetica
+7266,5.0,Juventude,Criciúma,Empate,0,0,sintetica
+7267,5.0,Londrina,Ponte Preta,Londrina,6,0,sintetica
+7268,5.0,Operário Ferroviário,Botafogo-SP,Botafogo-SP,1,2,sintetica
+7269,5.0,Sport,América-MG,Sport,3,0,sintetica
+7270,5.0,São Bernardo,CRB,São Bernardo,3,1,sintetica
+7271,6.0,América-MG,Athletic,Athletic,1,3,sintetica
+7272,6.0,Atlético-GO,Botafogo-SP,Atlético-GO,3,0,sintetica
 7273,6.0,CRB,São Bernardo,São Bernardo,2,3,sintetica
 7274,6.0,Ceará,Avaí,Ceará,2,1,sintetica
-7275,6.0,Criciúma,Fortaleza,Fortaleza,0,2,sintetica
-7276,6.0,Goiás,Londrina,Goiás,1,0,sintetica
-7277,6.0,Juventude,Sport,Sport,0,1,sintetica
-7278,6.0,Novorizontino,Cuiabá,Empate,1,1,sintetica
-7279,6.0,Náutico,Athletic,Náutico,2,1,sintetica
-7280,6.0,Operário Ferroviário,Vila Nova,Empate,0,0,sintetica
-7281,7.0,Athletic,Cuiabá,Empate,0,0,sintetica
-7282,7.0,Botafogo-SP,Atlético-GO,Empate,1,1,sintetica
-7283,7.0,CRB,Ponte Preta,CRB,4,2,sintetica
-7284,7.0,Fortaleza,Avaí,Fortaleza,1,0,sintetica
-7285,7.0,Goiás,Ceará,Goiás,2,0,sintetica
-7286,7.0,Juventude,América-MG,Juventude,3,0,sintetica
-7287,7.0,Novorizontino,São Bernardo,Empate,0,0,sintetica
-7288,7.0,Náutico,Criciúma,Criciúma,0,1,sintetica
-7289,7.0,Sport,Operário Ferroviário,Empate,2,2,sintetica
-7290,7.0,Vila Nova,Londrina,Vila Nova,2,0,sintetica
-7291,8.0,América-MG,Atlético-GO,Atlético-GO,1,2,sintetica
-7292,8.0,Athletic,Operário Ferroviário,Operário Ferroviário,0,1,sintetica
-7293,8.0,Criciúma,Avaí,Criciúma,3,0,sintetica
-7294,8.0,Fortaleza,Ceará,Empate,1,1,sintetica
-7295,8.0,Goiás,Cuiabá,Cuiabá,0,2,sintetica
-7296,8.0,Juventude,CRB,Juventude,2,1,sintetica
-7297,8.0,Náutico,Londrina,Náutico,2,1,sintetica
-7298,8.0,Ponte Preta,Botafogo-SP,Empate,0,0,sintetica
-7299,8.0,Sport,Vila Nova,Empate,1,1,sintetica
-7300,8.0,São Bernardo,Novorizontino,Empate,1,1,sintetica
-7301,9.0,América-MG,CRB,CRB,1,2,sintetica
-7302,9.0,Botafogo-SP,Náutico,Empate,1,1,sintetica
-7303,9.0,Ceará,Londrina,Ceará,2,1,sintetica
-7304,9.0,Cuiabá,Operário Ferroviário,Cuiabá,1,0,sintetica
-7305,9.0,Fortaleza,São Bernardo,Empate,1,1,sintetica
-7306,9.0,Goiás,Atlético-GO,Atlético-GO,0,1,sintetica
-7307,9.0,Juventude,Athletic,Athletic,0,2,sintetica
-7308,9.0,Novorizontino,Avaí,Novorizontino,3,1,sintetica
-7309,9.0,Ponte Preta,Criciúma,Criciúma,1,2,sintetica
-7310,9.0,Vila Nova,Sport,Sport,0,1,sintetica
-7311,10.0,América-MG,Juventude,Juventude,0,1,sintetica
-7312,10.0,Atlético-GO,Athletic,Empate,0,0,sintetica
-7313,10.0,Botafogo-SP,Operário Ferroviário,Botafogo-SP,2,1,sintetica
-7314,10.0,Criciúma,Goiás,Criciúma,1,0,sintetica
-7315,10.0,Fortaleza,Novorizontino,Fortaleza,1,0,sintetica
-7316,10.0,Londrina,CRB,Londrina,5,0,sintetica
-7317,10.0,Náutico,Ceará,Náutico,1,0,sintetica
-7318,10.0,Ponte Preta,Vila Nova,Vila Nova,0,1,sintetica
-7319,10.0,Sport,Cuiabá,Empate,1,1,sintetica
-7320,10.0,São Bernardo,Avaí,Empate,1,1,sintetica
-7321,11.0,América-MG,Vila Nova,Vila Nova,1,2,sintetica
-7322,11.0,Avaí,Atlético-GO,Atlético-GO,0,1,sintetica
-7323,11.0,Botafogo-SP,Ponte Preta,Botafogo-SP,2,0,sintetica
-7324,11.0,CRB,Athletic,Athletic,2,3,sintetica
-7325,11.0,Ceará,Fortaleza,Ceará,2,1,sintetica
+7275,6.0,Fortaleza,Goiás,Fortaleza,4,1,sintetica
+7276,6.0,Juventude,Cuiabá,Juventude,2,0,sintetica
+7277,6.0,Londrina,Operário Ferroviário,Operário Ferroviário,1,2,sintetica
+7278,6.0,Novorizontino,Sport,Novorizontino,2,1,sintetica
+7279,6.0,Náutico,Criciúma,Criciúma,0,1,sintetica
+7280,6.0,Ponte Preta,Vila Nova,Vila Nova,0,1,sintetica
+7281,7.0,América-MG,Atlético-GO,Atlético-GO,1,2,sintetica
+7282,7.0,Athletic,Operário Ferroviário,Operário Ferroviário,0,1,sintetica
+7283,7.0,Avaí,Sport,Avaí,2,1,sintetica
+7284,7.0,Botafogo-SP,Ponte Preta,Botafogo-SP,2,0,sintetica
+7285,7.0,Criciúma,São Bernardo,Criciúma,1,0,sintetica
+7286,7.0,Cuiabá,Novorizontino,Empate,0,0,sintetica
+7287,7.0,Fortaleza,Juventude,Fortaleza,2,1,sintetica
+7288,7.0,Goiás,Vila Nova,Goiás,1,0,sintetica
+7289,7.0,Londrina,CRB,Londrina,5,0,sintetica
+7290,7.0,Náutico,Ceará,Náutico,1,0,sintetica
+7291,8.0,Botafogo-SP,Atlético-GO,Empate,1,1,sintetica
+7292,8.0,CRB,Fortaleza,Empate,1,1,sintetica
+7293,8.0,Ceará,Náutico,Ceará,1,0,sintetica
+7294,8.0,Cuiabá,América-MG,Cuiabá,1,0,sintetica
+7295,8.0,Goiás,Londrina,Goiás,1,0,sintetica
+7296,8.0,Juventude,Vila Nova,Juventude,1,0,sintetica
+7297,8.0,Novorizontino,São Bernardo,Empate,0,0,sintetica
+7298,8.0,Operário Ferroviário,Avaí,Avaí,1,2,sintetica
+7299,8.0,Ponte Preta,Criciúma,Criciúma,1,2,sintetica
+7300,8.0,Sport,Athletic,Empate,1,1,sintetica
+7301,9.0,Athletic,Avaí,Athletic,1,0,sintetica
+7302,9.0,CRB,Vila Nova,CRB,2,0,sintetica
+7303,9.0,Criciúma,Botafogo-SP,Criciúma,1,0,sintetica
+7304,9.0,Cuiabá,Atlético-GO,Atlético-GO,0,1,sintetica
+7305,9.0,Fortaleza,Sport,Fortaleza,2,1,sintetica
+7306,9.0,Novorizontino,Ceará,Novorizontino,2,1,sintetica
+7307,9.0,Náutico,Goiás,Goiás,0,1,sintetica
+7308,9.0,Operário Ferroviário,América-MG,Operário Ferroviário,1,0,sintetica
+7309,9.0,Ponte Preta,Londrina,Londrina,1,4,sintetica
+7310,9.0,São Bernardo,Juventude,Juventude,0,1,sintetica
+7311,10.0,Atlético-GO,América-MG,Atlético-GO,2,0,sintetica
+7312,10.0,Avaí,Operário Ferroviário,Empate,0,0,sintetica
+7313,10.0,CRB,Goiás,Empate,2,2,sintetica
+7314,10.0,Ceará,Botafogo-SP,Botafogo-SP,0,1,sintetica
+7315,10.0,Criciúma,Londrina,Criciúma,1,0,sintetica
+7316,10.0,Juventude,Fortaleza,Empate,0,0,sintetica
+7317,10.0,Novorizontino,Athletic,Novorizontino,2,1,sintetica
+7318,10.0,Náutico,Sport,Náutico,3,1,sintetica
+7319,10.0,Ponte Preta,Cuiabá,Cuiabá,1,2,sintetica
+7320,10.0,Vila Nova,São Bernardo,Vila Nova,2,1,sintetica
+7321,11.0,Athletic,Sport,Sport,1,2,sintetica
+7322,11.0,Atlético-GO,Operário Ferroviário,Atlético-GO,3,1,sintetica
+7323,11.0,Avaí,América-MG,Avaí,2,1,sintetica
+7324,11.0,Botafogo-SP,Cuiabá,Cuiabá,1,2,sintetica
+7325,11.0,CRB,Juventude,Juventude,0,1,sintetica
 7326,11.0,Criciúma,Náutico,Empate,0,0,sintetica
-7327,11.0,Cuiabá,Londrina,Empate,2,2,sintetica
-7328,11.0,Operário Ferroviário,Novorizontino,Operário Ferroviário,2,1,sintetica
-7329,11.0,Sport,Juventude,Sport,2,1,sintetica
-7330,11.0,São Bernardo,Goiás,São Bernardo,1,0,sintetica
-7331,12.0,América-MG,Athletic,Athletic,1,3,sintetica
-7332,12.0,Atlético-GO,Operário Ferroviário,Atlético-GO,3,1,sintetica
-7333,12.0,Avaí,Criciúma,Criciúma,1,2,sintetica
-7334,12.0,Botafogo-SP,Novorizontino,Novorizontino,1,3,sintetica
-7335,12.0,CRB,Náutico,CRB,2,1,sintetica
-7336,12.0,Goiás,Sport,Empate,1,1,sintetica
-7337,12.0,Juventude,Ceará,Juventude,2,0,sintetica
-7338,12.0,Londrina,Vila Nova,Vila Nova,0,1,sintetica
-7339,12.0,Ponte Preta,Cuiabá,Cuiabá,1,2,sintetica
-7340,12.0,São Bernardo,Fortaleza,Fortaleza,0,1,sintetica
-7341,13.0,América-MG,Criciúma,Criciúma,0,1,sintetica
-7342,13.0,Atlético-GO,CRB,Empate,3,3,sintetica
-7343,13.0,Avaí,Juventude,Avaí,2,0,sintetica
-7344,13.0,Ceará,Athletic,Empate,0,0,sintetica
-7345,13.0,Cuiabá,Vila Nova,Cuiabá,1,0,sintetica
-7346,13.0,Fortaleza,Operário Ferroviário,Empate,1,1,sintetica
-7347,13.0,Londrina,Sport,Sport,1,2,sintetica
-7348,13.0,Náutico,Goiás,Goiás,0,1,sintetica
-7349,13.0,Ponte Preta,Novorizontino,Novorizontino,0,2,sintetica
-7350,13.0,São Bernardo,Botafogo-SP,Botafogo-SP,0,1,sintetica
-7351,14.0,Athletic,Juventude,Empate,1,1,sintetica
-7352,14.0,Atlético-GO,América-MG,Atlético-GO,2,0,sintetica
-7353,14.0,Avaí,Fortaleza,Empate,0,0,sintetica
-7354,14.0,Botafogo-SP,CRB,CRB,0,1,sintetica
-7355,14.0,Ceará,Náutico,Ceará,1,0,sintetica
-7356,14.0,Criciúma,Sport,Criciúma,1,0,sintetica
-7357,14.0,Cuiabá,Ponte Preta,Cuiabá,2,0,sintetica
-7358,14.0,Londrina,Novorizontino,Novorizontino,1,4,sintetica
+7327,11.0,Goiás,Ceará,Goiás,2,0,sintetica
+7328,11.0,Londrina,Fortaleza,Fortaleza,1,2,sintetica
+7329,11.0,Novorizontino,Vila Nova,Novorizontino,2,1,sintetica
+7330,11.0,Ponte Preta,São Bernardo,São Bernardo,0,2,sintetica
+7331,12.0,Athletic,Vila Nova,Athletic,5,0,sintetica
+7332,12.0,Avaí,Fortaleza,Empate,0,0,sintetica
+7333,12.0,Botafogo-SP,Goiás,Goiás,1,3,sintetica
+7334,12.0,Criciúma,Juventude,Juventude,0,2,sintetica
+7335,12.0,Cuiabá,Operário Ferroviário,Cuiabá,1,0,sintetica
+7336,12.0,Londrina,Ceará,Empate,0,0,sintetica
+7337,12.0,Novorizontino,Atlético-GO,Novorizontino,3,0,sintetica
+7338,12.0,Náutico,América-MG,Náutico,4,0,sintetica
+7339,12.0,Sport,CRB,CRB,1,2,sintetica
+7340,12.0,São Bernardo,Ponte Preta,São Bernardo,3,0,sintetica
+7341,13.0,Athletic,Ponte Preta,Athletic,2,1,sintetica
+7342,13.0,Atlético-GO,Goiás,Empate,1,1,sintetica
+7343,13.0,Avaí,Vila Nova,Empate,1,1,sintetica
+7344,13.0,Ceará,CRB,CRB,0,1,sintetica
+7345,13.0,Fortaleza,América-MG,América-MG,0,3,sintetica
+7346,13.0,Londrina,Botafogo-SP,Empate,0,0,sintetica
+7347,13.0,Novorizontino,Criciúma,Criciúma,0,1,sintetica
+7348,13.0,Náutico,Cuiabá,Náutico,1,0,sintetica
+7349,13.0,Operário Ferroviário,Juventude,Operário Ferroviário,2,1,sintetica
+7350,13.0,Sport,São Bernardo,Sport,2,1,sintetica
+7351,14.0,Atlético-GO,Avaí,Atlético-GO,2,1,sintetica
+7352,14.0,Botafogo-SP,Criciúma,Empate,1,1,sintetica
+7353,14.0,CRB,América-MG,CRB,3,1,sintetica
+7354,14.0,Goiás,Fortaleza,Fortaleza,0,1,sintetica
+7355,14.0,Londrina,Athletic,Londrina,2,0,sintetica
+7356,14.0,Novorizontino,Cuiabá,Empate,1,1,sintetica
+7357,14.0,Ponte Preta,Ceará,Empate,1,1,sintetica
+7358,14.0,Sport,Juventude,Sport,2,1,sintetica
 7359,14.0,São Bernardo,Operário Ferroviário,Operário Ferroviário,1,2,sintetica
-7360,14.0,Vila Nova,Goiás,Vila Nova,2,0,sintetica
-7361,15.0,América-MG,Náutico,América-MG,2,1,sintetica
-7362,15.0,Atlético-GO,Goiás,Empate,1,1,sintetica
-7363,15.0,Botafogo-SP,Athletic,Athletic,1,2,sintetica
-7364,15.0,Cuiabá,Ceará,Ceará,0,2,sintetica
-7365,15.0,Fortaleza,Criciúma,Fortaleza,3,2,sintetica
+7360,14.0,Vila Nova,Náutico,Vila Nova,4,3,sintetica
+7361,15.0,América-MG,Criciúma,Criciúma,0,1,sintetica
+7362,15.0,Athletic,Náutico,Náutico,0,1,sintetica
+7363,15.0,Atlético-GO,Ponte Preta,Atlético-GO,2,0,sintetica
+7364,15.0,Cuiabá,CRB,Cuiabá,2,0,sintetica
+7365,15.0,Goiás,Botafogo-SP,Goiás,1,0,sintetica
 7366,15.0,Juventude,Operário Ferroviário,Juventude,3,0,sintetica
 7367,15.0,Londrina,São Bernardo,São Bernardo,1,3,sintetica
-7368,15.0,Ponte Preta,Avaí,Avaí,0,2,sintetica
-7369,15.0,Sport,Novorizontino,Sport,1,0,sintetica
-7370,15.0,Vila Nova,CRB,Empate,2,2,sintetica
-7371,16.0,América-MG,Ponte Preta,América-MG,2,0,sintetica
-7372,16.0,Athletic,Náutico,Náutico,0,1,sintetica
-7373,16.0,Atlético-GO,Botafogo-SP,Atlético-GO,3,0,sintetica
-7374,16.0,Ceará,Vila Nova,Empate,3,3,sintetica
-7375,16.0,Cuiabá,Novorizontino,Empate,0,0,sintetica
-7376,16.0,Goiás,São Bernardo,Goiás,2,1,sintetica
-7377,16.0,Juventude,Fortaleza,Empate,0,0,sintetica
-7378,16.0,Londrina,Avaí,Londrina,3,2,sintetica
-7379,16.0,Operário Ferroviário,Criciúma,Empate,1,1,sintetica
-7380,16.0,Sport,CRB,CRB,1,2,sintetica
-7381,17.0,Athletic,Avaí,Athletic,1,0,sintetica
-7382,17.0,CRB,América-MG,CRB,3,1,sintetica
-7383,17.0,Cuiabá,Botafogo-SP,Empate,1,1,sintetica
-7384,17.0,Fortaleza,Londrina,Fortaleza,3,0,sintetica
-7385,17.0,Juventude,Goiás,Juventude,2,0,sintetica
-7386,17.0,Novorizontino,Criciúma,Criciúma,0,1,sintetica
-7387,17.0,Operário Ferroviário,Ponte Preta,Operário Ferroviário,3,2,sintetica
-7388,17.0,Sport,Atlético-GO,Empate,1,1,sintetica
-7389,17.0,São Bernardo,Ceará,Ceará,3,4,sintetica
-7390,17.0,Vila Nova,Náutico,Vila Nova,4,3,sintetica
-7391,18.0,América-MG,São Bernardo,São Bernardo,0,2,sintetica
-7392,18.0,Athletic,Ponte Preta,Athletic,2,1,sintetica
-7393,18.0,Atlético-GO,Avaí,Atlético-GO,2,1,sintetica
-7394,18.0,Botafogo-SP,Goiás,Goiás,1,3,sintetica
-7395,18.0,CRB,Novorizontino,Empate,0,0,sintetica
-7396,18.0,Criciúma,Ceará,Empate,1,1,sintetica
-7397,18.0,Juventude,Cuiabá,Juventude,2,0,sintetica
-7398,18.0,Operário Ferroviário,Náutico,Náutico,2,6,sintetica
-7399,18.0,Sport,Londrina,Sport,2,1,sintetica
-7400,18.0,Vila Nova,Fortaleza,Vila Nova,2,1,sintetica
-7401,19.0,Avaí,Náutico,Avaí,2,0,sintetica
-7402,19.0,Criciúma,CRB,Criciúma,3,1,sintetica
-7403,19.0,Goiás,América-MG,Goiás,3,1,sintetica
-7404,19.0,Juventude,Novorizontino,Empate,0,0,sintetica
-7405,19.0,Londrina,Fortaleza,Fortaleza,1,2,sintetica
-7406,19.0,Operário Ferroviário,Cuiabá,Empate,0,0,sintetica
-7407,19.0,Ponte Preta,Athletic,Empate,1,1,sintetica
-7408,19.0,Sport,Botafogo-SP,Empate,3,3,sintetica
-7409,19.0,São Bernardo,Atlético-GO,São Bernardo,1,0,sintetica
-7410,19.0,Vila Nova,Ceará,Vila Nova,2,0,sintetica
-7411,20.0,Atlético-GO,Juventude,Empate,0,0,sintetica
-7412,20.0,Avaí,Goiás,Goiás,0,2,sintetica
-7413,20.0,Criciúma,Vila Nova,Criciúma,2,0,sintetica
-7414,20.0,Cuiabá,Sport,Empate,0,0,sintetica
-7415,20.0,Fortaleza,América-MG,América-MG,0,3,sintetica
-7416,20.0,Londrina,Botafogo-SP,Empate,0,0,sintetica
-7417,20.0,Novorizontino,Athletic,Novorizontino,2,1,sintetica
-7418,20.0,Náutico,Operário Ferroviário,Empate,3,3,sintetica
-7419,20.0,Ponte Preta,Ceará,Empate,1,1,sintetica
-7420,20.0,São Bernardo,CRB,São Bernardo,3,1,sintetica
-7421,21.0,América-MG,Novorizontino,Novorizontino,0,3,sintetica
-7422,21.0,Atlético-GO,Londrina,Atlético-GO,2,1,sintetica
-7423,21.0,Avaí,Ceará,Ceará,0,1,sintetica
-7424,21.0,CRB,Cuiabá,CRB,3,0,sintetica
-7425,21.0,Criciúma,Operário Ferroviário,Operário Ferroviário,0,2,sintetica
-7426,21.0,Fortaleza,Juventude,Fortaleza,2,1,sintetica
-7427,21.0,Goiás,Botafogo-SP,Goiás,1,0,sintetica
-7428,21.0,Ponte Preta,Sport,Sport,1,3,sintetica
-7429,21.0,São Bernardo,Náutico,Empate,1,1,sintetica
-7430,21.0,Vila Nova,Athletic,Empate,1,1,sintetica
-7431,22.0,Atlético-GO,Criciúma,Atlético-GO,4,0,sintetica
-7432,22.0,Avaí,América-MG,Avaí,2,1,sintetica
-7433,22.0,CRB,Vila Nova,CRB,2,0,sintetica
-7434,22.0,Ceará,Operário Ferroviário,Operário Ferroviário,1,2,sintetica
-7435,22.0,Cuiabá,Athletic,Cuiabá,3,0,sintetica
-7436,22.0,Goiás,Fortaleza,Fortaleza,0,1,sintetica
-7437,22.0,Londrina,Juventude,Empate,0,0,sintetica
-7438,22.0,Novorizontino,Botafogo-SP,Novorizontino,1,0,sintetica
-7439,22.0,Ponte Preta,São Bernardo,São Bernardo,0,2,sintetica
-7440,22.0,Sport,Náutico,Sport,2,0,sintetica
-7441,23.0,América-MG,Goiás,América-MG,1,0,sintetica
-7442,23.0,Athletic,Botafogo-SP,Empate,1,1,sintetica
-7443,23.0,Avaí,Sport,Avaí,2,1,sintetica
-7444,23.0,Ceará,Novorizontino,Ceará,2,1,sintetica
-7445,23.0,Criciúma,Atlético-GO,Empate,1,1,sintetica
-7446,23.0,Fortaleza,Náutico,Empate,1,1,sintetica
-7447,23.0,Juventude,Vila Nova,Juventude,1,0,sintetica
-7448,23.0,Operário Ferroviário,CRB,Operário Ferroviário,3,0,sintetica
-7449,23.0,Ponte Preta,Londrina,Londrina,1,4,sintetica
-7450,23.0,São Bernardo,Cuiabá,Empate,2,2,sintetica
-7451,24.0,Avaí,Novorizontino,Empate,3,3,sintetica
-7452,24.0,CRB,Operário Ferroviário,CRB,3,0,sintetica
-7453,24.0,Ceará,Cuiabá,Cuiabá,1,3,sintetica
-7454,24.0,Criciúma,São Bernardo,Criciúma,1,0,sintetica
-7455,24.0,Fortaleza,Goiás,Fortaleza,4,1,sintetica
-7456,24.0,Juventude,Atlético-GO,Empate,2,2,sintetica
-7457,24.0,Londrina,Ponte Preta,Londrina,6,0,sintetica
-7458,24.0,Náutico,Botafogo-SP,Náutico,1,0,sintetica
-7459,24.0,Sport,Athletic,Empate,1,1,sintetica
-7460,24.0,Vila Nova,América-MG,Vila Nova,1,0,sintetica
-7461,25.0,Athletic,Vila Nova,Athletic,5,0,sintetica
-7462,25.0,Atlético-GO,Náutico,Náutico,1,2,sintetica
-7463,25.0,Avaí,CRB,CRB,0,1,sintetica
-7464,25.0,Botafogo-SP,Juventude,Botafogo-SP,4,2,sintetica
-7465,25.0,Ceará,São Bernardo,Empate,1,1,sintetica
-7466,25.0,Criciúma,Londrina,Criciúma,1,0,sintetica
-7467,25.0,Cuiabá,Goiás,Empate,1,1,sintetica
-7468,25.0,Novorizontino,América-MG,Novorizontino,3,0,sintetica
-7469,25.0,Operário Ferroviário,Fortaleza,Empate,0,0,sintetica
-7470,25.0,Sport,Ponte Preta,Sport,2,0,sintetica
-7471,26.0,América-MG,Sport,Empate,0,0,sintetica
-7472,26.0,Athletic,CRB,CRB,0,2,sintetica
-7473,26.0,Avaí,Operário Ferroviário,Empate,0,0,sintetica
-7474,26.0,Botafogo-SP,Fortaleza,Botafogo-SP,4,0,sintetica
-7475,26.0,Criciúma,Juventude,Juventude,0,2,sintetica
-7476,26.0,Cuiabá,Náutico,Cuiabá,3,0,sintetica
-7477,26.0,Goiás,Vila Nova,Goiás,1,0,sintetica
-7478,26.0,Londrina,Atlético-GO,Empate,0,0,sintetica
-7479,26.0,Novorizontino,Ceará,Novorizontino,2,1,sintetica
-7480,26.0,São Bernardo,Ponte Preta,São Bernardo,3,0,sintetica
-7481,27.0,Athletic,Criciúma,Athletic,2,0,sintetica
-7482,27.0,Atlético-GO,Ceará,Atlético-GO,2,1,sintetica
-7483,27.0,Botafogo-SP,América-MG,Botafogo-SP,2,1,sintetica
-7484,27.0,CRB,Sport,CRB,2,1,sintetica
-7485,27.0,Fortaleza,Cuiabá,Empate,0,0,sintetica
-7486,27.0,Juventude,Avaí,Juventude,1,0,sintetica
-7487,27.0,Novorizontino,Goiás,Novorizontino,3,0,sintetica
-7488,27.0,Náutico,Ponte Preta,Náutico,1,0,sintetica
-7489,27.0,São Bernardo,Londrina,Londrina,1,2,sintetica
-7490,27.0,Vila Nova,Operário Ferroviário,Vila Nova,2,1,sintetica
-7491,28.0,Cuiabá,Criciúma,Empate,1,1,sintetica
-7492,28.0,Fortaleza,Botafogo-SP,Fortaleza,1,0,sintetica
-7493,28.0,Goiás,Juventude,Juventude,0,1,sintetica
-7494,28.0,Londrina,Athletic,Londrina,2,0,sintetica
-7495,28.0,Novorizontino,Vila Nova,Novorizontino,2,1,sintetica
-7496,28.0,Náutico,Atlético-GO,Empate,1,1,sintetica
-7497,28.0,Operário Ferroviário,Ceará,Empate,2,2,sintetica
-7498,28.0,Ponte Preta,CRB,Ponte Preta,1,0,sintetica
-7499,28.0,Sport,Avaí,Empate,2,2,sintetica
-7500,28.0,São Bernardo,América-MG,Empate,1,1,sintetica
-7501,29.0,América-MG,Londrina,Empate,1,1,sintetica
-7502,29.0,Athletic,Fortaleza,Athletic,1,0,sintetica
-7503,29.0,Atlético-GO,Vila Nova,Vila Nova,0,2,sintetica
-7504,29.0,Botafogo-SP,Criciúma,Empate,1,1,sintetica
-7505,29.0,Ceará,Ponte Preta,Ceará,2,0,sintetica
-7506,29.0,Cuiabá,CRB,Cuiabá,2,0,sintetica
-7507,29.0,Goiás,Avaí,Goiás,2,1,sintetica
-7508,29.0,Novorizontino,Juventude,Juventude,0,1,sintetica
-7509,29.0,Náutico,Sport,Náutico,3,1,sintetica
-7510,29.0,Operário Ferroviário,São Bernardo,São Bernardo,1,3,sintetica
+7368,15.0,Novorizontino,Avaí,Novorizontino,3,1,sintetica
+7369,15.0,Sport,Ceará,Sport,2,0,sintetica
+7370,15.0,Vila Nova,Fortaleza,Vila Nova,2,1,sintetica
+7371,16.0,América-MG,Novorizontino,Novorizontino,0,3,sintetica
+7372,16.0,Avaí,Cuiabá,Avaí,1,0,sintetica
+7373,16.0,CRB,Criciúma,CRB,2,1,sintetica
+7374,16.0,Ceará,Atlético-GO,Atlético-GO,0,1,sintetica
+7375,16.0,Fortaleza,Náutico,Empate,1,1,sintetica
+7376,16.0,Juventude,Sport,Sport,0,1,sintetica
+7377,16.0,Operário Ferroviário,Londrina,Operário Ferroviário,3,0,sintetica
+7378,16.0,Ponte Preta,Athletic,Empate,1,1,sintetica
+7379,16.0,São Bernardo,Botafogo-SP,Botafogo-SP,0,1,sintetica
+7380,16.0,Vila Nova,Goiás,Vila Nova,2,0,sintetica
+7381,17.0,CRB,Avaí,Avaí,0,1,sintetica
+7382,17.0,Criciúma,Atlético-GO,Empate,1,1,sintetica
+7383,17.0,Cuiabá,Vila Nova,Cuiabá,1,0,sintetica
+7384,17.0,Fortaleza,Operário Ferroviário,Empate,1,1,sintetica
+7385,17.0,Juventude,América-MG,Juventude,3,0,sintetica
+7386,17.0,Londrina,Goiás,Empate,2,2,sintetica
+7387,17.0,Náutico,Athletic,Náutico,2,1,sintetica
+7388,17.0,Ponte Preta,Novorizontino,Novorizontino,0,2,sintetica
+7389,17.0,Sport,Botafogo-SP,Empate,3,3,sintetica
+7390,17.0,São Bernardo,Ceará,Ceará,3,4,sintetica
+7391,18.0,Athletic,CRB,CRB,0,2,sintetica
+7392,18.0,Ceará,Fortaleza,Ceará,2,1,sintetica
+7393,18.0,Criciúma,Sport,Criciúma,1,0,sintetica
+7394,18.0,Cuiabá,Náutico,Cuiabá,3,0,sintetica
+7395,18.0,Goiás,Operário Ferroviário,Operário Ferroviário,0,3,sintetica
+7396,18.0,Juventude,Londrina,Juventude,1,0,sintetica
+7397,18.0,Novorizontino,Botafogo-SP,Novorizontino,1,0,sintetica
+7398,18.0,Ponte Preta,Avaí,Avaí,0,2,sintetica
+7399,18.0,São Bernardo,América-MG,Empate,1,1,sintetica
+7400,18.0,Vila Nova,Atlético-GO,Vila Nova,2,1,sintetica
+7401,19.0,América-MG,CRB,CRB,1,2,sintetica
+7402,19.0,Avaí,Novorizontino,Empate,3,3,sintetica
+7403,19.0,Botafogo-SP,Athletic,Athletic,1,2,sintetica
+7404,19.0,Ceará,Sport,Ceará,2,1,sintetica
+7405,19.0,Cuiabá,Criciúma,Empate,1,1,sintetica
+7406,19.0,Fortaleza,Ponte Preta,Fortaleza,2,0,sintetica
+7407,19.0,Londrina,Atlético-GO,Empate,0,0,sintetica
+7408,19.0,Náutico,Juventude,Empate,0,0,sintetica
+7409,19.0,São Bernardo,Goiás,São Bernardo,1,0,sintetica
+7410,19.0,Vila Nova,Operário Ferroviário,Vila Nova,2,1,sintetica
+7411,20.0,América-MG,Náutico,América-MG,2,1,sintetica
+7412,20.0,Athletic,Goiás,Empate,1,1,sintetica
+7413,20.0,Atlético-GO,Londrina,Atlético-GO,2,1,sintetica
+7414,20.0,Botafogo-SP,Vila Nova,Vila Nova,0,1,sintetica
+7415,20.0,CRB,Cuiabá,CRB,3,0,sintetica
+7416,20.0,Ceará,São Bernardo,Empate,1,1,sintetica
+7417,20.0,Criciúma,Fortaleza,Fortaleza,0,2,sintetica
+7418,20.0,Juventude,Ponte Preta,Juventude,3,0,sintetica
+7419,20.0,Operário Ferroviário,Novorizontino,Operário Ferroviário,2,1,sintetica
+7420,20.0,Sport,Avaí,Empate,2,2,sintetica
+7421,21.0,Athletic,Cuiabá,Empate,0,0,sintetica
+7422,21.0,Atlético-GO,CRB,Empate,3,3,sintetica
+7423,21.0,Ceará,Londrina,Ceará,2,1,sintetica
+7424,21.0,Fortaleza,Avaí,Fortaleza,1,0,sintetica
+7425,21.0,Goiás,Criciúma,Goiás,1,0,sintetica
+7426,21.0,Novorizontino,América-MG,Novorizontino,3,0,sintetica
+7427,21.0,Operário Ferroviário,Náutico,Náutico,2,6,sintetica
+7428,21.0,Ponte Preta,Juventude,Juventude,0,2,sintetica
+7429,21.0,São Bernardo,Sport,Empate,0,0,sintetica
+7430,21.0,Vila Nova,Botafogo-SP,Vila Nova,1,0,sintetica
+7431,22.0,América-MG,Sport,Empate,0,0,sintetica
+7432,22.0,Avaí,Ponte Preta,Ponte Preta,1,2,sintetica
+7433,22.0,Botafogo-SP,Fortaleza,Botafogo-SP,4,0,sintetica
+7434,22.0,Ceará,Athletic,Empate,0,0,sintetica
+7435,22.0,Goiás,Juventude,Juventude,0,1,sintetica
+7436,22.0,Londrina,Criciúma,Criciúma,0,2,sintetica
+7437,22.0,Náutico,Novorizontino,Novorizontino,0,2,sintetica
+7438,22.0,Operário Ferroviário,Atlético-GO,Operário Ferroviário,1,0,sintetica
+7439,22.0,São Bernardo,Cuiabá,Empate,2,2,sintetica
+7440,22.0,Vila Nova,CRB,Empate,2,2,sintetica
+7441,23.0,América-MG,Fortaleza,Fortaleza,0,1,sintetica
+7442,23.0,Athletic,São Bernardo,Athletic,2,1,sintetica
+7443,23.0,Avaí,Atlético-GO,Atlético-GO,0,1,sintetica
+7444,23.0,Botafogo-SP,Novorizontino,Novorizontino,1,3,sintetica
+7445,23.0,CRB,Operário Ferroviário,CRB,3,0,sintetica
+7446,23.0,Ceará,Cuiabá,Cuiabá,1,3,sintetica
+7447,23.0,Criciúma,Vila Nova,Criciúma,2,0,sintetica
+7448,23.0,Juventude,Goiás,Juventude,2,0,sintetica
+7449,23.0,Londrina,Sport,Sport,1,2,sintetica
+7450,23.0,Ponte Preta,Náutico,Empate,1,1,sintetica
+7451,24.0,América-MG,Goiás,América-MG,1,0,sintetica
+7452,24.0,Athletic,Fortaleza,Athletic,1,0,sintetica
+7453,24.0,Atlético-GO,Vila Nova,Vila Nova,0,2,sintetica
+7454,24.0,Ceará,Criciúma,Ceará,1,0,sintetica
+7455,24.0,Juventude,Avaí,Juventude,1,0,sintetica
+7456,24.0,Novorizontino,Londrina,Londrina,1,3,sintetica
+7457,24.0,Operário Ferroviário,CRB,Operário Ferroviário,3,0,sintetica
+7458,24.0,Ponte Preta,Botafogo-SP,Empate,0,0,sintetica
+7459,24.0,Sport,Cuiabá,Empate,1,1,sintetica
+7460,24.0,São Bernardo,Náutico,Empate,1,1,sintetica
+7461,25.0,América-MG,São Bernardo,São Bernardo,0,2,sintetica
+7462,25.0,Atlético-GO,Juventude,Empate,0,0,sintetica
+7463,25.0,Avaí,Londrina,Avaí,2,1,sintetica
+7464,25.0,Criciúma,Ceará,Empate,1,1,sintetica
+7465,25.0,Cuiabá,Athletic,Cuiabá,3,0,sintetica
+7466,25.0,Fortaleza,Botafogo-SP,Fortaleza,1,0,sintetica
+7467,25.0,Goiás,Sport,Empate,1,1,sintetica
+7468,25.0,Novorizontino,Náutico,Empate,2,2,sintetica
+7469,25.0,Operário Ferroviário,Vila Nova,Empate,0,0,sintetica
+7470,25.0,Ponte Preta,CRB,Ponte Preta,1,0,sintetica
+7471,26.0,América-MG,Londrina,Empate,1,1,sintetica
+7472,26.0,Avaí,Goiás,Goiás,0,2,sintetica
+7473,26.0,Cuiabá,Ceará,Ceará,0,2,sintetica
+7474,26.0,Fortaleza,Criciúma,Fortaleza,3,2,sintetica
+7475,26.0,Juventude,Atlético-GO,Empate,2,2,sintetica
+7476,26.0,Novorizontino,CRB,Empate,1,1,sintetica
+7477,26.0,Náutico,Botafogo-SP,Náutico,1,0,sintetica
+7478,26.0,Operário Ferroviário,São Bernardo,São Bernardo,1,3,sintetica
+7479,26.0,Ponte Preta,Sport,Sport,1,3,sintetica
+7480,26.0,Vila Nova,Athletic,Empate,1,1,sintetica
+7481,27.0,América-MG,Ponte Preta,América-MG,2,0,sintetica
+7482,27.0,Atlético-GO,Fortaleza,Atlético-GO,1,0,sintetica
+7483,27.0,Avaí,Criciúma,Criciúma,1,2,sintetica
+7484,27.0,Botafogo-SP,Náutico,Empate,1,1,sintetica
+7485,27.0,Goiás,Athletic,Goiás,2,1,sintetica
+7486,27.0,Juventude,CRB,Juventude,2,1,sintetica
+7487,27.0,Operário Ferroviário,Ceará,Empate,2,2,sintetica
+7488,27.0,Sport,Londrina,Sport,2,1,sintetica
+7489,27.0,São Bernardo,Novorizontino,Empate,1,1,sintetica
+7490,27.0,Vila Nova,Cuiabá,Empate,0,0,sintetica
+7491,28.0,Atlético-GO,Ceará,Atlético-GO,2,1,sintetica
+7492,28.0,Botafogo-SP,Avaí,Botafogo-SP,3,1,sintetica
+7493,28.0,CRB,Sport,CRB,2,1,sintetica
+7494,28.0,Criciúma,Athletic,Empate,1,1,sintetica
+7495,28.0,Goiás,Cuiabá,Cuiabá,0,2,sintetica
+7496,28.0,Londrina,Vila Nova,Vila Nova,0,1,sintetica
+7497,28.0,Novorizontino,Juventude,Juventude,0,1,sintetica
+7498,28.0,Náutico,São Bernardo,São Bernardo,0,3,sintetica
+7499,28.0,Operário Ferroviário,Fortaleza,Empate,0,0,sintetica
+7500,28.0,Ponte Preta,América-MG,Ponte Preta,1,0,sintetica
+7501,29.0,América-MG,Botafogo-SP,Botafogo-SP,1,2,sintetica
+7502,29.0,Athletic,Criciúma,Athletic,2,0,sintetica
+7503,29.0,CRB,Ponte Preta,CRB,4,2,sintetica
+7504,29.0,Ceará,Operário Ferroviário,Operário Ferroviário,1,2,sintetica
+7505,29.0,Cuiabá,Fortaleza,Empate,1,1,sintetica
+7506,29.0,Goiás,Avaí,Goiás,2,1,sintetica
+7507,29.0,Juventude,Novorizontino,Empate,0,0,sintetica
+7508,29.0,Náutico,Atlético-GO,Empate,1,1,sintetica
+7509,29.0,São Bernardo,Londrina,Londrina,1,2,sintetica
+7510,29.0,Vila Nova,Sport,Sport,0,1,sintetica
 7511,30.0,Athletic,América-MG,Empate,1,1,sintetica
-7512,30.0,Botafogo-SP,São Bernardo,São Bernardo,1,2,sintetica
-7513,30.0,Ceará,Sport,Ceará,2,1,sintetica
-7514,30.0,Criciúma,Cuiabá,Criciúma,2,0,sintetica
-7515,30.0,Fortaleza,CRB,Empate,1,1,sintetica
-7516,30.0,Goiás,Novorizontino,Novorizontino,0,4,sintetica
-7517,30.0,Juventude,Londrina,Juventude,1,0,sintetica
-7518,30.0,Operário Ferroviário,Avaí,Avaí,1,2,sintetica
-7519,30.0,Ponte Preta,Náutico,Empate,1,1,sintetica
-7520,30.0,Vila Nova,Atlético-GO,Vila Nova,2,1,sintetica
-7521,31.0,Athletic,Novorizontino,Novorizontino,1,4,sintetica
-7522,31.0,Atlético-GO,Fortaleza,Atlético-GO,1,0,sintetica
-7523,31.0,Avaí,Ponte Preta,Ponte Preta,1,2,sintetica
-7524,31.0,Ceará,CRB,CRB,0,1,sintetica
-7525,31.0,Criciúma,Botafogo-SP,Criciúma,1,0,sintetica
-7526,31.0,Londrina,Goiás,Empate,2,2,sintetica
-7527,31.0,Náutico,Cuiabá,Náutico,1,0,sintetica
-7528,31.0,Operário Ferroviário,Juventude,Operário Ferroviário,2,1,sintetica
-7529,31.0,Sport,América-MG,Sport,3,0,sintetica
-7530,31.0,Vila Nova,São Bernardo,Vila Nova,2,1,sintetica
-7531,32.0,CRB,Fortaleza,Empate,1,1,sintetica
+7512,30.0,Atlético-GO,Náutico,Náutico,1,2,sintetica
+7513,30.0,Avaí,Juventude,Avaí,2,0,sintetica
+7514,30.0,Botafogo-SP,CRB,CRB,0,1,sintetica
+7515,30.0,Ceará,Ponte Preta,Ceará,2,0,sintetica
+7516,30.0,Cuiabá,Londrina,Empate,2,2,sintetica
+7517,30.0,Novorizontino,Goiás,Novorizontino,3,0,sintetica
+7518,30.0,Operário Ferroviário,Criciúma,Empate,1,1,sintetica
+7519,30.0,Sport,Vila Nova,Empate,1,1,sintetica
+7520,30.0,São Bernardo,Fortaleza,Fortaleza,0,1,sintetica
+7521,31.0,Botafogo-SP,América-MG,Botafogo-SP,2,1,sintetica
+7522,31.0,CRB,Novorizontino,Empate,0,0,sintetica
+7523,31.0,Criciúma,Operário Ferroviário,Operário Ferroviário,0,2,sintetica
+7524,31.0,Cuiabá,Sport,Empate,0,0,sintetica
+7525,31.0,Fortaleza,São Bernardo,Empate,1,1,sintetica
+7526,31.0,Goiás,Atlético-GO,Atlético-GO,0,1,sintetica
+7527,31.0,Juventude,Athletic,Athletic,0,2,sintetica
+7528,31.0,Londrina,Avaí,Londrina,3,2,sintetica
+7529,31.0,Náutico,Ponte Preta,Náutico,1,0,sintetica
+7530,31.0,Vila Nova,Ceará,Vila Nova,2,0,sintetica
+7531,32.0,Athletic,Juventude,Empate,1,1,sintetica
+7532,32.0,CRB,Atlético-GO,CRB,3,1,sintetica
+7533,32.0,Criciúma,Avaí,Criciúma,3,0,sintetica
+7534,32.0,Cuiabá,Botafogo-SP,Empate,1,1,sintetica
+7535,32.0,Fortaleza,Ceará,Empate,1,1,sintetica
+7536,32.0,Goiás,São Bernardo,Goiás,2,1,sintetica
+7537,32.0,Londrina,Novorizontino,Novorizontino,1,4,sintetica
+7538,32.0,Náutico,Operário Ferroviário,Empate,3,3,sintetica
+7539,32.0,Sport,Ponte Preta,Sport,2,0,sintetica
+7540,32.0,Vila Nova,América-MG,Vila Nova,1,0,sintetica

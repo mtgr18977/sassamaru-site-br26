@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-globals */
 'use strict';
 
-const CACHE_VERSION = 'v9';
+const CACHE_VERSION = 'v10';
 const CACHE_NAME = `br26-${CACHE_VERSION}`;
 
 // Assets to pre-cache on install
@@ -9,6 +9,7 @@ const PRECACHE_ASSETS = [
   './index.html',
   './apps/index.html',
   './apps/bench-selecoes.html',
+  './apps/tabela.html',
   './simulacoes/bench-copa2026.html',
   './simulacoes/bench-brasileirao2026.html',
   './bench-docs.html',
@@ -18,6 +19,7 @@ const PRECACHE_ASSETS = [
   './modelos/competicoes.js',
   './datasets/calendario.js',
   './datasets/campeonato-brasileiro-serie-b.csv',
+  './datasets/campeonato-brasileiro-limpo.csv',
   './modelos/selecoes-model.js',
   './i18n/i18n.js',
   './i18n/en.js',
