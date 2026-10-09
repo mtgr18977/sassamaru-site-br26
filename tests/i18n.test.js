@@ -38,6 +38,7 @@ const PAGES = [
   'bench-docs.html',
   'apps/index.html',
   'apps/bench-selecoes.html',
+  'apps/tabela.html',
   'simulacoes/bench-brasileirao2026.html',
   'simulacoes/bench-copa2026.html',
 ];
