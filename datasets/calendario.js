@@ -21,7 +21,7 @@
     'serie-a-2026': {
       competicao: 'serie-a',
       temporada: 2026,
-      atualizadoEm: '2026-10-09',
+      atualizadoEm: '2026-10-13',
       fonte: 'CBF (tabela detalhada), conferida em valorfinal.com.br e Wikipedia',
       rodadas: [
         { n: 1,  inicio: '2026-01-28', fim: '2026-01-29', status: C },
@@ -53,7 +53,7 @@
         { n: 27, inicio: '2026-09-11', fim: '2026-09-14', status: C },
         { n: 28, inicio: '2026-09-19', fim: '2026-09-20', status: C },
         { n: 29, inicio: '2026-10-07', fim: '2026-10-08', status: C },
-        { n: 30, inicio: '2026-10-10', fim: '2026-10-12', status: K },
+        { n: 30, inicio: '2026-10-10', fim: '2026-10-12', status: C },
         { n: 31, inicio: '2026-10-16', fim: '2026-10-19', status: K },
         { n: 32, inicio: '2026-10-23', fim: '2026-10-26', status: K },
         { n: 33, inicio: '2026-10-28', fim: '2026-10-30', status: K },
@@ -69,16 +69,6 @@
       ],
       // jogos das próximas rodadas (horário de Brasília) — só as rodadas já detalhadas pela CBF
       jogos: [
-        { rodada: 30, data: '2026-10-10', hora: '17:00', mandante: 'Vasco',            visitante: 'Remo' },
-        { rodada: 30, data: '2026-10-10', hora: '21:00', mandante: 'São Paulo',        visitante: 'Vitória' },
-        { rodada: 30, data: '2026-10-11', hora: '16:00', mandante: 'Atlético Mineiro', visitante: 'Santos' },
-        { rodada: 30, data: '2026-10-11', hora: '17:30', mandante: 'Flamengo',         visitante: 'Fluminense' },
-        { rodada: 30, data: '2026-10-11', hora: '17:30', mandante: 'Palmeiras',        visitante: 'Corinthians' },
-        { rodada: 30, data: '2026-10-11', hora: '17:30', mandante: 'Grêmio',           visitante: 'Internacional' },
-        { rodada: 30, data: '2026-10-11', hora: '19:30', mandante: 'Coritiba',         visitante: 'Botafogo' },
-        { rodada: 30, data: '2026-10-11', hora: '19:30', mandante: 'Bahia',            visitante: 'Mirassol' },
-        { rodada: 30, data: '2026-10-12', hora: '19:30', mandante: 'Chapecoense',      visitante: 'Athletico Paranaense' },
-        { rodada: 30, data: '2026-10-12', hora: '21:00', mandante: 'Bragantino',       visitante: 'Cruzeiro' },
         { rodada: 31, data: '2026-10-16', hora: '20:00', mandante: 'Mirassol', visitante: 'Internacional' },
         { rodada: 31, data: '2026-10-17', hora: '18:00', mandante: 'Botafogo', visitante: 'Chapecoense' },
         { rodada: 31, data: '2026-10-17', hora: '18:30', mandante: 'Atlético Mineiro', visitante: 'Coritiba' },
@@ -124,7 +114,7 @@
     'serie-b-2026': {
       competicao: 'serie-b',
       temporada: 2026,
-      atualizadoEm: '2026-10-09',
+      atualizadoEm: '2026-10-13',
       fonte: 'O Tempo e Gazeta Esportiva (programação da 33ª rodada); CBF',
       rodadas: [
         { n: 1, inicio: null, fim: null, status: C },
@@ -160,14 +150,14 @@
         { n: 31, inicio: null, fim: null, status: C },
         { n: 32, inicio: '2026-10-06', fim: '2026-10-08', status: C },
         { n: 33, inicio: '2026-10-11', fim: '2026-10-13', status: K },
-        { n: 34, inicio: null, fim: null, status: S },   // datas ainda não divulgadas
+        { n: 34, inicio: '2026-10-16', fim: '2026-10-19', status: P },   // janela da tabela básica da CBF (16–18/10) + folga; jogo CRB × Botafogo-SP confirmado em 18/10
         { n: 35, inicio: null, fim: null, status: S },   // datas ainda não divulgadas
         { n: 36, inicio: null, fim: null, status: S },   // datas ainda não divulgadas
         { n: 37, inicio: null, fim: null, status: S },   // datas ainda não divulgadas
         { n: 38, inicio: null, fim: null, status: S },   // datas ainda não divulgadas
       ],
       pendentes: [],
-      // só a rodada 33 tem a programação completa; as seguintes ainda não foram divulgadas para todos os jogos
+      // rodada 33: programação completa (dia e hora); rodada 34: só os confrontos, vindos da tabela básica da CBF
       jogos: [
         { rodada: 33, data: '2026-10-11', hora: '16:00', mandante: 'Juventude', visitante: 'São Bernardo' },
         { rodada: 33, data: '2026-10-11', hora: '16:10', mandante: 'Atlético-GO', visitante: 'Sport' },
@@ -179,6 +169,16 @@
         { rodada: 33, data: '2026-10-12', hora: '19:30', mandante: 'Criciúma', visitante: 'América-MG' },
         { rodada: 33, data: '2026-10-12', hora: '21:00', mandante: 'Botafogo-SP', visitante: 'Ceará' },
         { rodada: 33, data: '2026-10-13', hora: '19:30', mandante: 'Athletic', visitante: 'Londrina' },
+        { rodada: 34, data: null, hora: null, mandante: 'Ponte Preta', visitante: 'Atlético-GO' },
+        { rodada: 34, data: null, hora: null, mandante: 'São Bernardo', visitante: 'Criciúma' },
+        { rodada: 34, data: null, hora: null, mandante: 'América-MG', visitante: 'Operário Ferroviário' },
+        { rodada: 34, data: null, hora: null, mandante: 'Londrina', visitante: 'Cuiabá' },
+        { rodada: 34, data: null, hora: null, mandante: 'Ceará', visitante: 'Juventude' },
+        { rodada: 34, data: null, hora: null, mandante: 'Goiás', visitante: 'Náutico' },
+        { rodada: 34, data: null, hora: null, mandante: 'Avaí', visitante: 'Athletic' },
+        { rodada: 34, data: null, hora: null, mandante: 'Sport', visitante: 'Fortaleza' },
+        { rodada: 34, data: null, hora: null, mandante: 'CRB', visitante: 'Botafogo-SP' },
+        { rodada: 34, data: null, hora: null, mandante: 'Vila Nova', visitante: 'Novorizontino' },
       ],
     },
   };
