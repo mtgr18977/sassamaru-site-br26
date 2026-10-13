@@ -1,0 +1,381 @@
+rodada,mandante,visitante
+1,Botafogo-SP,Fortaleza
+1,Novorizontino,Londrina
+1,Athletic,Ponte Preta
+1,Operário Ferroviário,Atlético-GO
+1,Ceará,São Bernardo
+1,Goiás,América-MG
+1,Avaí,Juventude
+1,Náutico,Criciúma
+1,Cuiabá,Sport
+1,Vila Nova,CRB
+2,Ponte Preta,Ceará
+2,São Bernardo,Operário Ferroviário
+2,América-MG,Botafogo-SP
+2,Londrina,Goiás
+2,Fortaleza,Cuiabá
+2,Atlético-GO,Náutico
+2,Criciúma,Athletic
+2,Sport,Vila Nova
+2,CRB,Avaí
+2,Juventude,Novorizontino
+3,Botafogo-SP,São Bernardo
+3,Novorizontino,CRB
+3,Athletic,América-MG
+3,Londrina,Sport
+3,Fortaleza,Juventude
+3,Goiás,Criciúma
+3,Avaí,Operário Ferroviário
+3,Náutico,Ponte Preta
+3,Cuiabá,Ceará
+3,Vila Nova,Atlético-GO
+4,Ponte Preta,Vila Nova
+4,São Bernardo,Fortaleza
+4,América-MG,Novorizontino
+4,Operário Ferroviário,Cuiabá
+4,Ceará,Náutico
+4,Atlético-GO,Londrina
+4,Criciúma,Botafogo-SP
+4,Sport,Avaí
+4,CRB,Athletic
+4,Juventude,Goiás
+5,Botafogo-SP,Atlético-GO
+5,Novorizontino,Athletic
+5,América-MG,Sport
+5,Londrina,Ceará
+5,Fortaleza,Criciúma
+5,Goiás,Cuiabá
+5,Avaí,Ponte Preta
+5,Náutico,São Bernardo
+5,CRB,Juventude
+5,Vila Nova,Operário Ferroviário
+6,Ponte Preta,América-MG
+6,São Bernardo,Goiás
+6,Athletic,Náutico
+6,Operário Ferroviário,Fortaleza
+6,Ceará,Vila Nova
+6,Atlético-GO,Avaí
+6,Criciúma,CRB
+6,Sport,Novorizontino
+6,Cuiabá,Botafogo-SP
+6,Juventude,Londrina
+7,Botafogo-SP,Náutico
+7,São Bernardo,Ponte Preta
+7,América-MG,CRB
+7,Operário Ferroviário,Londrina
+7,Fortaleza,Goiás
+7,Atlético-GO,Juventude
+7,Avaí,Novorizontino
+7,Sport,Ceará
+7,Cuiabá,Criciúma
+7,Vila Nova,Athletic
+8,Ponte Preta,Sport
+8,Novorizontino,Botafogo-SP
+8,Athletic,Cuiabá
+8,Londrina,São Bernardo
+8,Ceará,Atlético-GO
+8,Goiás,Vila Nova
+8,Avaí,Fortaleza
+8,Náutico,América-MG
+8,CRB,Operário Ferroviário
+8,Juventude,Criciúma
+9,Ponte Preta,Londrina
+9,São Bernardo,América-MG
+9,Athletic,Juventude
+9,Operário Ferroviário,Náutico
+9,Ceará,Fortaleza
+9,Goiás,Botafogo-SP
+9,Criciúma,Atlético-GO
+9,Sport,CRB
+9,Cuiabá,Novorizontino
+9,Vila Nova,Avaí
+10,Botafogo-SP,Athletic
+10,Novorizontino,Ceará
+10,América-MG,Vila Nova
+10,Operário Ferroviário,Criciúma
+10,Fortaleza,Londrina
+10,Atlético-GO,São Bernardo
+10,Avaí,Goiás
+10,Náutico,Cuiabá
+10,CRB,Ponte Preta
+10,Juventude,Sport
+11,Ponte Preta,Botafogo-SP
+11,São Bernardo,Novorizontino
+11,Athletic,Fortaleza
+11,Londrina,Vila Nova
+11,Ceará,Operário Ferroviário
+11,Atlético-GO,Goiás
+11,Avaí,Criciúma
+11,Sport,Náutico
+11,Cuiabá,CRB
+11,Juventude,América-MG
+12,Ponte Preta,Cuiabá
+12,Sport,Athletic
+12,América-MG,Atlético-GO
+12,Operário Ferroviário,Juventude
+12,Ceará,Avaí
+12,Goiás,Novorizontino
+12,Criciúma,Londrina
+12,Náutico,Fortaleza
+12,CRB,São Bernardo
+12,Vila Nova,Botafogo-SP
+13,Botafogo-SP,Operário Ferroviário
+13,São Bernardo,Sport
+13,Athletic,Goiás
+13,Londrina,Avaí
+13,Fortaleza,América-MG
+13,Atlético-GO,CRB
+13,Criciúma,Ceará
+13,Novorizontino,Náutico
+13,Cuiabá,Vila Nova
+13,Juventude,Ponte Preta
+14,Ponte Preta,Novorizontino
+14,São Bernardo,Juventude
+14,América-MG,Criciúma
+14,Londrina,Athletic
+14,Ceará,Botafogo-SP
+14,Goiás,Operário Ferroviário
+14,Avaí,Cuiabá
+14,Sport,Atlético-GO
+14,CRB,Fortaleza
+14,Vila Nova,Náutico
+15,Botafogo-SP,CRB
+15,Novorizontino,Vila Nova
+15,Athletic,Avaí
+15,Operário Ferroviário,América-MG
+15,Fortaleza,Sport
+15,Atlético-GO,Ponte Preta
+15,Criciúma,São Bernardo
+15,Náutico,Goiás
+15,Cuiabá,Londrina
+15,Juventude,Ceará
+16,Botafogo-SP,Avaí
+16,Novorizontino,Atlético-GO
+16,Athletic,Operário Ferroviário
+16,Londrina,CRB
+16,Fortaleza,Ponte Preta
+16,Goiás,Ceará
+16,Criciúma,Sport
+16,Náutico,Juventude
+16,Cuiabá,América-MG
+16,Vila Nova,São Bernardo
+17,Ponte Preta,Criciúma
+17,São Bernardo,Cuiabá
+17,América-MG,Londrina
+17,Operário Ferroviário,Novorizontino
+17,Ceará,Athletic
+17,Atlético-GO,Fortaleza
+17,Avaí,Náutico
+17,Sport,Botafogo-SP
+17,CRB,Goiás
+17,Juventude,Vila Nova
+18,Ponte Preta,Goiás
+18,São Bernardo,Avaí
+18,América-MG,Ceará
+18,Londrina,Botafogo-SP
+18,Fortaleza,Novorizontino
+18,Atlético-GO,Athletic
+18,Criciúma,Vila Nova
+18,Sport,Operário Ferroviário
+18,CRB,Náutico
+18,Juventude,Cuiabá
+19,Botafogo-SP,Juventude
+19,Novorizontino,Criciúma
+19,Athletic,São Bernardo
+19,Operário Ferroviário,Ponte Preta
+19,Ceará,CRB
+19,Goiás,Sport
+19,Avaí,América-MG
+19,Náutico,Londrina
+19,Cuiabá,Atlético-GO
+19,Vila Nova,Fortaleza
+20,Ponte Preta,Athletic
+20,São Bernardo,Ceará
+20,América-MG,Goiás
+20,Londrina,Novorizontino
+20,Fortaleza,Botafogo-SP
+20,Atlético-GO,Operário Ferroviário
+20,Criciúma,Náutico
+20,Sport,Cuiabá
+20,CRB,Vila Nova
+20,Juventude,Avaí
+21,Botafogo-SP,América-MG
+21,Novorizontino,Juventude
+21,Athletic,Criciúma
+21,Operário Ferroviário,São Bernardo
+21,Ceará,Ponte Preta
+21,Goiás,Londrina
+21,Avaí,CRB
+21,Náutico,Atlético-GO
+21,Cuiabá,Fortaleza
+21,Vila Nova,Sport
+22,Ponte Preta,Náutico
+22,São Bernardo,Botafogo-SP
+22,América-MG,Athletic
+22,Operário Ferroviário,Avaí
+22,Ceará,Cuiabá
+22,Atlético-GO,Vila Nova
+22,Criciúma,Goiás
+22,Sport,Londrina
+22,CRB,Novorizontino
+22,Juventude,Fortaleza
+23,Botafogo-SP,Criciúma
+23,Novorizontino,América-MG
+23,Athletic,CRB
+23,Londrina,Atlético-GO
+23,Fortaleza,São Bernardo
+23,Goiás,Juventude
+23,Avaí,Sport
+23,Náutico,Ceará
+23,Cuiabá,Operário Ferroviário
+23,Vila Nova,Ponte Preta
+24,Ponte Preta,Avaí
+24,São Bernardo,Náutico
+24,Athletic,Novorizontino
+24,Operário Ferroviário,Vila Nova
+24,Ceará,Londrina
+24,Atlético-GO,Botafogo-SP
+24,Criciúma,Fortaleza
+24,Sport,América-MG
+24,Cuiabá,Goiás
+24,Juventude,CRB
+25,Botafogo-SP,Cuiabá
+25,Novorizontino,Sport
+25,América-MG,Ponte Preta
+25,Londrina,Juventude
+25,Fortaleza,Operário Ferroviário
+25,Goiás,São Bernardo
+25,Avaí,Atlético-GO
+25,Náutico,Athletic
+25,CRB,Criciúma
+25,Vila Nova,Ceará
+26,Ponte Preta,São Bernardo
+26,Novorizontino,Avaí
+26,Athletic,Vila Nova
+26,Londrina,Operário Ferroviário
+26,Ceará,Sport
+26,Goiás,Fortaleza
+26,Criciúma,Cuiabá
+26,Náutico,Botafogo-SP
+26,CRB,América-MG
+26,Juventude,Atlético-GO
+27,Botafogo-SP,Novorizontino
+27,São Bernardo,Londrina
+27,América-MG,Náutico
+27,Operário Ferroviário,CRB
+27,Fortaleza,Avaí
+27,Atlético-GO,Ceará
+27,Criciúma,Juventude
+27,Sport,Ponte Preta
+27,Cuiabá,Athletic
+27,Vila Nova,Goiás
+28,Botafogo-SP,Goiás
+28,Novorizontino,Cuiabá
+28,América-MG,São Bernardo
+28,Londrina,Ponte Preta
+28,Fortaleza,Ceará
+28,Atlético-GO,Criciúma
+28,Avaí,Vila Nova
+28,Náutico,Operário Ferroviário
+28,CRB,Sport
+28,Juventude,Athletic
+29,Ponte Preta,CRB
+29,São Bernardo,Atlético-GO
+29,Athletic,Botafogo-SP
+29,Londrina,Fortaleza
+29,Ceará,Novorizontino
+29,Goiás,Avaí
+29,Criciúma,Operário Ferroviário
+29,Sport,Juventude
+29,Cuiabá,Náutico
+29,Vila Nova,América-MG
+30,Botafogo-SP,Ponte Preta
+30,Novorizontino,São Bernardo
+30,América-MG,Juventude
+30,Operário Ferroviário,Ceará
+30,Fortaleza,Athletic
+30,Goiás,Atlético-GO
+30,Criciúma,Avaí
+30,Náutico,Sport
+30,CRB,Cuiabá
+30,Vila Nova,Londrina
+31,Botafogo-SP,Vila Nova
+31,São Bernardo,CRB
+31,Athletic,Sport
+31,Londrina,Criciúma
+31,Fortaleza,Náutico
+31,Atlético-GO,América-MG
+31,Avaí,Ceará
+31,Novorizontino,Goiás
+31,Cuiabá,Ponte Preta
+31,Juventude,Operário Ferroviário
+32,Ponte Preta,Juventude
+32,Sport,São Bernardo
+32,América-MG,Fortaleza
+32,Operário Ferroviário,Botafogo-SP
+32,Ceará,Criciúma
+32,Goiás,Athletic
+32,Avaí,Londrina
+32,Náutico,Novorizontino
+32,CRB,Atlético-GO
+32,Vila Nova,Cuiabá
+33,Botafogo-SP,Ceará
+33,Novorizontino,Ponte Preta
+33,Athletic,Londrina
+33,Operário Ferroviário,Goiás
+33,Fortaleza,CRB
+33,Atlético-GO,Sport
+33,Criciúma,América-MG
+33,Náutico,Vila Nova
+33,Cuiabá,Avaí
+33,Juventude,São Bernardo
+34,Ponte Preta,Atlético-GO
+34,São Bernardo,Criciúma
+34,América-MG,Operário Ferroviário
+34,Londrina,Cuiabá
+34,Ceará,Juventude
+34,Goiás,Náutico
+34,Avaí,Athletic
+34,Sport,Fortaleza
+34,CRB,Botafogo-SP
+34,Vila Nova,Novorizontino
+35,Ponte Preta,Fortaleza
+35,São Bernardo,Vila Nova
+35,América-MG,Cuiabá
+35,Operário Ferroviário,Athletic
+35,Ceará,Goiás
+35,Atlético-GO,Novorizontino
+35,Avaí,Botafogo-SP
+35,Sport,Criciúma
+35,CRB,Londrina
+35,Juventude,Náutico
+36,Botafogo-SP,Sport
+36,Novorizontino,Operário Ferroviário
+36,Athletic,Ceará
+36,Londrina,América-MG
+36,Fortaleza,Atlético-GO
+36,Goiás,CRB
+36,Criciúma,Ponte Preta
+36,Náutico,Avaí
+36,Cuiabá,São Bernardo
+36,Vila Nova,Juventude
+37,Botafogo-SP,Londrina
+37,Novorizontino,Fortaleza
+37,Athletic,Atlético-GO
+37,Operário Ferroviário,Sport
+37,Ceará,América-MG
+37,Goiás,Ponte Preta
+37,Avaí,São Bernardo
+37,Náutico,CRB
+37,Cuiabá,Juventude
+37,Vila Nova,Criciúma
+38,Ponte Preta,Operário Ferroviário
+38,São Bernardo,Athletic
+38,América-MG,Avaí
+38,Londrina,Náutico
+38,Fortaleza,Vila Nova
+38,Atlético-GO,Cuiabá
+38,Criciúma,Novorizontino
+38,Sport,Goiás
+38,CRB,Ceará
+38,Juventude,Botafogo-SP

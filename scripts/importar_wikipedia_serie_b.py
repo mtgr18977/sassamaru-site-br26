@@ -7,7 +7,7 @@ Fonte: cada página "AAAA Campeonato Brasileiro Série B" (en.wikipedia.org, wik
 completa de resultados (mandante × visitante, 380 jogos). 2014 (matriz incompleta) e 2015 (sem matriz) usam a tabela
 "Confrontos" da página em português. 2006 não tem matriz em nenhuma das duas e fica de fora.
 
-ATENÇÃO — a matriz não traz data nem rodada. O modelo mede o tempo em rodadas, então a rodada é
+ATENÇÃO — a matriz não traz data nem rodada (2026 é a exceção: usa as rodadas reais da tabela básica da CBF). O modelo mede o tempo em rodadas, então a rodada é
 SINTÉTICA: o calendário é montado pelo método do círculo (19 rodadas de ida + 19 de volta) com o sorteio de
 qual perna é a primeira, fixado por uma semente por temporada. Os resultados e os mandos são reais; só a
 ORDEM dos jogos dentro da temporada é inventada (a coluna `rodada_origem` registra isso). O efeito é pequeno
@@ -180,10 +180,24 @@ def rodadas_parciais(times, jogos, semente, tentativas=200):
     sys.exit("não consegui repartir os jogos da temporada em andamento em rodadas completas")
 
 
+def rodadas_reais(jogos, tabela_csv):
+    """2026: a rodada de cada jogo disputado vem da tabela básica da CBF (datasets/serie-b-2026-tabela-cbf.csv,
+    gerada por scripts/importar_tabela_cbf.py). Jogo adiado já disputado mantém a rodada nominal dele."""
+    rodada = {(r["mandante"], r["visitante"]): int(r["rodada"]) for r in csv.DictReader(open(tabela_csv, encoding="utf-8"))}
+    ausentes = [k for k in jogos if k not in rodada]
+    if ausentes:
+        sys.exit(f"jogos que a Wikipedia traz e a tabela da CBF não (nome ou mando diferente?): {ausentes[:5]}")
+    return sorted((rodada[k], k[0], k[1], *jogos[k]) for k in jogos)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--saida", default="datasets/campeonato-brasileiro-serie-b.csv")
     ap.add_argument("--cache", default=None, help="pasta para guardar o wikitext baixado")
+    ap.add_argument("--tabela-cbf", default="datasets/serie-b-2026-tabela-cbf.csv",
+                    help="rodadas reais de 2026 (gerado por importar_tabela_cbf.py); se não existir, usa rodadas sintéticas")
+    ap.add_argument("--fonte", choices=["ambas", "pt", "en"], default="ambas",
+                    help="2026 em andamento: só jogos presentes nas duas páginas (padrão) ou os de uma delas")
     a = ap.parse_args()
 
     temporadas = {}
@@ -194,17 +208,27 @@ def main():
         url = "https://pt.wikipedia.org/w/index.php?title=" + urllib.parse.quote(f"Campeonato_Brasileiro_de_Futebol_de_{ano}_-_Série_B") + "&action=raw"
         temporadas[ano] = parse_pt_tabela(baixar(url, a.cache, f"pt{ano}.txt"))
 
-    # temporada em andamento (pt.wikipedia, conferida com a en.wikipedia): jogos disputados até agora
+    # temporada em andamento: as páginas pt e en são editadas por pessoas diferentes e se atrasam uma da outra
+    # (e já houve jogo inexistente numa delas). Por padrão só entra o que as DUAS trazem, com o mesmo placar.
     url_pt = "https://pt.wikipedia.org/w/index.php?title=" + urllib.parse.quote(f"Campeonato_Brasileiro_de_Futebol_de_{ANO_ANDAMENTO}_-_Série_B") + "&action=raw"
     url_en = "https://en.wikipedia.org/w/index.php?title=" + urllib.parse.quote(f"{ANO_ANDAMENTO}_Campeonato_Brasileiro_Série_B") + "&action=raw"
     times_pt, jogos_pt = parse_en(baixar(url_pt, a.cache, f"pt{ANO_ANDAMENTO}.txt"))
     times_en, jogos_en = parse_en(baixar(url_en, a.cache, f"en{ANO_ANDAMENTO}.txt"))
-    if jogos_pt != jogos_en or times_pt != times_en:
-        dif = sorted(set(jogos_pt.items()) ^ set(jogos_en.items()))[:5]
-        print(f"AVISO: as páginas pt e en de {ANO_ANDAMENTO} divergem ({len(jogos_pt)} × {len(jogos_en)} jogos): {dif}")
-    # a página mais completa vence (a mais recente costuma ser a que tem mais jogos)
-    times_26, jogos_26 = (times_pt, jogos_pt) if len(jogos_pt) >= len(jogos_en) else (times_en, jogos_en)
-    print(f"{ANO_ANDAMENTO:>5} {len(times_26):>6} {len(jogos_26):>6}  (em andamento; pt={len(jogos_pt)} en={len(jogos_en)})")
+    so_pt = {k: v for k, v in jogos_pt.items() if jogos_en.get(k) != v}
+    so_en = {k: v for k, v in jogos_en.items() if jogos_pt.get(k) != v}
+    if so_pt or so_en:
+        print(f"AVISO: pt e en de {ANO_ANDAMENTO} divergem ({len(jogos_pt)} × {len(jogos_en)} jogos). Confira numa terceira fonte:")
+        for k, v in sorted(so_pt.items()):
+            print(f"   só/diferente no pt: {k[0]} {v[0]}–{v[1]} {k[1]}   (en: {jogos_en.get(k)})")
+        for k, v in sorted(so_en.items()):
+            print(f"   só/diferente no en: {k[0]} {v[0]}–{v[1]} {k[1]}   (pt: {jogos_pt.get(k)})")
+    if a.fonte == "pt":
+        times_26, jogos_26 = times_pt, jogos_pt
+    elif a.fonte == "en":
+        times_26, jogos_26 = times_en, jogos_en
+    else:
+        times_26, jogos_26 = times_pt, {k: v for k, v in jogos_pt.items() if jogos_en.get(k) == v}
+    print(f"{ANO_ANDAMENTO:>5} {len(times_26):>6} {len(jogos_26):>6}  (em andamento; fonte={a.fonte}; pt={len(jogos_pt)} en={len(jogos_en)})")
 
     problemas = []
     linhas_saida = []
@@ -219,8 +243,14 @@ def main():
             linhas_saida.append((ano, rod, h, ad, gh, ga))
     if problemas:
         sys.exit("temporadas incompletas:\n  " + "\n  ".join(problemas))
+    origem_26 = "sintetica"
     if len(times_26) == 20 and jogos_26:
-        for rod, h, ad, gh, ga in rodadas_parciais(times_26, jogos_26, semente=ANO_ANDAMENTO):
+        if os.path.exists(a.tabela_cbf):
+            partidas_26, origem_26 = rodadas_reais(jogos_26, a.tabela_cbf), "cbf"
+        else:
+            print(f"(sem {a.tabela_cbf}: rodadas de {ANO_ANDAMENTO} sintéticas)")
+            partidas_26 = rodadas_parciais(times_26, jogos_26, semente=ANO_ANDAMENTO)
+        for rod, h, ad, gh, ga in partidas_26:
             linhas_saida.append((ANO_ANDAMENTO, rod, h, ad, gh, ga))
 
     with open(a.saida, "w", newline="", encoding="utf-8") as f:
@@ -228,8 +258,8 @@ def main():
         w.writerow(["ID", "rodata", "mandante", "visitante", "vencedor", "mandante_Placar", "visitante_Placar", "rodada_origem"])
         for i, (ano, rod, h, ad, gh, ga) in enumerate(linhas_saida, start=1):
             venc = h if gh > ga else ad if ga > gh else "Empate"
-            w.writerow([i, f"{rod}.0", h, ad, venc, gh, ga, "sintetica"])
-    print(f"\n{len(linhas_saida)} jogos em {a.saida} (rodadas sintéticas; 2006 ausente; {ANO_ANDAMENTO} parcial)")
+            w.writerow([i, f"{rod}.0", h, ad, venc, gh, ga, origem_26 if ano == ANO_ANDAMENTO else "sintetica"])
+    print(f"\n{len(linhas_saida)} jogos em {a.saida} (2007–2025 com rodadas sintéticas; {ANO_ANDAMENTO} parcial, rodadas {"reais da CBF" if origem_26 == "cbf" else "sintéticas"}; 2006 ausente)")
 
 
 if __name__ == "__main__":
