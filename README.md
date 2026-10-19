@@ -26,30 +26,30 @@ As abas **Série A** e **Série B** comparam o dia do dispositivo com `datasets/
 Limitações, de propósito explícitas:
 - **Rodadas: sintéticas até 2025, reais em 2026.** A matriz da Wikipedia não traz data nem rodada; em 2007–2025 a ordem dos jogos dentro da temporada é inventada (método do círculo, perna de ida sorteada por temporada), com resultados e mandos reais. Em 2026 a rodada de cada jogo vem da **tabela básica da CBF** (`datasets/serie-b-2026-tabela-cbf.csv`, gerada por `scripts/importar_tabela_cbf.py` a partir do PDF oficial). A coluna `rodada_origem` diz qual é qual (`sintetica` / `cbf`).
 - **2006 fica de fora**: não tem matriz completa em nenhuma das duas Wikipedias.
-- **2026 é parcial** (329 jogos, até 12 out; a 33ª rodada termina em 13 out). O importador só aceita jogos que as páginas em português e em inglês trazem **com o mesmo placar** (a pt já chegou a ter um 1×1 "Fortaleza × CRB" inexistente) e confere o mando e a rodada de cada jogo na tabela da CBF — se um jogo não está lá, para com erro. Conferência extra de 13 out: os pontos, jogos e gols de todos os 20 clubes na tabela de classificação da página batem com o que sai da matriz.
-- **Ganho pequeno.** `npm run test:backtest:b` (n = 1 089: 2024, 2025 e 2026 até agora): log-loss 1,045 × 1,053 da taxa-base 49/27/24 (RPS 0,215 × 0,218). A Série B é mais parelha e troca de elenco todo ano; clubes sem histórico entram como média da liga.
+- **2026 é parcial** (338 jogos, até 18 out; a 34ª rodada ainda tem dois jogos por disputar: Londrina × Cuiabá e Goiás × Náutico). O importador só aceita jogos que as páginas em português e em inglês trazem **com o mesmo placar** (a pt já chegou a ter um 1×1 "Fortaleza × CRB" inexistente) e confere o mando e a rodada de cada jogo na tabela da CBF — se um jogo não está lá, para com erro. Conferência extra de 13 out: os pontos, jogos e gols de todos os 20 clubes na tabela de classificação da página batem com o que sai da matriz.
+- **Ganho pequeno.** `npm run test:backtest:b` (n = 1 098: 2024, 2025 e 2026 até agora): log-loss 1,048 × 1,055 da taxa-base 49/27/24 (RPS 0,215 × 0,218). A Série B é mais parelha e troca de elenco todo ano; clubes sem histórico entram como média da liga.
 - O treino usa todo o histórico (a janela muda pouco o resultado).
 
 Para regerar: `python scripts/importar_wikipedia_serie_b.py` (precisa de internet; aceita `--cache DIR`; `--fonte pt|en` força uma das páginas em 2026, o padrão é a interseção das duas). Para atualizar as rodadas reais de 2026, baixe a tabela básica em PDF no site da CBF e rode `python scripts/importar_tabela_cbf.py tabela.pdf datasets/serie-b-2026-tabela-cbf.csv` (precisa do `pdftotext`). `python scripts/dados_serie.py validar <csv>` confere qualquer CSV no formato do modelo.
 
-## Estado dos dados (13 out 2026)
+## Estado dos dados (19 out 2026)
 
 | Base | Cobertura | Jogos |
 |------|-----------|-------|
-| Brasileirão (clubes) | 2003 – rodada 30 de 2026 (+ adiados da 21ª) | 9 464 |
+| Brasileirão (clubes) | 2003 – rodada 31 de 2026 (+ adiados da 21ª) | 9 473 |
 | Seleções | 1872 – 2026 | 49 000+ |
-| Série B | 2007 – rodada 33 de 2026 (2026 com rodadas reais da CBF) | 7 549 |
+| Série B | 2007 – rodada 34 de 2026 (2026 com rodadas reais da CBF) | 7 558 |
 
-Faltam no Brasileirão 2026: 81 jogos (299 de 380 disputados), entre eles Chapecoense × Vasco, adiado da 21ª rodada.
+Faltam no Brasileirão 2026: 72 jogos (308 de 380 disputados), entre eles Chapecoense × Vasco, adiado da 21ª rodada, e Corinthians × Vitória (31ª rodada, segunda 19/10).
 
-Precisão do modelo de clubes (backtest walk-forward; Série A n = 1 059, Série B n = 1 089):
+Precisão do modelo de clubes (backtest walk-forward; Série A n = 1 068, Série B n = 1 098):
 
 | | log-loss | RPS | acurácia |
 |---|---|---|---|
-| Série A — modelo | 1,029 | 0,211 | 48,3% |
+| Série A — modelo | 1,028 | 0,211 | 48,4% |
 | Série A — taxa-base fixa 47/27/26 | 1,058 | 0,221 | 47,2% |
-| Série B — modelo | 1,045 | 0,215 | 47,1% |
-| Série B — taxa-base 49/27/24 | 1,053 | 0,218 | 47,8% |
+| Série B — modelo | 1,048 | 0,215 | 46,8% |
+| Série B — taxa-base 49/27/24 | 1,055 | 0,218 | 47,5% |
 
 ## Estrutura do repositório
 
