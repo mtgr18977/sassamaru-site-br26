@@ -33,13 +33,13 @@
 - [x] **Sassamaru 2026: shell de aplicativo** — barra de abas no topo (`shell/`), página inicial explicando o site, botão "Instalar app", manifest com novo nome e atalhos.
 - [x] **Rodada de hoje + contagem regressiva** — `modelos/competicoes.js` + `datasets/calendario.js`, comparados com o relógio do visitante (abas Série A/B e página inicial).
 - [x] **Estrutura multi-competição (Série B)** — registro, abas Série A / Série B no topo, `scripts/dados_serie.py`, teste com liga de alta rotatividade.
-- [x] **Dados da Série B 2007–2026** — importados da Wikipedia (`scripts/importar_wikipedia_serie_b.py`), 7 549 jogos (2026 parcial), validados contra campeões/promovidos conhecidos e entre pt/en.
+- [x] **Dados da Série B 2007–2026** — importados da Wikipedia (`scripts/importar_wikipedia_serie_b.py`), 7 558 jogos (2026 parcial), validados contra campeões/promovidos conhecidos e entre pt/en.
 - [x] **Rodadas reais na Série B 2026** — vêm da tabela básica da CBF (`scripts/importar_tabela_cbf.py`). Ainda sintéticas em 2007–2025: falta fonte com a ordem real dos jogos (CBF/ge/soccerway por temporada).
 - [ ] **Série B 2006** — sem matriz completa na Wikipedia (en/pt); precisa de outra fonte.
-- [ ] **Ganho da Série B é pequeno** (log-loss 1,045 × 1,053): testar prior por divisão (Série A/B/C), `log γ` por time e meia-vida própria.
+- [ ] **Ganho da Série B é pequeno** (log-loss 1,048 × 1,055): testar prior por divisão (Série A/B/C), `log γ` por time e meia-vida própria.
 - [ ] **Clubes sem histórico (promovidos/rebaixados)** — hoje entram como média da liga. Melhor: prior vindo da outra divisão com desconto (Série C→B→A), e `log γ` por time. Medir no backtest da Série B.
 - [ ] **Simulação de temporada para a Série B** — `bench-brasileirao2026.html` tem as zonas da Série A fixas; ler de `Competicoes.zonas` (acesso G4 / Z4).
-- [ ] **Calendário da Série B** — rodada 33 completa e 34 só com os confrontos (janela provisória 16–19 out); preencher dia/hora e as próximas conforme a CBF divulgar (`datasets/calendario.js`).
+- [ ] **Calendário da Série B** — rodada 35 só com os confrontos (janela provisória 23–25 out) e dois jogos da 34 por disputar (Londrina × Cuiabá, Goiás × Náutico); preencher dia/hora e as próximas conforme a CBF divulgar (`datasets/calendario.js`).
 - [ ] **Calendário automático** — hoje editado à mão após cada divulgação da CBF; um script que leia a tabela da CBF e gere `calendario.js`.
 - [ ] **Navegação sem recarregar a página** — hoje cada aba é uma página; um roteador leve manteria o modelo em memória entre abas.
 - [ ] **Home com números ao vivo** — a página inicial (`index.html`) usa números escritos à mão; gerá-los do CSV evitaria divergência.
@@ -99,7 +99,7 @@
   `datasets/campeonato-brasileiro-full_ate_2025.csv`. Recuperá-la permitiria
   decay por data em vez de assumir `roundsPerSeason = 38`.
 - **Os três CSVs do Brasileirão** (`datasets/` + dois blocos embutidos) precisam ser
-  atualizados juntos a cada rodada; hoje estão em sincronia (9 464 jogos), mas já divergiram antes.
+  atualizados juntos a cada rodada; hoje estão em sincronia (9 473 jogos), mas já divergiram antes.
 - **Números escritos à mão** em `index.html`, `README.md`, `CLAUDE.md` e `datasets/readme.md`
   (veja *Home com números ao vivo*).
 - **`datasets/selecoes.zip`** é uma cópia de fev 2026 (só `results.csv` é usado).
@@ -107,4 +107,4 @@
 ### Resolvido
 - ~~Arquivos órfãos~~ — removidos `mundial-2026.html`, `fetch_xg.py`, `campeonatobrasileirolimpo_xg.csv`, `papaparse.min.js` e `datasets/brasileirao-26.zip`. A coleta de xG (item em *Dados*) recomeça do zero se for retomada.
 - ~~Linha errada na rodada 7 (`Mirassol x Fortaleza`)~~ — corrigida para `Mirassol x Coritiba`.
-- ~~`apps/index.html` com CSV embutido atrasado~~ — em sincronia desde a rodada 30.
+- ~~`apps/index.html` com CSV embutido atrasado~~ — em sincronia desde a rodada 31.

@@ -7539,12 +7539,21 @@ ID,rodata,mandante,visitante,vencedor,mandante_Placar,visitante_Placar,rodada_or
 7538,32.0,Ponte Preta,Juventude,Juventude,0,2,cbf
 7539,32.0,Sport,São Bernardo,Sport,2,1,cbf
 7540,32.0,Vila Nova,Cuiabá,Empate,0,0,cbf
-7541,33.0,Atlético-GO,Sport,Empate,1,1,cbf
-7542,33.0,Botafogo-SP,Ceará,Botafogo-SP,1,0,cbf
-7543,33.0,Criciúma,América-MG,Criciúma,1,0,cbf
-7544,33.0,Cuiabá,Avaí,Avaí,0,1,cbf
-7545,33.0,Fortaleza,CRB,Empate,2,2,cbf
-7546,33.0,Juventude,São Bernardo,Empate,2,2,cbf
-7547,33.0,Novorizontino,Ponte Preta,Novorizontino,5,1,cbf
-7548,33.0,Náutico,Vila Nova,Vila Nova,0,2,cbf
-7549,33.0,Operário Ferroviário,Goiás,Goiás,0,2,cbf
+7541,33.0,Athletic,Londrina,Empate,2,2,cbf
+7542,33.0,Atlético-GO,Sport,Empate,1,1,cbf
+7543,33.0,Botafogo-SP,Ceará,Botafogo-SP,1,0,cbf
+7544,33.0,Criciúma,América-MG,Criciúma,1,0,cbf
+7545,33.0,Cuiabá,Avaí,Avaí,0,1,cbf
+7546,33.0,Fortaleza,CRB,Empate,2,2,cbf
+7547,33.0,Juventude,São Bernardo,Empate,2,2,cbf
+7548,33.0,Novorizontino,Ponte Preta,Novorizontino,5,1,cbf
+7549,33.0,Náutico,Vila Nova,Vila Nova,0,2,cbf
+7550,33.0,Operário Ferroviário,Goiás,Goiás,0,2,cbf
+7551,34.0,América-MG,Operário Ferroviário,América-MG,1,0,cbf
+7552,34.0,Avaí,Athletic,Empate,0,0,cbf
+7553,34.0,CRB,Botafogo-SP,Botafogo-SP,0,1,cbf
+7554,34.0,Ceará,Juventude,Empate,2,2,cbf
+7555,34.0,Ponte Preta,Atlético-GO,Empate,1,1,cbf
+7556,34.0,Sport,Fortaleza,Fortaleza,0,2,cbf
+7557,34.0,São Bernardo,Criciúma,Criciúma,0,1,cbf
+7558,34.0,Vila Nova,Novorizontino,Empate,2,2,cbf

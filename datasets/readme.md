@@ -4,8 +4,8 @@ Dados usados pelos modelos. Nenhum arquivo daqui é gerado em tempo de execuçã
 
 | Arquivo | Conteúdo | Atualizado |
 |---------|----------|------------|
-| `campeonato-brasileiro-limpo.csv` | Brasileirão 2003–2026 (9 464 jogos): `ID, rodata, mandante, visitante, vencedor, mandante_Placar, visitante_Placar`. Sem datas. Lido pelo backtest | 13 out 2026 (rodada 30 + adiados da 21ª) |
-| `campeonato-brasileiro-serie-b.csv` | Série B 2007–2025 (19 × 380 jogos) + 2026 em andamento (329 jogos); mesmo formato + coluna `rodada_origem` (`sintetica` até 2025, `cbf` em 2026). Gerado por `scripts/importar_wikipedia_serie_b.py` | 13 out 2026 |
+| `campeonato-brasileiro-limpo.csv` | Brasileirão 2003–2026 (9 473 jogos): `ID, rodata, mandante, visitante, vencedor, mandante_Placar, visitante_Placar`. Sem datas. Lido pelo backtest | 19 out 2026 (rodada 31, exceto Corinthians × Vitória + adiados da 21ª) |
+| `campeonato-brasileiro-serie-b.csv` | Série B 2007–2025 (19 × 380 jogos) + 2026 em andamento (338 jogos); mesmo formato + coluna `rodada_origem` (`sintetica` até 2025, `cbf` em 2026). Gerado por `scripts/importar_wikipedia_serie_b.py` | 19 out 2026 |
 | `serie-b-2026-tabela-cbf.csv` | Tabela básica da CBF da Série B 2026: `rodada, mandante, visitante` dos 380 jogos (rodada real; as datas do PDF são só planejamento). Gerado por `scripts/importar_tabela_cbf.py` | fev 2026 (edição de 06/02) |
 | `campeonato-brasileiro-full_ate_2025.csv` | Variante rica do Brasileirão até 2025 (datas reais, arena, técnico, estado). **Sem uso hoje** — é a fonte para recuperar datas e `log γ` por estádio | 2025 |
 | `results.csv` | Jogos internacionais de seleções desde 1872 (49 000+ linhas) | 2026 |
