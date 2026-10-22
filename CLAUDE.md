@@ -161,12 +161,12 @@ became a 21st club in the table.
 ## Model accuracy
 
 `npm run test:backtest` is the regression gate. Current numbers (walk-forward, refit every 4
-rounds, last 3 seasons, n=1068 for Série A, data through round 31 of 2026):
+rounds, last 3 seasons, n=1069 for Série A, data through round 31 of 2026):
 
 | | log-loss | RPS | accuracy |
 |---|---|---|---|
 | Model | 1.028 | 0.211 | 48.4% |
-| Constant 47/27/26 baseline | 1.058 | 0.221 | 47.2% |
+| Constant 47/27/26 baseline | 1.058 | 0.221 | 47.1% |
 | Série B model (n=1,098) | 1.048 | 0.215 | 46.8% |
 | Série B constant 49/27/24 baseline | 1.055 | 0.218 | 47.5% |
 

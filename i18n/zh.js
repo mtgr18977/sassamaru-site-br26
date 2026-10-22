@@ -114,7 +114,7 @@
   "Mandante x Visitante — um jogo por linha": "主队 x 客队 — 每行一场比赛",
   "A mesma previsão de rodada para a Série B, com 20 temporadas de resultados (2007 a 2026, esta em andamento) vindas da Wikipedia. Até 2025 a ordem dos jogos dentro da temporada é sintética; em 2026 a rodada de cada jogo vem da tabela da CBF.": "针对乙级的同款轮次预测，包含来自维基百科的 20 个赛季（2007 至 2026，后者仍在进行）赛果。2025 年及以前每个赛季内比赛的先后顺序是合成的；2026 年每场比赛的轮次来自巴西足协赛程表。",
   "2007 – rodada 34 de 2026 (2026 com rodadas da CBF)": "2007 – 2026 年第 34 轮（2026 年为协会轮次）",
-  "Backtest walk-forward: Série A em 1 068 jogos (2024, 2025 e 2026 até agora); Série B em 1 098 jogos (2024, 2025 e 2026 até agora). Menor log-loss e RPS é melhor. Na Série B o ganho sobre a taxa-base é pequeno: a divisão é mais parelha e muda de elenco todo ano.": "滚动回测：甲级 1,059 场（2024、2025 及 2026 年至今）；乙级 1,089 场（2024、2025 及 2026 年至今）。对数损失和 RPS 越低越好。乙级相对基准的提升很小：该级别实力更均衡，且每年阵容变动很大。",
+  "Backtest walk-forward: Série A em 1 069 jogos (2024, 2025 e 2026 até agora); Série B em 1 098 jogos (2024, 2025 e 2026 até agora). Menor log-loss e RPS é melhor. Na Série B o ganho sobre a taxa-base é pequeno: a divisão é mais parelha e muda de elenco todo ano.": "滚动回测：甲级 1,069 场（2024、2025 及 2026 年至今）；乙级 1,089 场（2024、2025 及 2026 年至今）。对数损失和 RPS 越低越好。乙级相对基准的提升很小：该级别实力更均衡，且每年阵容变动很大。",
   "Série A — Sassamaru": "甲级 — Sassamaru",
   "Série A — taxa-base 47/27/26": "甲级 — 47/27/26 基准",
   "2007–2025": "2007–2025",

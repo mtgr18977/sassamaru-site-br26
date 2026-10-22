@@ -36,18 +36,18 @@ Para regerar: `python scripts/importar_wikipedia_serie_b.py` (precisa de interne
 
 | Base | Cobertura | Jogos |
 |------|-----------|-------|
-| Brasileirão (clubes) | 2003 – rodada 31 de 2026 (+ adiados da 21ª) | 9 473 |
+| Brasileirão (clubes) | 2003 – rodada 31 de 2026 (+ adiados da 21ª) | 9 474 |
 | Seleções | 1872 – 2026 | 49 000+ |
 | Série B | 2007 – rodada 34 de 2026 (2026 com rodadas reais da CBF) | 7 558 |
 
-Faltam no Brasileirão 2026: 72 jogos (308 de 380 disputados), entre eles Chapecoense × Vasco, adiado da 21ª rodada, e Corinthians × Vitória (31ª rodada, segunda 19/10).
+Faltam no Brasileirão 2026: 71 jogos (309 de 380 disputados), entre eles Chapecoense × Vasco, adiado da 21ª rodada.
 
-Precisão do modelo de clubes (backtest walk-forward; Série A n = 1 068, Série B n = 1 098):
+Precisão do modelo de clubes (backtest walk-forward; Série A n = 1 069, Série B n = 1 098):
 
 | | log-loss | RPS | acurácia |
 |---|---|---|---|
 | Série A — modelo | 1,028 | 0,211 | 48,4% |
-| Série A — taxa-base fixa 47/27/26 | 1,058 | 0,221 | 47,2% |
+| Série A — taxa-base fixa 47/27/26 | 1,058 | 0,221 | 47,1% |
 | Série B — modelo | 1,048 | 0,215 | 46,8% |
 | Série B — taxa-base 49/27/24 | 1,055 | 0,218 | 47,5% |
 
