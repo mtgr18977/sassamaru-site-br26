@@ -21,7 +21,7 @@
     'serie-a-2026': {
       competicao: 'serie-a',
       temporada: 2026,
-      atualizadoEm: '2026-10-19',
+      atualizadoEm: '2026-10-22',
       fonte: 'CBF (tabela detalhada), conferida em valorfinal.com.br e Wikipedia',
       rodadas: [
         { n: 1,  inicio: '2026-01-28', fim: '2026-01-29', status: C },
@@ -54,7 +54,7 @@
         { n: 28, inicio: '2026-09-19', fim: '2026-09-20', status: C },
         { n: 29, inicio: '2026-10-07', fim: '2026-10-08', status: C },
         { n: 30, inicio: '2026-10-10', fim: '2026-10-12', status: C },
-        { n: 31, inicio: '2026-10-16', fim: '2026-10-19', status: K },   // falta só Corinthians × Vitória (seg. 19/10, 20:00)
+        { n: 31, inicio: '2026-10-16', fim: '2026-10-19', status: C },
         { n: 32, inicio: '2026-10-23', fim: '2026-10-26', status: K },
         { n: 33, inicio: '2026-10-28', fim: '2026-10-30', status: K },
         { n: 34, inicio: '2026-11-02', fim: '2026-11-06', status: K },
@@ -69,7 +69,6 @@
       ],
       // jogos das próximas rodadas (horário de Brasília) — só as rodadas já detalhadas pela CBF
       jogos: [
-        { rodada: 31, data: '2026-10-19', hora: '20:00', mandante: 'Corinthians', visitante: 'Vitória' },
         { rodada: 32, data: '2026-10-23', hora: '20:00', mandante: 'Cruzeiro', visitante: 'Remo' },
         { rodada: 32, data: '2026-10-24', hora: '16:30', mandante: 'Mirassol', visitante: 'São Paulo' },
         { rodada: 32, data: '2026-10-24', hora: '16:30', mandante: 'Internacional', visitante: 'Botafogo' },
