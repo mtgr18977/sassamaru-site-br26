@@ -128,6 +128,8 @@
   "Classificação — {nome}": "Standings — {nome}",
   "Temporada {ano} · {n} de {total} jogos disputados · dados até {data}": "{ano} season · {n} of {total} matches played · data up to {data}",
   "Acesso à Série A@@zona": "Promotion to Série A",
+  "Playoff de acesso@@zona": "Promotion playoff",
+  "Top 2 + playoff · Z4": "Top 2 + playoff · Bottom 4",
   "Rebaixamento@@zona": "Relegation",
   "Libertadores@@zona": "Libertadores",
   "Sul-Americana@@zona": "Sudamericana",

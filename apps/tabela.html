@@ -95,6 +95,7 @@
   // faixas de posição a destacar, na ordem em que aparecem; `cls` casa com as cores do CSS
   var ZONAS = COMP.id === 'serie-b'
     ? [{ cls: 'z-lib', faixa: COMP.zonas.acesso, rot: _t('Acesso à Série A@@zona'), cor: 'var(--lib)' },
+       { cls: 'z-sul', faixa: COMP.zonas.playoff, rot: _t('Playoff de acesso@@zona'), cor: 'var(--sul)' },
        { cls: 'z-rel', faixa: COMP.zonas.rebaixamento, rot: _t('Rebaixamento@@zona'), cor: 'var(--rel)' }]
     : [{ cls: 'z-lib', faixa: COMP.zonas.libertadores, rot: _t('Libertadores@@zona'), cor: 'var(--lib)' },
        { cls: 'z-sul', faixa: COMP.zonas.sulamericana, rot: _t('Sul-Americana@@zona'), cor: 'var(--sul)' },

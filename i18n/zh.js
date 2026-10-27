@@ -128,6 +128,8 @@
   "Classificação — {nome}": "积分榜 — {nome}",
   "Temporada {ano} · {n} de {total} jogos disputados · dados até {data}": "{ano} 赛季 · 已赛 {n} / {total} 场 · 数据截至 {data}",
   "Acesso à Série A@@zona": "升入甲级",
+  "Playoff de acesso@@zona": "升级附加赛",
+  "Top 2 + playoff · Z4": "前 2 + 附加赛 · 后 4",
   "Rebaixamento@@zona": "降级",
   "Libertadores@@zona": "解放者杯",
   "Sul-Americana@@zona": "南美杯",
