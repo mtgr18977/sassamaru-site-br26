@@ -21,7 +21,7 @@
     'serie-a-2026': {
       competicao: 'serie-a',
       temporada: 2026,
-      atualizadoEm: '2026-10-22',
+      atualizadoEm: '2026-10-27',
       fonte: 'CBF (tabela detalhada), conferida em valorfinal.com.br e Wikipedia',
       rodadas: [
         { n: 1,  inicio: '2026-01-28', fim: '2026-01-29', status: C },
@@ -55,7 +55,7 @@
         { n: 29, inicio: '2026-10-07', fim: '2026-10-08', status: C },
         { n: 30, inicio: '2026-10-10', fim: '2026-10-12', status: C },
         { n: 31, inicio: '2026-10-16', fim: '2026-10-19', status: C },
-        { n: 32, inicio: '2026-10-23', fim: '2026-10-26', status: K },
+        { n: 32, inicio: '2026-10-23', fim: '2026-10-26', status: C },
         { n: 33, inicio: '2026-10-28', fim: '2026-10-30', status: K },
         { n: 34, inicio: '2026-11-02', fim: '2026-11-06', status: K },
         { n: 35, inicio: '2026-11-18', fim: '2026-11-18', status: P },
@@ -69,16 +69,6 @@
       ],
       // jogos das próximas rodadas (horário de Brasília) — só as rodadas já detalhadas pela CBF
       jogos: [
-        { rodada: 32, data: '2026-10-23', hora: '20:00', mandante: 'Cruzeiro', visitante: 'Remo' },
-        { rodada: 32, data: '2026-10-24', hora: '16:30', mandante: 'Mirassol', visitante: 'São Paulo' },
-        { rodada: 32, data: '2026-10-24', hora: '16:30', mandante: 'Internacional', visitante: 'Botafogo' },
-        { rodada: 32, data: '2026-10-24', hora: '16:30', mandante: 'Vitória', visitante: 'Athletico Paranaense' },
-        { rodada: 32, data: '2026-10-24', hora: '18:30', mandante: 'Vasco', visitante: 'Corinthians' },
-        { rodada: 32, data: '2026-10-24', hora: '18:30', mandante: 'Palmeiras', visitante: 'Bragantino' },
-        { rodada: 32, data: '2026-10-24', hora: '19:30', mandante: 'Chapecoense', visitante: 'Fluminense' },
-        { rodada: 32, data: '2026-10-24', hora: '21:00', mandante: 'Santos', visitante: 'Bahia' },
-        { rodada: 32, data: '2026-10-26', hora: '19:30', mandante: 'Coritiba', visitante: 'Grêmio' },
-        { rodada: 32, data: '2026-10-26', hora: '20:00', mandante: 'Flamengo', visitante: 'Atlético Mineiro' },
         { rodada: 33, data: '2026-10-28', hora: '19:30', mandante: 'Fluminense', visitante: 'Internacional' },
         { rodada: 33, data: '2026-10-28', hora: '19:30', mandante: 'Santos', visitante: 'Palmeiras' },
         { rodada: 33, data: '2026-10-28', hora: '19:30', mandante: 'Bragantino', visitante: 'Chapecoense' },
@@ -104,7 +94,7 @@
     'serie-b-2026': {
       competicao: 'serie-b',
       temporada: 2026,
-      atualizadoEm: '2026-10-19',
+      atualizadoEm: '2026-10-27',
       fonte: 'CBF (tabela básica); resultados conferidos na Wikipedia (pt e en)',
       rodadas: [
         { n: 1, inicio: null, fim: null, status: C },
@@ -140,28 +130,27 @@
         { n: 31, inicio: null, fim: null, status: C },
         { n: 32, inicio: '2026-10-06', fim: '2026-10-08', status: C },
         { n: 33, inicio: '2026-10-11', fim: '2026-10-13', status: C },
-        { n: 34, inicio: '2026-10-16', fim: '2026-10-19', status: C },   // 2 jogos adiados (ver pendentes)
-        { n: 35, inicio: '2026-10-23', fim: '2026-10-25', status: P },   // janela da tabela básica da CBF; dias/horas ainda não divulgados
-        { n: 36, inicio: null, fim: null, status: S },   // datas ainda não divulgadas
+        { n: 34, inicio: '2026-10-16', fim: '2026-10-19', status: C },
+        { n: 35, inicio: '2026-10-23', fim: '2026-10-25', status: C },   // Ceará × Goiás ainda sem resultado (ver pendentes)
+        { n: 36, inicio: null, fim: null, status: P },   // só os confrontos (tabela básica da CBF); dias/horas ainda não divulgados
         { n: 37, inicio: null, fim: null, status: S },   // datas ainda não divulgadas
         { n: 38, inicio: null, fim: null, status: S },   // datas ainda não divulgadas
       ],
       pendentes: [
-        { rodada: 34, mandante: 'Londrina', visitante: 'Cuiabá', data: null },
-        { rodada: 34, mandante: 'Goiás', visitante: 'Náutico', data: null },
+        { rodada: 35, mandante: 'Ceará', visitante: 'Goiás', data: null },
       ],
-      // rodada 35: só os confrontos, vindos da tabela básica da CBF (dia/hora ainda não divulgados)
+      // rodada 36: só os confrontos, vindos da tabela básica da CBF (dia/hora ainda não divulgados)
       jogos: [
-        { rodada: 35, data: null, hora: null, mandante: 'Ponte Preta', visitante: 'Fortaleza' },
-        { rodada: 35, data: null, hora: null, mandante: 'São Bernardo', visitante: 'Vila Nova' },
-        { rodada: 35, data: null, hora: null, mandante: 'América-MG', visitante: 'Cuiabá' },
-        { rodada: 35, data: null, hora: null, mandante: 'Operário Ferroviário', visitante: 'Athletic' },
-        { rodada: 35, data: null, hora: null, mandante: 'Ceará', visitante: 'Goiás' },
-        { rodada: 35, data: null, hora: null, mandante: 'Atlético-GO', visitante: 'Novorizontino' },
-        { rodada: 35, data: null, hora: null, mandante: 'Avaí', visitante: 'Botafogo-SP' },
-        { rodada: 35, data: null, hora: null, mandante: 'Sport', visitante: 'Criciúma' },
-        { rodada: 35, data: null, hora: null, mandante: 'CRB', visitante: 'Londrina' },
-        { rodada: 35, data: null, hora: null, mandante: 'Juventude', visitante: 'Náutico' },
+        { rodada: 36, data: null, hora: null, mandante: 'Botafogo-SP', visitante: 'Sport' },
+        { rodada: 36, data: null, hora: null, mandante: 'Novorizontino', visitante: 'Operário Ferroviário' },
+        { rodada: 36, data: null, hora: null, mandante: 'Athletic', visitante: 'Ceará' },
+        { rodada: 36, data: null, hora: null, mandante: 'Londrina', visitante: 'América-MG' },
+        { rodada: 36, data: null, hora: null, mandante: 'Fortaleza', visitante: 'Atlético-GO' },
+        { rodada: 36, data: null, hora: null, mandante: 'Goiás', visitante: 'CRB' },
+        { rodada: 36, data: null, hora: null, mandante: 'Criciúma', visitante: 'Ponte Preta' },
+        { rodada: 36, data: null, hora: null, mandante: 'Náutico', visitante: 'Avaí' },
+        { rodada: 36, data: null, hora: null, mandante: 'Cuiabá', visitante: 'São Bernardo' },
+        { rodada: 36, data: null, hora: null, mandante: 'Vila Nova', visitante: 'Juventude' },
       ],
     },
   };

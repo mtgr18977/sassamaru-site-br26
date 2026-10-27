@@ -64,7 +64,7 @@ section('statusCalendario — rodada de hoje');
 }
 
 // ── calendário da Série B ───────────────────────────────────────────────────
-section('Calendário da Série B 2026 — rodadas 34 e 35');
+section('Calendário da Série B 2026 — rodadas 35 e 36');
 {
   const cal = CALS['serie-b-2026'];
   let s = C.statusCalendario(cal, at('2026-10-06'));
@@ -77,21 +77,21 @@ section('Calendário da Série B 2026 — rodadas 34 e 35');
   ok(s.estado === 'entre-rodadas' && s.foco.n === 35 && s.ultima.n === 34, '21 out: próxima é a 35 (janela provisória da CBF)');
   s = C.statusCalendario(cal, at('2026-10-26'));
   ok(s.estado === 'sem-calendario' && s.ultima.n === 35, '26 out: acabaram as datas conhecidas → "sem calendário" (não "temporada encerrada")');
-  ok(cal.rodadas.length === 38 && cal.rodadas.filter((r) => r.status === 'semdata').length === 3, 'rodadas 36–38 marcadas como sem data');
-  ok(cal.rodadas[34].status === 'provisoria', 'rodada 35: janela provisória');
-  const j = C.jogosDaRodada(cal, 35);
+  ok(cal.rodadas.length === 38 && cal.rodadas.filter((r) => r.status === 'semdata').length === 2, 'rodadas 37–38 marcadas como sem data');
+  ok(cal.rodadas[35].status === 'provisoria', 'rodada 36: só os confrontos, datas provisórias');
+  const j = C.jogosDaRodada(cal, 36);
   const nomes = new Set(j.flatMap((x) => [M.normalizeTeam(x.mandante), M.normalizeTeam(x.visitante)]));
-  ok(j.length === 10 && nomes.size === 20, 'rodada 35: 10 jogos, 20 clubes distintos');
+  ok(j.length === 10 && nomes.size === 20, 'rodada 36: 10 jogos, 20 clubes distintos');
   const csvB = path.join(ROOT, C.obter('serie-b').csv);
   if (fs.existsSync(csvB)) {
     const ls = fs.readFileSync(csvB, 'utf8').trim().split('\n').slice(1), n26 = ls.length - 19 * 380;
     const doDataset = new Set(ls.slice(-n26).flatMap((l) => [l.split(',')[2], l.split(',')[3]]).map(M.normalizeTeam));
-    ok([...nomes].every((n) => doDataset.has(n)), 'rodada 35: os nomes batem com os clubes da Série B 2026 do dataset');
-    // rodada 35: os confrontos do calendário são os da tabela básica da CBF
-    const j34 = C.jogosDaRodada(cal, 35), pares = (l) => l.map((x) => M.normalizeTeam(x.mandante) + '|' + M.normalizeTeam(x.visitante)).sort().join(',');
-    const cbf34 = fs.readFileSync(path.join(ROOT, 'datasets/serie-b-2026-tabela-cbf.csv'), 'utf8').trim().split('\n').slice(1).map((l) => l.split(',')).filter((c) => c[0] === '35').map((c) => ({ mandante: c[1], visitante: c[2] }));
-    ok(j34.length === 10 && pares(j34) === pares(cbf34), 'rodada 35: 10 confrontos, iguais aos da tabela básica da CBF');
-    ok([...new Set(j34.flatMap((x) => [M.normalizeTeam(x.mandante), M.normalizeTeam(x.visitante)]))].every((n) => doDataset.has(n)), 'rodada 35: os nomes batem com o dataset');
+    ok([...nomes].every((n) => doDataset.has(n)), 'rodada 36: os nomes batem com os clubes da Série B 2026 do dataset');
+    // rodada 36: os confrontos do calendário são os da tabela básica da CBF
+    const j36 = C.jogosDaRodada(cal, 36), pares = (l) => l.map((x) => M.normalizeTeam(x.mandante) + '|' + M.normalizeTeam(x.visitante)).sort().join(',');
+    const cbf36 = fs.readFileSync(path.join(ROOT, 'datasets/serie-b-2026-tabela-cbf.csv'), 'utf8').trim().split('\n').slice(1).map((l) => l.split(',')).filter((c) => c[0] === '36').map((c) => ({ mandante: c[1], visitante: c[2] }));
+    ok(j36.length === 10 && pares(j36) === pares(cbf36), 'rodada 36: 10 confrontos, iguais aos da tabela básica da CBF');
+    ok([...new Set(j36.flatMap((x) => [M.normalizeTeam(x.mandante), M.normalizeTeam(x.visitante)]))].every((n) => doDataset.has(n)), 'rodada 36: os nomes batem com o dataset');
   }
 }
 
