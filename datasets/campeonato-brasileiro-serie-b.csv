@@ -7553,7 +7553,18 @@ ID,rodata,mandante,visitante,vencedor,mandante_Placar,visitante_Placar,rodada_or
 7552,34.0,Avaí,Athletic,Empate,0,0,cbf
 7553,34.0,CRB,Botafogo-SP,Botafogo-SP,0,1,cbf
 7554,34.0,Ceará,Juventude,Empate,2,2,cbf
-7555,34.0,Ponte Preta,Atlético-GO,Empate,1,1,cbf
-7556,34.0,Sport,Fortaleza,Fortaleza,0,2,cbf
-7557,34.0,São Bernardo,Criciúma,Criciúma,0,1,cbf
-7558,34.0,Vila Nova,Novorizontino,Empate,2,2,cbf
+7555,34.0,Goiás,Náutico,Empate,0,0,cbf
+7556,34.0,Londrina,Cuiabá,Londrina,1,0,cbf
+7557,34.0,Ponte Preta,Atlético-GO,Empate,1,1,cbf
+7558,34.0,Sport,Fortaleza,Fortaleza,0,2,cbf
+7559,34.0,São Bernardo,Criciúma,Criciúma,0,1,cbf
+7560,34.0,Vila Nova,Novorizontino,Empate,2,2,cbf
+7561,35.0,América-MG,Cuiabá,América-MG,1,0,cbf
+7562,35.0,Atlético-GO,Novorizontino,Novorizontino,0,1,cbf
+7563,35.0,Avaí,Botafogo-SP,Botafogo-SP,0,2,cbf
+7564,35.0,CRB,Londrina,CRB,2,1,cbf
+7565,35.0,Juventude,Náutico,Juventude,4,0,cbf
+7566,35.0,Operário Ferroviário,Athletic,Operário Ferroviário,1,0,cbf
+7567,35.0,Ponte Preta,Fortaleza,Empate,2,2,cbf
+7568,35.0,Sport,Criciúma,Sport,2,1,cbf
+7569,35.0,São Bernardo,Vila Nova,São Bernardo,3,2,cbf

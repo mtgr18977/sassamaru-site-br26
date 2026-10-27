@@ -38,7 +38,7 @@
 - [ ] **Série B 2006** — sem matriz completa na Wikipedia (en/pt); precisa de outra fonte.
 - [ ] **Ganho da Série B é pequeno** (log-loss 1,048 × 1,055): testar prior por divisão (Série A/B/C), `log γ` por time e meia-vida própria.
 - [ ] **Clubes sem histórico (promovidos/rebaixados)** — hoje entram como média da liga. Melhor: prior vindo da outra divisão com desconto (Série C→B→A), e `log γ` por time. Medir no backtest da Série B.
-- [ ] **Simulação de temporada para a Série B** — `bench-brasileirao2026.html` tem as zonas da Série A fixas; ler de `Competicoes.zonas` (acesso G4 / Z4).
+- [ ] **Simulação de temporada para a Série B** — `bench-brasileirao2026.html` tem as zonas da Série A fixas; ler de `Competicoes.zonas` (acesso direto 1º–2º, playoff 3º–6º / Z4).
 - [ ] **Calendário da Série B** — rodada 35 só com os confrontos (janela provisória 23–25 out) e dois jogos da 34 por disputar (Londrina × Cuiabá, Goiás × Náutico); preencher dia/hora e as próximas conforme a CBF divulgar (`datasets/calendario.js`).
 - [ ] **Calendário automático** — hoje editado à mão após cada divulgação da CBF; um script que leia a tabela da CBF e gere `calendario.js`.
 - [ ] **Navegação sem recarregar a página** — hoje cada aba é uma página; um roteador leve manteria o modelo em memória entre abas.
