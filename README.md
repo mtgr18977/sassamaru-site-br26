@@ -21,7 +21,7 @@ As abas **Série A** e **Série B** comparam o dia do dispositivo com `datasets/
 
 ## Série B
 
-`modelos/competicoes.js` registra Série A e Série B (20 clubes, 38 rodadas, 1º–2º sobem direto, 3º–6º disputam playoff de acesso e Z4). A aba **Série B** usa o mesmo modelo, com `datasets/campeonato-brasileiro-serie-b.csv`: **20 temporadas (2007–2025 completas + 2026 em andamento), 7 549 jogos**, gerado por `scripts/importar_wikipedia_serie_b.py` a partir da matriz de resultados de cada página "AAAA Campeonato Brasileiro Série B" da Wikipedia (2014 e 2015 vêm da página em português).
+`modelos/competicoes.js` registra Série A e Série B (20 clubes, 38 rodadas, 1º–2º sobem direto, 3º–6º disputam playoff de acesso (3º×6º e 4º×5º, ida e volta; os 2 vencedores sobem, 4 promovidos no total) e Z4). A aba **Série B** usa o mesmo modelo, com `datasets/campeonato-brasileiro-serie-b.csv`: **20 temporadas (2007–2025 completas + 2026 em andamento), 7 549 jogos**, gerado por `scripts/importar_wikipedia_serie_b.py` a partir da matriz de resultados de cada página "AAAA Campeonato Brasileiro Série B" da Wikipedia (2014 e 2015 vêm da página em português).
 
 Limitações, de propósito explícitas:
 - **Rodadas: sintéticas até 2025, reais em 2026.** A matriz da Wikipedia não traz data nem rodada; em 2007–2025 a ordem dos jogos dentro da temporada é inventada (método do círculo, perna de ida sorteada por temporada), com resultados e mandos reais. Em 2026 a rodada de cada jogo vem da **tabela básica da CBF** (`datasets/serie-b-2026-tabela-cbf.csv`, gerada por `scripts/importar_tabela_cbf.py` a partir do PDF oficial). A coluna `rodada_origem` diz qual é qual (`sintetica` / `cbf`).

@@ -27,6 +27,7 @@ section('Registro de competições');
   ok(a.nTimes === 20 && a.rodadas === 38 && a.dados === 'embutido', 'Série A: 20 clubes, 38 rodadas, dados embutidos');
   ok(b.pontosCorridosDesde === 2006 && b.nTimes === 20 && b.rodadas === 38, 'Série B: pontos corridos desde 2006, 20 clubes, 38 rodadas');
   ok(b.zonas.acesso[1] === 2 && b.zonas.playoff[0] === 3 && b.zonas.playoff[1] === 6 && b.zonas.rebaixamento[0] === 17, 'Série B: 1º–2º sobem, 3º–6º playoff de acesso, Z4');
+  ok(JSON.stringify(b.playoffAcesso.cruzamentos) === '[[3,6],[4,5]]' && b.playoffAcesso.vagas === 2, 'Série B: playoff 3º×6º e 4º×5º, 2 vagas (4 promovidos no total)');
   ok(C.obter('qualquer-coisa').id === 'serie-a', 'id desconhecido cai na Série A');
   ok(C.indiceTreino(a) === 12, 'índice de treino da Série A = 2015 − 2003');
   ok(C.indiceTreino(b) === 0, 'Série B treina com todo o histórico (índice 0 = 2007)');
