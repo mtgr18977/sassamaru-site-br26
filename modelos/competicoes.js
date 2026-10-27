@@ -47,6 +47,8 @@
                                    // 'disponivel' = CSV existe e é lido por fetch (lembre de pô-lo no precache do service-worker.js)
       calendario: 'serie-b-2026',
       zonas: { acesso: [1, 2], playoff: [3, 6], rebaixamento: [17, 20] },   // 1º–2º sobem direto; 3º–6º disputam o playoff de acesso
+      // playoff (a partir de 2026): cruzamento olímpico, ida e volta; os 2 vencedores sobem → 4 promovidos no total
+      playoffAcesso: { cruzamentos: [[3, 6], [4, 5]], idaEVolta: true, vagas: 2 },
       taxaBase: { pH: 0.49, pD: 0.27, pA: 0.24 },   // frequência histórica 2007–2025 (7 220 jogos)
       limiteLogLoss: 1.050,                          // medido: 1.044 (2007+); a Série B é mais parelha, o ganho sobre a taxa-base é pequeno
       promocao: 'serie-a',
