@@ -1,6 +1,6 @@
 # Testes
 
-Rodam em Node, sem framework: `npm test` (seis suítes) e `npm run test:backtest[:b]`.
+Rodam em Node, sem framework: `npm test` (sete suítes) e `npm run test:backtest[:b]`.
 
 | Arquivo | Script npm | Asserções | Cobre |
 |---|---|---|---|
@@ -10,6 +10,7 @@ Rodam em Node, sem framework: `npm test` (seis suítes) e `npm run test:backtest
 | `copa2026-bracket.test.js` | `test:copa` | 8 | Chaveamento da Copa (lógica copiada de `bench-copa2026.html`) |
 | `i18n.test.js` | `test:i18n` | 57 | Dicionários en/zh, placeholders, chaves `_t()`, blocos de docs, choque com nomes de clubes |
 | `competicoes.test.js` | `test:competicoes` | 55 | Calendário, rodada de hoje, integridade com o CSV, Série B, `scripts/dados_serie.py` |
+| `simulacao.test.js` | `test:simulacao` | 29 | Simulador de temporada (`modelos/simulacao.js`), faixas do modal de clube × zonas do registro, cores/escudos de todos os clubes (`modelos/clubes.js`) |
 | `backtest.test.js` | `test:backtest` / `test:backtest:b` | — | Walk-forward sobre dados reais; falha se o modelo não superar a taxa-base em log-loss **e** RPS |
 
 O backtest não entra no `npm test` por ser mais lento (2–5 s). Rode-o após qualquer mudança na matemática do modelo de clubes. Contagens de asserções mudam: confira a saída de cada suíte.

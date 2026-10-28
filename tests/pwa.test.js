@@ -85,6 +85,7 @@ const htmlFiles = [
   'apps/index.html',
   'apps/bench-selecoes.html',
   'apps/tabela.html',
+  'apps/clubes.html',
   'simulacoes/bench-copa2026.html',
   'simulacoes/bench-brasileirao2026.html',
 ];

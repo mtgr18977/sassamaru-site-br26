@@ -29,6 +29,12 @@
       // faixas de posição final (1-indexado, inclusive) usadas na simulação de temporada
       zonas: { libertadores: [1, 6], sulamericana: [7, 12], rebaixamento: [17, 20] },
       promocao: null,
+      // linhas do modal de cada clube (apps/clubes.html): probabilidade de terminar entre as posições de..ate (1-indexado).
+      // G4/G8 são cumulativos (1º–4º, 1º–8º); Sul-Americana é a faixa 7º–12º de `zonas`.
+      faixasClube: [
+        { id: 'titulo', de: 1, ate: 1 }, { id: 'g4', de: 1, ate: 4 }, { id: 'g8', de: 1, ate: 8 },
+        { id: 'sul', de: 7, ate: 12 }, { id: 'rebaixamento', de: 17, ate: 20 },
+      ],
       taxaBase: { pH: 0.47, pD: 0.27, pA: 0.26 },   // referência do backtest: prever sempre isto não pode ganhar do modelo
       limiteLogLoss: 1.035,                          // trava de regressão (tests/backtest.test.js)
     },
@@ -52,6 +58,10 @@
       taxaBase: { pH: 0.49, pD: 0.27, pA: 0.24 },   // frequência histórica 2007–2025 (7 220 jogos)
       limiteLogLoss: 1.050,                          // medido: 1.044 (2007+); a Série B é mais parelha, o ganho sobre a taxa-base é pequeno
       promocao: 'serie-a',
+      // G2 = acesso direto; G6 = acesso direto ou playoff (3º–6º); só 4 sobem no total (ver playoffAcesso)
+      faixasClube: [
+        { id: 'g2', de: 1, ate: 2 }, { id: 'g6', de: 1, ate: 6 }, { id: 'rebaixamento', de: 17, ate: 20 },
+      ],
       // Elenco muda muito mais que na Série A (4 sobem, 4 caem, 4 chegam da C todo ano): times sem
       // histórico entram na média da liga (α=β=1, Elo 1500) com aviso. Ver ToDo.md.
       rotatividade: 'alta',

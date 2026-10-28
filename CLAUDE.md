@@ -6,12 +6,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 # Run tests
-npm test                   # Six suites (model, selecoes, pwa, copa, i18n, competicoes)
+npm test                   # Seven suites (model, selecoes, pwa, copa, i18n, competicoes, simulacao)
 npm run test:model         # Club model unit tests
 npm run test:backtest      # Walk-forward accuracy regression gate — run this
                            # after ANY change to the Brasileirão model math
 npm run test:backtest:b    # same gate for Série B (COMP=serie-b)
 npm run test:competicoes   # calendar / current round / Série B dataset and importer
+npm run test:simulacao      # Season simulator, club-modal bands vs zones, crest colours for every club
 npm run test:selecoes      # Selection model tests (111 assertions)
 npm run test:pwa           # PWA compliance tests (manifest, service worker, icons)
 npm run test:copa          # Copa 2026 bracket tests
@@ -28,7 +29,7 @@ Static HTML + vanilla JavaScript PWA — no build process, no framework.
 ### App shell (Sassamaru 2026)
 
 The product is called **Sassamaru 2026**. `shell/shell.js` + `shell/shell.css` inject the sticky top tab
-bar (Início · Série A · Série B · Seleções · Copa 2026 · Docs; Série A/B have a second row: Previsão da rodada · Classificação · Simulação da temporada — Série B has no simulation), move the `PT | EN | 中文`
+bar (Início · Série A · Série B · Clubes · Seleções · Copa 2026 · Docs; Série A/B have a second row: Previsão da rodada · Classificação · Simulação da temporada — Série B has no simulation), move the `PT | EN | 中文`
 switcher into it and show an "Instalar app" button on `beforeinstallprompt`. Every page loads them right
 after `i18n/i18n.js`. To add a section: add it to `TABS` in `shell/shell.js` (each tab has an `on(page, params)` predicate; both divisions share `apps/index.html?comp=`), add `Nome@@aba` to
 `i18n/{en,zh}.js`, precache the page in `service-worker.js`. `index.html` is the home page (what the
@@ -80,6 +81,8 @@ Keep a club's name identical across divisions (the importer's `CANONICO` map) or
   - `model.js` — Brasileirão club model
   - `selecoes-model.js` — national teams model
   - `competicoes.js` — division registry + `statusCalendario()`
+  - `simulacao.js` — seeded Monte Carlo of the rest of the season (`simularTemporada`, `probabilidade`)
+  - `clubes.js` — club crests: real PNG in `icons/clubes/<chave>.png` (downloaded from Wikipedia by `scripts/baixar_escudos.py`, sources in `icons/clubes/fontes.csv`), with a generated SVG crest (`escudoSvg`, club colour + initials) as fallback. Every club of both divisions needs a colour and a PNG (tested): when a club is promoted, add it to `CORES` and to `CLUBES` in the script and run it with `--so <chave>`
 - `apps/` — Interactive prediction UIs. `apps/index.html` loads `../modelos/model.js` via `<script src>`
 - `simulacoes/` — Simulation pages with the dataset embedded inline. `bench-brasileirao2026.html`
   also loads `../modelos/model.js`; `bench-copa2026.html` (and `apps/bench-selecoes.html`) still carry

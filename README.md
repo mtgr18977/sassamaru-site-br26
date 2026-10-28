@@ -11,6 +11,7 @@ A barra de abas no topo (`shell/shell.js` + `shell/shell.css`, injetada em todas
 | Início | `index.html` | Apresenta o app, estado dos dados e precisão do modelo |
 | Série A | `apps/index.html?comp=serie-a` | Rodada de hoje e contagem regressiva; previsão 1X2, odds e placares. Sub-aba **Simulação da temporada** (`simulacoes/bench-brasileirao2026.html`): Monte Carlo do resto de 2026 |
 | Série B | `apps/index.html?comp=serie-b` | Mesma previsão de rodada para a Série B (2007–2026) |
+| Clubes | `apps/clubes.html` | Escudo de cada clube da Série A e da Série B; o modal mostra as chances na temporada (título, G4, G8, Sul-Americana e cair na A; G2, G6 e cair na B) |
 | Seleções | `apps/bench-selecoes.html` | Previsão de partidas entre seleções |
 | Copa 2026 | `simulacoes/bench-copa2026.html` | Simulação do torneio completo |
 | Docs | `bench-docs.html` | Documentação técnica do modelo |
@@ -59,7 +60,7 @@ Precisão do modelo de clubes (backtest walk-forward; Série A n = 1 079, Série
 | `bench-docs.html` | Documentação técnica do modelo (aba **Docs**) |
 | `shell/` | Casca do app: barra de abas, tema claro/escuro e botão de instalação |
 | `modelos/` | **Fonte única** dos modelos (JS puro, usado pelo navegador e pelo Node) — [detalhes](modelos/readme.md) |
-| `apps/` | Webapps de previsão: Série A/B (`index.html`) e Seleções (`bench-selecoes.html`) — [detalhes](apps/readme.md) |
+| `apps/` | Webapps de previsão: Série A/B (`index.html`), Clubes (`clubes.html`) e Seleções (`bench-selecoes.html`) — [detalhes](apps/readme.md) |
 | `simulacoes/` | Simulação da temporada (Brasileirão) e da Copa 2026, com dados embutidos — [detalhes](simulacoes/readme.md) |
 | `datasets/` | CSVs, calendário e `.zip` com as fontes originais (fev 2026) — [detalhes](datasets/readme.md) |
 | `scripts/` | Python: importador da Série B e validador de CSVs — [detalhes](scripts/readme.md) |
@@ -81,7 +82,7 @@ python -m http.server 8000
 
 ## Testes
 
-`npm test` roda **seis suítes** em sequência; o backtest é separado porque é mais lento.
+`npm test` roda **sete suítes** em sequência; o backtest é separado porque é mais lento.
 
 | Comando | O que verifica | Asserções |
 |---|---|---|
