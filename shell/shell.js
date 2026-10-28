@@ -14,6 +14,7 @@
     { href: 'index.html',                           key: 'Início@@aba',    ico: '🏠', on: function (p) { return p === 'index.html' || p === ''; } },
     { href: 'apps/index.html?comp=serie-a',         key: 'Série A@@aba',   ico: '🏆', on: SERIE_A },
     { href: 'apps/index.html?comp=serie-b',         key: 'Série B@@aba',   ico: '🥈', on: SERIE_B },
+    { href: 'apps/clubes.html',                    key: 'Clubes@@aba',    ico: '🛡️', on: function (p) { return p === 'apps/clubes.html'; } },
     { href: 'apps/bench-selecoes.html',             key: 'Seleções@@aba',  ico: '🌍', on: function (p) { return p === 'apps/bench-selecoes.html'; } },
     { href: 'simulacoes/bench-copa2026.html',       key: 'Copa 2026@@aba', ico: '🌐', on: function (p) { return p === 'simulacoes/bench-copa2026.html'; } },
     { href: 'bench-docs.html',                      key: 'Docs@@aba',      ico: '📄', on: function (p) { return p === 'bench-docs.html'; } },
