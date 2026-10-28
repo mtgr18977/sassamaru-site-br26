@@ -206,7 +206,7 @@
   "posição final média": "平均最终名次",
   "Simulação de {n} temporadas a partir da tabela atual: é uma probabilidade, não uma previsão.": "基于当前积分榜模拟 {n} 个赛季：这是概率，而不是预测。",
   "Na Série B sobem 4 clubes: os 2 primeiros e os 2 vencedores do playoff entre o 3º e o 6º.": "乙级共有 4 支球队升级：前 2 名，以及第 3 至第 6 名附加赛的 2 个胜者。",
-  "Os escudos são ilustrações geradas pelo app (cor do clube e sigla), não os brasões oficiais.": "队徽为应用生成的示意图（球队颜色和缩写），并非官方队徽。",
+  "Escudos: marcas dos respectivos clubes, usadas apenas para identificá-los (imagens da Wikipédia). Se uma imagem não carregar, o app mostra um brasão genérico.": "队徽：各俱乐部的商标，仅用于标识球队（图片来自维基百科）。如果图片无法加载，应用会显示通用徽章。",
   "Série A": "甲级",
   "Série C": "丙级",
   "Escudos e chances na temporada": "队徽与赛季概率",

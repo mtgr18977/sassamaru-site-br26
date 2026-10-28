@@ -49,7 +49,10 @@
       font: 500 13px/1.25 var(--sans); color: var(--text); text-align: center; transition: transform .12s, border-color .12s; }
     .clube:hover { transform: translateY(-2px); border-color: var(--accent); }
     .clube:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-    .clube .escudo { width: 52px; height: 62px; filter: drop-shadow(0 1px 2px rgba(0,0,0,.25)); }
+    /* o escudo real fica sobre um fundo claro fixo: brasões escuros (preto e branco) somem no tema escuro */
+    .ebox { display: flex; align-items: center; justify-content: center; width: 64px; height: 74px; padding: 6px; border-radius: 10px; background: #fff; }
+    .ebox .escudo, .ebox .escudo-img { width: 52px; height: 62px; object-fit: contain; }
+    .ebox .escudo { filter: drop-shadow(0 1px 2px rgba(0,0,0,.25)); }
     .err { background: var(--bad-lt); color: var(--bad); border-radius: var(--radius); padding: 12px 14px; font: 400 13px var(--mono); margin-top: 16px; }
     .notes { margin-top: 28px; font: 400 12px/1.6 var(--mono); color: var(--muted); }
 
@@ -57,7 +60,8 @@
       background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 18px 50px rgba(0,0,0,.35); }
     dialog::backdrop { background: rgba(0,0,0,.55); }
     .m-head { display: flex; align-items: center; gap: 16px; padding: 22px 52px 18px 22px; border-bottom: 1px solid var(--border); }
-    .m-head .escudo { width: 64px; height: 77px; flex: none; filter: drop-shadow(0 1px 3px rgba(0,0,0,.3)); }
+    .m-head .ebox { flex: none; width: 80px; height: 92px; }
+    .m-head .ebox .escudo, .m-head .ebox .escudo-img { width: 64px; height: 77px; }
     .m-head h3 { font-size: 20px; font-weight: 600; letter-spacing: -.4px; line-height: 1.2; }
     .m-head p { font: 400 12px/1.5 var(--mono); color: var(--muted); margin-top: 4px; }
     .fechar { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border: 0; border-radius: 50%; cursor: pointer;
@@ -155,10 +159,10 @@
       var d = estado[id], clubes = d.st.teams.slice().sort(function (a, b) { return d.nomes[a].localeCompare(d.nomes[b], 'pt'); });
       return '<h2 class="div">' + esc(d.comp.nome) + ' <small>' + esc(_t('{n} clubes', { n: _n(clubes.length) })) + '</small></h2><div class="grid">' +
         clubes.map(function (t) {
-          return '<button type="button" class="clube" data-div="' + id + '" data-clube="' + esc(t) + '">' + Clubes.escudoSvg(t, d.nomes[t]) + '<span>' + esc(d.nomes[t]) + '</span></button>';
+          return '<button type="button" class="clube" data-div="' + id + '" data-clube="' + esc(t) + '"><span class="ebox">' + Clubes.escudoImg(t, d.nomes[t], '../') + '</span><span>' + esc(d.nomes[t]) + '</span></button>';
         }).join('') + '</div>';
     }).join('');
-    $('notas').innerHTML = '<p>' + esc(_t('Os escudos são ilustrações geradas pelo app (cor do clube e sigla), não os brasões oficiais.')) + '</p>';
+    $('notas').innerHTML = '<p>' + esc(_t('Escudos: marcas dos respectivos clubes, usadas apenas para identificá-los (imagens da Wikipédia). Se uma imagem não carregar, o app mostra um brasão genérico.')) + '</p>';
   }
 
   // 0,0% e 100% só quando for exato; o resto nunca arredonda para um extremo que não aconteceu
@@ -175,7 +179,7 @@
   function corpo() {
     var d = estado[aberto.id], chave = aberto.chave, nome = d.nomes[chave], s = d.st.standings.get(chave);
     var pos = d.tabela.indexOf(chave) + 1;
-    $('m-escudo').innerHTML = Clubes.escudoSvg(chave, nome);
+    $('m-escudo').innerHTML = '<span class="ebox">' + Clubes.escudoImg(chave, nome, '../') + '</span>';
     $('m-nome').textContent = nome;
     $('m-sub').textContent = _t(d.comp.nome) + ' · ' + _t('{pos} lugar · {pts} pts · {j} jogos', { pos: _o(pos), pts: _n(s.pts), j: _n(s.played) });
     if (d.erro) { $('m-corpo').innerHTML = '<div class="err">' + esc(_t('Não foi possível calcular as chances.')) + ' (' + esc(d.erro) + ')</div>'; return; }
@@ -214,6 +218,15 @@
     });
     if (aberto && $('modal').open) corpo();
   }
+
+  // imagem que não carrega (arquivo ausente, offline na primeira visita): troca pelo brasão gerado
+  document.addEventListener('error', function (e) {
+    var img = e.target;
+    if (!img || img.tagName !== 'IMG' || img.className !== 'escudo-img') return;
+    var box = document.createElement('span');
+    box.innerHTML = Clubes.escudoSvg(img.getAttribute('data-chave'), img.getAttribute('data-nome'));
+    img.parentNode.replaceChild(box.firstChild, img);
+  }, true);
 
   $('secoes').addEventListener('click', function (e) {
     var b = e.target.closest ? e.target.closest('.clube') : null;

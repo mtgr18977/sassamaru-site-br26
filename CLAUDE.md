@@ -82,7 +82,7 @@ Keep a club's name identical across divisions (the importer's `CANONICO` map) or
   - `selecoes-model.js` — national teams model
   - `competicoes.js` — division registry + `statusCalendario()`
   - `simulacao.js` — seeded Monte Carlo of the rest of the season (`simularTemporada`, `probabilidade`)
-  - `clubes.js` — club colours + generated SVG crest (`escudoSvg`); every club of both divisions needs a colour (tested)
+  - `clubes.js` — club crests: real PNG in `icons/clubes/<chave>.png` (downloaded from Wikipedia by `scripts/baixar_escudos.py`, sources in `icons/clubes/fontes.csv`), with a generated SVG crest (`escudoSvg`, club colour + initials) as fallback. Every club of both divisions needs a colour and a PNG (tested): when a club is promoted, add it to `CORES` and to `CLUBES` in the script and run it with `--so <chave>`
 - `apps/` — Interactive prediction UIs. `apps/index.html` loads `../modelos/model.js` via `<script src>`
 - `simulacoes/` — Simulation pages with the dataset embedded inline. `bench-brasileirao2026.html`
   also loads `../modelos/model.js`; `bench-copa2026.html` (and `apps/bench-selecoes.html`) still carry

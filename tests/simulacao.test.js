@@ -96,7 +96,19 @@ section('Escudos');
   ok(semCor.length === 0, `todo clube tem cor${semCor.length ? ' — faltam: ' + semCor.join(', ') : ''}`);
   ok(K.sigla('Vila Nova') === 'VN' && K.sigla('Atlético-GO') === 'AG' && K.sigla('Flamengo') === 'FLA' && K.sigla('São Bernardo') === 'SB', 'siglas');
   const svg = K.escudoSvg('flamengo', 'Flamengo');
-  ok(svg.startsWith('<svg') && svg.includes('FLA') && svg.includes(K.cores('flamengo')[0]), 'escudo é um SVG com a sigla e a cor do clube');
+  ok(svg.startsWith('<svg') && svg.includes('FLA') && svg.includes(K.cores('flamengo')[0]), 'brasão de reserva é um SVG com a sigla e a cor do clube');
+  ok(K.arquivo('atletico go') === 'atletico-go.png' && K.escudoImg('sao paulo', 'São Paulo', '../').includes('src="../icons/clubes/sao-paulo.png"'), 'escudoImg aponta para icons/clubes/<chave>.png');
+
+  // escudos reais (baixados por scripts/baixar_escudos.py)
+  const dir = path.join(ROOT, 'icons/clubes');
+  const semImagem = [...nomes].filter((t) => {
+    const f = path.join(dir, K.arquivo(t));
+    return !fs.existsSync(f) || fs.readFileSync(f).subarray(0, 4).toString('hex') !== '89504e47';
+  });
+  ok(semImagem.length === 0, `todo clube tem o PNG do escudo em icons/clubes${semImagem.length ? ' — faltam: ' + semImagem.join(', ') : ''}`);
+  const fontes = fs.readFileSync(path.join(dir, 'fontes.csv'), 'utf8').trim().split('\n').slice(1).map((l) => l.split(',')[0]);
+  ok([...nomes].every((t) => fontes.includes(t.replace(/\s+/g, '-'))), 'fontes.csv registra a origem de cada escudo');
+
 }
 
 console.log(`\n${'─'.repeat(50)}\nsimulacao: ${passed} passed, ${failed} failed`);

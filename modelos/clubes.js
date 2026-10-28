@@ -1,9 +1,10 @@
 // ═══════════════════════════════════════════════════════════════════════════
 //  Identidade visual dos clubes (funções puras, sem DOM).
 //
-//  Não há imagens oficiais no projeto (os escudos são marcas registradas dos clubes): o "escudo" é um
-//  brasão SVG gerado, com a cor principal do clube e a sigla. As cores são aproximações. A chave é o
-//  nome normalizado do modelo (Model.normalizeTeam): "atletico go", "sao paulo", "vila nova"…
+//  O escudo é a imagem em icons/clubes/<chave>.png (baixada da Wikipedia por scripts/baixar_escudos.py; os
+//  brasões são marcas dos clubes). Se o arquivo faltar, a página cai num brasão SVG gerado, com a cor
+//  principal do clube e a sigla (as cores são aproximações). A chave é o nome normalizado do modelo
+//  (Model.normalizeTeam): "atletico go", "sao paulo", "vila nova"…
 // ═══════════════════════════════════════════════════════════════════════════
 (function (root, factory) {
   var api = factory();
@@ -44,6 +45,15 @@
     return s.normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase();
   }
 
+  /** Nome do arquivo em icons/clubes/ ("atletico go" → "atletico-go.png"). */
+  function arquivo(chave) { return String(chave).replace(/\s+/g, '-') + '.png'; }
+
+  /** <img> do escudo; `base` é o caminho até a raiz do site ("../"). Se a imagem falhar, a página troca por escudoSvg. */
+  function escudoImg(chave, nome, base) {
+    return '<img class="escudo-img" src="' + (base || '') + 'icons/clubes/' + arquivo(chave) + '" alt="" width="52" height="62" decoding="async"' +
+      ' data-chave="' + chave + '" data-nome="' + String(nome).replace(/"/g, '&quot;') + '">';
+  }
+
   /** Brasão em SVG (string), com a classe `escudo`; o tamanho vem do CSS. */
   function escudoSvg(chave, nome) {
     var c = cores(chave), txt = sigla(nome), tam = txt.length > 2 ? 30 : 38;
@@ -54,5 +64,5 @@
       '</svg>';
   }
 
-  return { CORES: CORES, cores: cores, sigla: sigla, escudoSvg: escudoSvg };
+  return { CORES: CORES, cores: cores, sigla: sigla, arquivo: arquivo, escudoImg: escudoImg, escudoSvg: escudoSvg };
 });
