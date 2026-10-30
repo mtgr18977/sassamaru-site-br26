@@ -21,7 +21,7 @@
     'serie-a-2026': {
       competicao: 'serie-a',
       temporada: 2026,
-      atualizadoEm: '2026-10-27',
+      atualizadoEm: '2026-10-30',
       fonte: 'CBF (tabela detalhada), conferida em valorfinal.com.br e Wikipedia',
       rodadas: [
         { n: 1,  inicio: '2026-01-28', fim: '2026-01-29', status: C },
@@ -56,7 +56,7 @@
         { n: 30, inicio: '2026-10-10', fim: '2026-10-12', status: C },
         { n: 31, inicio: '2026-10-16', fim: '2026-10-19', status: C },
         { n: 32, inicio: '2026-10-23', fim: '2026-10-26', status: C },
-        { n: 33, inicio: '2026-10-28', fim: '2026-10-30', status: K },
+        { n: 33, inicio: '2026-10-28', fim: '2026-10-31', status: K },   // Coritiba × Vitória passou para sáb. 31/10 (imprensa); Corinthians × Mirassol 30/10
         { n: 34, inicio: '2026-11-02', fim: '2026-11-06', status: K },
         { n: 35, inicio: '2026-11-18', fim: '2026-11-18', status: P },
         { n: 36, inicio: '2026-11-21', fim: '2026-11-22', status: P },
@@ -69,16 +69,8 @@
       ],
       // jogos das próximas rodadas (horário de Brasília) — só as rodadas já detalhadas pela CBF
       jogos: [
-        { rodada: 33, data: '2026-10-28', hora: '19:30', mandante: 'Fluminense', visitante: 'Internacional' },
-        { rodada: 33, data: '2026-10-28', hora: '19:30', mandante: 'Santos', visitante: 'Palmeiras' },
-        { rodada: 33, data: '2026-10-28', hora: '19:30', mandante: 'Bragantino', visitante: 'Chapecoense' },
-        { rodada: 33, data: '2026-10-28', hora: '21:30', mandante: 'Bahia', visitante: 'São Paulo' },
-        { rodada: 33, data: '2026-10-28', hora: '21:30', mandante: 'Remo', visitante: 'Botafogo' },
-        { rodada: 33, data: '2026-10-29', hora: '19:30', mandante: 'Atlético Mineiro', visitante: 'Cruzeiro' },
-        { rodada: 33, data: '2026-10-29', hora: '19:30', mandante: 'Coritiba', visitante: 'Vitória' },
-        { rodada: 33, data: '2026-10-29', hora: '20:00', mandante: 'Vasco', visitante: 'Flamengo' },
-        { rodada: 33, data: '2026-10-29', hora: '21:30', mandante: 'Grêmio', visitante: 'Athletico Paranaense' },
         { rodada: 33, data: '2026-10-30', hora: '20:00', mandante: 'Corinthians', visitante: 'Mirassol' },
+        { rodada: 33, data: '2026-10-31', hora: '16:00', mandante: 'Coritiba', visitante: 'Vitória' },   // era 29/10 19h30; adiado para sábado (imprensa)
         { rodada: 34, data: '2026-11-02', hora: '20:00', mandante: 'Bragantino', visitante: 'Santos' },
         { rodada: 34, data: '2026-11-03', hora: '19:30', mandante: 'Chapecoense', visitante: 'Mirassol' },
         { rodada: 34, data: '2026-11-03', hora: '21:30', mandante: 'Internacional', visitante: 'Coritiba' },
@@ -94,7 +86,7 @@
     'serie-b-2026': {
       competicao: 'serie-b',
       temporada: 2026,
-      atualizadoEm: '2026-10-27',
+      atualizadoEm: '2026-10-30',
       fonte: 'CBF (tabela básica); resultados conferidos na Wikipedia (pt e en)',
       rodadas: [
         { n: 1, inicio: null, fim: null, status: C },
@@ -131,13 +123,12 @@
         { n: 32, inicio: '2026-10-06', fim: '2026-10-08', status: C },
         { n: 33, inicio: '2026-10-11', fim: '2026-10-13', status: C },
         { n: 34, inicio: '2026-10-16', fim: '2026-10-19', status: C },
-        { n: 35, inicio: '2026-10-23', fim: '2026-10-25', status: C },   // Ceará × Goiás ainda sem resultado (ver pendentes)
-        { n: 36, inicio: null, fim: null, status: P },   // só os confrontos (tabela básica da CBF); dias/horas ainda não divulgados
+        { n: 35, inicio: '2026-10-23', fim: '2026-10-25', status: C },
+        { n: 36, inicio: '2026-10-30', fim: '2026-11-01', status: P },   // janela da tabela básica da CBF (imprensa); dias/horas ainda não divulgados
         { n: 37, inicio: null, fim: null, status: S },   // datas ainda não divulgadas
         { n: 38, inicio: null, fim: null, status: S },   // datas ainda não divulgadas
       ],
       pendentes: [
-        { rodada: 35, mandante: 'Ceará', visitante: 'Goiás', data: null },
       ],
       // rodada 36: só os confrontos, vindos da tabela básica da CBF (dia/hora ainda não divulgados)
       jogos: [
