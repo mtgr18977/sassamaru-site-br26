@@ -18,39 +18,39 @@ A barra de abas no topo (`shell/shell.js` + `shell/shell.css`, injetada em todas
 
 ## Calendário e rodada atual
 
-As abas **Série A** e **Série B** comparam o dia do dispositivo com `datasets/calendario.js`, mostram a rodada em andamento (ou a próxima), as datas, quantos dias faltam e a faixa das 38 rodadas, e **já deixam o campo de jogos preenchido com a rodada em foco**; um botão simula a rodada. O navegador não consegue ler ge.globo.com nem a Wikipedia (CORS/bloqueio) e o app precisa funcionar offline, então o calendário é um arquivo editado a cada atualização, a partir da tabela detalhada da CBF. Série A: rodadas 29–32 confirmadas, 33–38 provisórias; jogos completos das rodadas 29 e 30. Série B: só a rodada 32 (6–8 out, 10 jogos) tem programação completa; as demais ainda não têm data (a tela diz isso em vez de "temporada encerrada"). Sem os jogos da rodada no calendário, o campo fica vazio com um aviso para colar.
+As abas **Série A** e **Série B** comparam o dia do dispositivo com `datasets/calendario.js`, mostram a rodada em andamento (ou a próxima), as datas, quantos dias faltam e a faixa das 38 rodadas, e **já deixam o campo de jogos preenchido com a rodada em foco**; um botão simula a rodada. O navegador não consegue ler ge.globo.com nem a Wikipedia (CORS/bloqueio) e o app precisa funcionar offline, então o calendário é um arquivo editado a cada atualização, a partir da tabela detalhada da CBF. Série A: rodadas 1–35 concluídas; 36–38 confirmadas pela CBF (21 nov – 2 dez), com os 30 jogos detalhados (dia e hora). Série B: as 38 rodadas concluídas (a temporada regular terminou em 14 nov) — a aba mostra "Temporada encerrada". Sem os jogos da rodada no calendário, o campo fica vazio com um aviso para colar.
 
 ## Série B
 
-`modelos/competicoes.js` registra Série A e Série B (20 clubes, 38 rodadas, 1º–2º sobem direto, 3º–6º disputam playoff de acesso (3º×6º e 4º×5º, ida e volta; os 2 vencedores sobem, 4 promovidos no total) e Z4). A aba **Série B** usa o mesmo modelo, com `datasets/campeonato-brasileiro-serie-b.csv`: **20 temporadas (2007–2025 completas + 2026 em andamento), 7 549 jogos**, gerado por `scripts/importar_wikipedia_serie_b.py` a partir da matriz de resultados de cada página "AAAA Campeonato Brasileiro Série B" da Wikipedia (2014 e 2015 vêm da página em português).
+`modelos/competicoes.js` registra Série A e Série B (20 clubes, 38 rodadas, 1º–2º sobem direto, 3º–6º disputam playoff de acesso (3º×6º e 4º×5º, ida e volta; os 2 vencedores sobem, 4 promovidos no total) e Z4). A aba **Série B** usa o mesmo modelo, com `datasets/campeonato-brasileiro-serie-b.csv`: **20 temporadas (2007–2026 completas), 7 600 jogos**, gerado por `scripts/importar_wikipedia_serie_b.py` a partir da matriz de resultados de cada página "AAAA Campeonato Brasileiro Série B" da Wikipedia (2014 e 2015 vêm da página em português).
 
 Limitações, de propósito explícitas:
 - **Rodadas: sintéticas até 2025, reais em 2026.** A matriz da Wikipedia não traz data nem rodada; em 2007–2025 a ordem dos jogos dentro da temporada é inventada (método do círculo, perna de ida sorteada por temporada), com resultados e mandos reais. Em 2026 a rodada de cada jogo vem da **tabela básica da CBF** (`datasets/serie-b-2026-tabela-cbf.csv`, gerada por `scripts/importar_tabela_cbf.py` a partir do PDF oficial). A coluna `rodada_origem` diz qual é qual (`sintetica` / `cbf`).
 - **2006 fica de fora**: não tem matriz completa em nenhuma das duas Wikipedias.
-- **2026 é parcial** (350 jogos, até 25 out; a 36ª rodada ainda não foi jogada). O importador só aceita jogos que as páginas em português e em inglês trazem **com o mesmo placar** (a pt já chegou a ter um 1×1 "Fortaleza × CRB" inexistente) e confere o mando e a rodada de cada jogo na tabela da CBF — se um jogo não está lá, para com erro. Conferência extra de 13 out: os pontos, jogos e gols de todos os 20 clubes na tabela de classificação da página batem com o que sai da matriz.
-- **Ganho pequeno.** `npm run test:backtest:b` (n = 1 110: 2024, 2025 e 2026 até agora): log-loss 1,047 × 1,054 da taxa-base 49/27/24 (RPS 0,215 × 0,218). A Série B é mais parelha e troca de elenco todo ano; clubes sem histórico entram como média da liga.
+- **2026 está completa** (380 jogos, 38 rodadas, até 14 nov; o playoff de acesso fica fora do modelo de pontos corridos). O importador só aceita jogos que as páginas em português e em inglês trazem **com o mesmo placar** (a pt já chegou a ter um 1×1 "Fortaleza × CRB" inexistente) e confere o mando e a rodada de cada jogo na tabela da CBF — se um jogo não está lá, para com erro. Conferência extra de 13 out: os pontos, jogos e gols de todos os 20 clubes na tabela de classificação da página batem com o que sai da matriz.
+- **Ganho pequeno.** `npm run test:backtest:b` (n = 1 140: 2024, 2025 e 2026): log-loss 1,045 × 1,054 da taxa-base 49/27/24 (RPS 0,215 × 0,218). A Série B é mais parelha e troca de elenco todo ano; clubes sem histórico entram como média da liga.
 - O treino usa todo o histórico (a janela muda pouco o resultado).
 
 Para regerar: `python scripts/importar_wikipedia_serie_b.py` (precisa de internet; aceita `--cache DIR`; `--fonte pt|en` força uma das páginas em 2026, o padrão é a interseção das duas). Para atualizar as rodadas reais de 2026, baixe a tabela básica em PDF no site da CBF e rode `python scripts/importar_tabela_cbf.py tabela.pdf datasets/serie-b-2026-tabela-cbf.csv` (precisa do `pdftotext`). `python scripts/dados_serie.py validar <csv>` confere qualquer CSV no formato do modelo.
 
-## Estado dos dados (30 out 2026)
+## Estado dos dados (20 nov 2026)
 
 | Base | Cobertura | Jogos |
 |------|-----------|-------|
-| Brasileirão (clubes) | 2003 – rodada 33 de 2026 (+ adiados da 21ª) | 9 492 |
+| Brasileirão (clubes) | 2003 – rodada 35 de 2026 (+ adiados da 21ª) | 9 515 |
 | Seleções | 1872 – 2026 | 49 000+ |
-| Série B | 2007 – rodada 35 de 2026 (2026 com rodadas reais da CBF) | 7 570 |
+| Série B | 2007 – 2026 completa, 38 rodadas (2026 com rodadas reais da CBF) | 7 600 |
 
-Faltam no Brasileirão 2026: 71 jogos (309 de 380 disputados), entre eles Chapecoense × Vasco, adiado da 21ª rodada.
+Faltam no Brasileirão 2026: 30 jogos (350 de 380 disputados), as rodadas 36 a 38 (21 nov – 2 dez). O adiado da 21ª, Chapecoense 0×2 Vasco, já foi jogado.
 
-Precisão do modelo de clubes (backtest walk-forward; Série A n = 1 087, Série B n = 1 110):
+Precisão do modelo de clubes (backtest walk-forward; Série A n = 1 110, Série B n = 1 140):
 
 | | log-loss | RPS | acurácia |
 |---|---|---|---|
-| Série A — modelo | 1,027 | 0,211 | 48,5% |
-| Série A — taxa-base fixa 47/27/26 | 1,057 | 0,221 | 47,4% |
-| Série B — modelo | 1,047 | 0,215 | 46,9% |
-| Série B — taxa-base 49/27/24 | 1,054 | 0,218 | 47,7% |
+| Série A — modelo | 1,025 | 0,211 | 48,7% |
+| Série A — taxa-base fixa 47/27/26 | 1,055 | 0,221 | 47,7% |
+| Série B — modelo | 1,045 | 0,215 | 47,0% |
+| Série B — taxa-base 49/27/24 | 1,054 | 0,218 | 47,8% |
 
 ## Estrutura do repositório
 

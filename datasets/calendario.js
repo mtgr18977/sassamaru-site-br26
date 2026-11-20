@@ -21,7 +21,7 @@
     'serie-a-2026': {
       competicao: 'serie-a',
       temporada: 2026,
-      atualizadoEm: '2026-10-30',
+      atualizadoEm: '2026-11-20',
       fonte: 'CBF (tabela detalhada), conferida em valorfinal.com.br e Wikipedia',
       rodadas: [
         { n: 1,  inicio: '2026-01-28', fim: '2026-01-29', status: C },
@@ -56,37 +56,55 @@
         { n: 30, inicio: '2026-10-10', fim: '2026-10-12', status: C },
         { n: 31, inicio: '2026-10-16', fim: '2026-10-19', status: C },
         { n: 32, inicio: '2026-10-23', fim: '2026-10-26', status: C },
-        { n: 33, inicio: '2026-10-28', fim: '2026-10-31', status: K },   // Coritiba × Vitória passou para sáb. 31/10 (imprensa); Corinthians × Mirassol 30/10
-        { n: 34, inicio: '2026-11-02', fim: '2026-11-06', status: K },
-        { n: 35, inicio: '2026-11-18', fim: '2026-11-18', status: P },
-        { n: 36, inicio: '2026-11-21', fim: '2026-11-22', status: P },
-        { n: 37, inicio: '2026-11-28', fim: '2026-11-29', status: P },
-        { n: 38, inicio: '2026-12-01', fim: '2026-12-02', status: P },
+        { n: 33, inicio: '2026-10-28', fim: '2026-10-31', status: C },
+        { n: 34, inicio: '2026-11-02', fim: '2026-11-06', status: C },
+        { n: 35, inicio: '2026-11-14', fim: '2026-11-19', status: C },
+        { n: 36, inicio: '2026-11-21', fim: '2026-11-25', status: K },
+        { n: 37, inicio: '2026-11-24', fim: '2026-11-29', status: K },
+        { n: 38, inicio: '2026-12-02', fim: '2026-12-02', status: K },
       ],
-      // jogos atrasados de rodadas já encerradas
+      // jogos atrasados de rodadas já encerradas (nenhum: Chapecoense 0×2 Vasco, da 21ª, foi jogado)
       pendentes: [
-        { rodada: 21, mandante: 'Chapecoense', visitante: 'Vasco', data: null },
       ],
       // jogos das próximas rodadas (horário de Brasília) — só as rodadas já detalhadas pela CBF
+      // (36ª: tabela das rodadas 35 e 36, de 30/10; 37ª e 38ª: tabela de 06/11)
       jogos: [
-        { rodada: 33, data: '2026-10-30', hora: '20:00', mandante: 'Corinthians', visitante: 'Mirassol' },
-        { rodada: 33, data: '2026-10-31', hora: '16:00', mandante: 'Coritiba', visitante: 'Vitória' },   // era 29/10 19h30; adiado para sábado (imprensa)
-        { rodada: 34, data: '2026-11-02', hora: '20:00', mandante: 'Bragantino', visitante: 'Santos' },
-        { rodada: 34, data: '2026-11-03', hora: '19:30', mandante: 'Chapecoense', visitante: 'Mirassol' },
-        { rodada: 34, data: '2026-11-03', hora: '21:30', mandante: 'Internacional', visitante: 'Coritiba' },
-        { rodada: 34, data: '2026-11-04', hora: '19:30', mandante: 'Flamengo', visitante: 'Grêmio' },
-        { rodada: 34, data: '2026-11-04', hora: '19:30', mandante: 'Athletico Paranaense', visitante: 'Vasco' },
-        { rodada: 34, data: '2026-11-04', hora: '21:30', mandante: 'Botafogo', visitante: 'Atlético Mineiro' },
-        { rodada: 34, data: '2026-11-04', hora: '21:30', mandante: 'São Paulo', visitante: 'Corinthians' },
-        { rodada: 34, data: '2026-11-05', hora: '19:30', mandante: 'Palmeiras', visitante: 'Remo' },
-        { rodada: 34, data: '2026-11-05', hora: '21:30', mandante: 'Cruzeiro', visitante: 'Bahia' },
-        { rodada: 34, data: '2026-11-06', hora: '20:00', mandante: 'Vitória', visitante: 'Fluminense' },
+        { rodada: 36, data: '2026-11-21', hora: '16:30', mandante: 'Palmeiras', visitante: 'Flamengo' },
+        { rodada: 36, data: '2026-11-21', hora: '17:30', mandante: 'Bahia', visitante: 'Coritiba' },
+        { rodada: 36, data: '2026-11-21', hora: '21:00', mandante: 'Chapecoense', visitante: 'Cruzeiro' },
+        { rodada: 36, data: '2026-11-22', hora: '16:00', mandante: 'Athletico Paranaense', visitante: 'Remo' },
+        { rodada: 36, data: '2026-11-22', hora: '18:30', mandante: 'Fluminense', visitante: 'Mirassol' },
+        { rodada: 36, data: '2026-11-22', hora: '19:30', mandante: 'Bragantino', visitante: 'Vasco' },
+        { rodada: 36, data: '2026-11-23', hora: '19:30', mandante: 'Internacional', visitante: 'Vitória' },
+        { rodada: 36, data: '2026-11-23', hora: '20:00', mandante: 'Botafogo', visitante: 'São Paulo' },
+        { rodada: 36, data: '2026-11-23', hora: '21:00', mandante: 'Santos', visitante: 'Grêmio' },
+        { rodada: 36, data: '2026-11-25', hora: '20:00', mandante: 'Atlético Mineiro', visitante: 'Corinthians' },
+        { rodada: 37, data: '2026-11-24', hora: '18:00', mandante: 'Chapecoense', visitante: 'Palmeiras' },
+        { rodada: 37, data: '2026-11-26', hora: '20:00', mandante: 'São Paulo', visitante: 'Remo' },
+        { rodada: 37, data: '2026-11-27', hora: '20:00', mandante: 'Fluminense', visitante: 'Cruzeiro' },
+        { rodada: 37, data: '2026-11-28', hora: '21:00', mandante: 'Botafogo', visitante: 'Bahia' },
+        { rodada: 37, data: '2026-11-29', hora: '16:00', mandante: 'Coritiba', visitante: 'Flamengo' },
+        { rodada: 37, data: '2026-11-29', hora: '16:00', mandante: 'Vitória', visitante: 'Santos' },
+        { rodada: 37, data: '2026-11-29', hora: '18:30', mandante: 'Corinthians', visitante: 'Grêmio' },
+        { rodada: 37, data: '2026-11-29', hora: '18:30', mandante: 'Internacional', visitante: 'Bragantino' },
+        { rodada: 37, data: '2026-11-29', hora: '18:30', mandante: 'Mirassol', visitante: 'Athletico Paranaense' },
+        { rodada: 37, data: '2026-11-29', hora: '19:30', mandante: 'Atlético Mineiro', visitante: 'Vasco' },
+        { rodada: 38, data: '2026-12-02', hora: '21:30', mandante: 'Athletico Paranaense', visitante: 'São Paulo' },
+        { rodada: 38, data: '2026-12-02', hora: '21:30', mandante: 'Bahia', visitante: 'Atlético Mineiro' },
+        { rodada: 38, data: '2026-12-02', hora: '21:30', mandante: 'Bragantino', visitante: 'Fluminense' },
+        { rodada: 38, data: '2026-12-02', hora: '21:30', mandante: 'Cruzeiro', visitante: 'Internacional' },
+        { rodada: 38, data: '2026-12-02', hora: '21:30', mandante: 'Flamengo', visitante: 'Chapecoense' },
+        { rodada: 38, data: '2026-12-02', hora: '21:30', mandante: 'Grêmio', visitante: 'Mirassol' },
+        { rodada: 38, data: '2026-12-02', hora: '21:30', mandante: 'Palmeiras', visitante: 'Coritiba' },
+        { rodada: 38, data: '2026-12-02', hora: '21:30', mandante: 'Remo', visitante: 'Corinthians' },
+        { rodada: 38, data: '2026-12-02', hora: '21:30', mandante: 'Santos', visitante: 'Botafogo' },
+        { rodada: 38, data: '2026-12-02', hora: '21:30', mandante: 'Vasco', visitante: 'Vitória' },
       ],
     },
     'serie-b-2026': {
       competicao: 'serie-b',
       temporada: 2026,
-      atualizadoEm: '2026-10-30',
+      atualizadoEm: '2026-11-20',
       fonte: 'CBF (tabela básica); resultados conferidos na Wikipedia (pt e en)',
       rodadas: [
         { n: 1, inicio: null, fim: null, status: C },
@@ -124,24 +142,14 @@
         { n: 33, inicio: '2026-10-11', fim: '2026-10-13', status: C },
         { n: 34, inicio: '2026-10-16', fim: '2026-10-19', status: C },
         { n: 35, inicio: '2026-10-23', fim: '2026-10-25', status: C },
-        { n: 36, inicio: '2026-10-30', fim: '2026-11-01', status: P },   // janela da tabela básica da CBF (imprensa); dias/horas ainda não divulgados
-        { n: 37, inicio: null, fim: null, status: S },   // datas ainda não divulgadas
-        { n: 38, inicio: null, fim: null, status: S },   // datas ainda não divulgadas
+        { n: 36, inicio: '2026-10-30', fim: '2026-11-01', status: C },
+        { n: 37, inicio: '2026-11-07', fim: '2026-11-08', status: C },
+        { n: 38, inicio: '2026-11-14', fim: '2026-11-14', status: C },
       ],
       pendentes: [
       ],
-      // rodada 36: só os confrontos, vindos da tabela básica da CBF (dia/hora ainda não divulgados)
+      // temporada regular encerrada em 14/11 (38 rodadas); resta o playoff de acesso (3º–6º), fora do modelo de pontos corridos
       jogos: [
-        { rodada: 36, data: null, hora: null, mandante: 'Botafogo-SP', visitante: 'Sport' },
-        { rodada: 36, data: null, hora: null, mandante: 'Novorizontino', visitante: 'Operário Ferroviário' },
-        { rodada: 36, data: null, hora: null, mandante: 'Athletic', visitante: 'Ceará' },
-        { rodada: 36, data: null, hora: null, mandante: 'Londrina', visitante: 'América-MG' },
-        { rodada: 36, data: null, hora: null, mandante: 'Fortaleza', visitante: 'Atlético-GO' },
-        { rodada: 36, data: null, hora: null, mandante: 'Goiás', visitante: 'CRB' },
-        { rodada: 36, data: null, hora: null, mandante: 'Criciúma', visitante: 'Ponte Preta' },
-        { rodada: 36, data: null, hora: null, mandante: 'Náutico', visitante: 'Avaí' },
-        { rodada: 36, data: null, hora: null, mandante: 'Cuiabá', visitante: 'São Bernardo' },
-        { rodada: 36, data: null, hora: null, mandante: 'Vila Nova', visitante: 'Juventude' },
       ],
     },
   };

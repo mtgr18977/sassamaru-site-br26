@@ -101,12 +101,13 @@
     });
     var atual = null, proxima = null, ultima = null;
     datadas.forEach(function (r) {
-      if (r.inicio <= h && h <= r.fim) atual = r;
+      // rodadas podem se sobrepor (ex.: a 36ª termina 25/11 e a 37ª começa 24/11): vale a de menor número, que ainda tem jogo
+      if (r.inicio <= h && h <= r.fim) { if (!atual || r.n < atual.n) atual = r; }
       else if (r.inicio > h && (!proxima || r.inicio < proxima.inicio)) proxima = r;
       else if (r.fim < h && (!ultima || r.fim > ultima.fim)) ultima = r;
     });
     var seguinte = null; // a rodada depois da atual (quando há uma em andamento)
-    if (atual) datadas.forEach(function (r) { if (r.inicio > atual.fim && (!seguinte || r.inicio < seguinte.inicio)) seguinte = r; });
+    if (atual) datadas.forEach(function (r) { if (r.n > atual.n && (!seguinte || r.n < seguinte.n)) seguinte = r; });
     var alvo = atual ? seguinte : proxima;
     var estado = atual ? 'em-andamento' : proxima ? (ultima ? 'entre-rodadas' : 'antes') : 'encerrada';
     // acabaram as rodadas COM data, mas o calendário ainda lista rodadas por jogar sem data (a CBF divulga em blocos)
