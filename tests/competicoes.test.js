@@ -65,40 +65,45 @@ section('statusCalendario — rodada de hoje');
 }
 
 // ── calendário da Série B ───────────────────────────────────────────────────
-section('Calendário da Série B 2026 — rodadas 35 e 36');
+section('Calendário da Série B 2026 — temporada encerrada');
 {
   const cal = CALS['serie-b-2026'];
   let s = C.statusCalendario(cal, at('2026-10-06'));
   ok(s.estado === 'em-andamento' && s.foco.n === 32, '6 out: 32ª rodada da Série B em andamento');
   s = C.statusCalendario(cal, at('2026-10-09'));
   ok(s.estado === 'entre-rodadas' && s.foco.n === 33 && s.ultima.n === 32, '9 out: entre a 32 e a 33');
-  s = C.statusCalendario(cal, at('2026-10-14'));
-  ok(s.estado === 'entre-rodadas' && s.foco.n === 34 && s.ultima.n === 33, '14 out: próxima é a 34 (janela da CBF)');
-  s = C.statusCalendario(cal, at('2026-10-21'));
-  ok(s.estado === 'entre-rodadas' && s.foco.n === 35 && s.ultima.n === 34, '21 out: próxima é a 35 (janela provisória da CBF)');
-  s = C.statusCalendario(cal, at('2026-10-26'));
-  ok(s.estado === 'entre-rodadas' && s.foco.n === 36 && s.ultima.n === 35, '26 out: próxima é a 36 (janela provisória da CBF)');
-  s = C.statusCalendario(cal, at('2026-11-02'));
-  ok(s.estado === 'sem-calendario' && s.ultima.n === 36, '2 nov: acabaram as datas conhecidas → "sem calendário" (não "temporada encerrada")');
-  ok(cal.rodadas.length === 38 && cal.rodadas.filter((r) => r.status === 'semdata').length === 2, 'rodadas 37–38 marcadas como sem data');
-  ok(cal.rodadas[35].status === 'provisoria', 'rodada 36: só os confrontos, datas provisórias');
-  const j = C.jogosDaRodada(cal, 36);
-  const nomes = new Set(j.flatMap((x) => [M.normalizeTeam(x.mandante), M.normalizeTeam(x.visitante)]));
-  ok(j.length === 10 && nomes.size === 20, 'rodada 36: 10 jogos, 20 clubes distintos');
+  s = C.statusCalendario(cal, at('2026-11-03'));
+  ok(s.estado === 'entre-rodadas' && s.foco.n === 37 && s.ultima.n === 36, '3 nov: próxima é a 37');
+  s = C.statusCalendario(cal, at('2026-11-14'));
+  ok(s.estado === 'em-andamento' && s.foco.n === 38, '14 nov: última rodada em andamento');
+  s = C.statusCalendario(cal, at('2026-11-20'));
+  ok(s.estado === 'encerrada' && s.ultima.n === 38, '20 nov: 38ª rodada jogada → temporada encerrada');
+  ok(cal.rodadas.length === 38 && cal.rodadas.every((r) => r.status === 'concluida'), 'as 38 rodadas estão concluídas');
+  ok(cal.jogos.length === 0 && cal.pendentes.length === 0, 'sem jogos por vir nem pendentes');
   const csvB = path.join(ROOT, C.obter('serie-b').csv);
   if (fs.existsSync(csvB)) {
     const ls = fs.readFileSync(csvB, 'utf8').trim().split('\n').slice(1), n26 = ls.length - 19 * 380;
-    const doDataset = new Set(ls.slice(-n26).flatMap((l) => [l.split(',')[2], l.split(',')[3]]).map(M.normalizeTeam));
-    ok([...nomes].every((n) => doDataset.has(n)), 'rodada 36: os nomes batem com os clubes da Série B 2026 do dataset');
-    // rodada 36: os confrontos do calendário são os da tabela básica da CBF
-    const j36 = C.jogosDaRodada(cal, 36), pares = (l) => l.map((x) => M.normalizeTeam(x.mandante) + '|' + M.normalizeTeam(x.visitante)).sort().join(',');
-    const cbf36 = fs.readFileSync(path.join(ROOT, 'datasets/serie-b-2026-tabela-cbf.csv'), 'utf8').trim().split('\n').slice(1).map((l) => l.split(',')).filter((c) => c[0] === '36').map((c) => ({ mandante: c[1], visitante: c[2] }));
-    ok(j36.length === 10 && pares(j36) === pares(cbf36), 'rodada 36: 10 confrontos, iguais aos da tabela básica da CBF');
-    ok([...new Set(j36.flatMap((x) => [M.normalizeTeam(x.mandante), M.normalizeTeam(x.visitante)]))].every((n) => doDataset.has(n)), 'rodada 36: os nomes batem com o dataset');
+    ok(n26 === 380, 'Série B 2026: 380 jogos no dataset (temporada completa)');
+    // todo jogo da tabela básica da CBF tem resultado no dataset, com a mesma rodada
+    const cbf = fs.readFileSync(path.join(ROOT, 'datasets/serie-b-2026-tabela-cbf.csv'), 'utf8').trim().split('\n').slice(1).map((l) => l.split(','));
+    const rod = new Map(ls.slice(-n26).map((l) => { const c = l.split(','); return [M.normalizeTeam(c[2]) + '|' + M.normalizeTeam(c[3]), Number(c[1])]; }));
+    ok(cbf.every((c) => rod.get(M.normalizeTeam(c[1]) + '|' + M.normalizeTeam(c[2])) === Number(c[0])), 'todos os 380 jogos da tabela da CBF estão no dataset, na mesma rodada');
   }
 }
 
-// ── integridade do calendário ───────────────────────────────────────────────
+// ── rodadas sobrepostas ─────────────────────────────────────────────────────
+section('statusCalendario — rodadas que se sobrepõem');
+{
+  const cal = { rodadas: [
+    { n: 1, inicio: '2026-11-21', fim: '2026-11-25', status: 'confirmada' },
+    { n: 2, inicio: '2026-11-24', fim: '2026-11-29', status: 'confirmada' },
+    { n: 3, inicio: '2026-12-02', fim: '2026-12-02', status: 'confirmada' }], jogos: [], pendentes: [] };
+  let s = C.statusCalendario(cal, at('2026-11-24'));
+  ok(s.atual.n === 1 && s.proxima.n === 2, 'dia comum às duas: a rodada 1 (menor) ainda está em andamento e a próxima é a 2, não a 3');
+  s = C.statusCalendario(cal, at('2026-11-26'));
+  ok(s.atual.n === 2 && s.proxima.n === 3, 'depois do fim da 1: a 2 em andamento, a 3 é a próxima');
+}
+
 section('Integridade do calendário 2026');
 {
   const cal = CALS['serie-a-2026'];
@@ -106,8 +111,8 @@ section('Integridade do calendário 2026');
   const datadas = cal.rodadas.filter((r) => r.inicio);
   ok(datadas.every((r) => r.inicio <= r.fim), 'início ≤ fim em toda rodada');
   let ordenado = true;
-  for (let i = 1; i < datadas.length; i++) if (datadas[i].inicio <= datadas[i - 1].fim) ordenado = false;
-  ok(ordenado, 'rodadas datadas não se sobrepõem e estão em ordem');
+  for (let i = 1; i < datadas.length; i++) if (datadas[i].inicio <= datadas[i - 1].inicio || datadas[i].fim < datadas[i - 1].fim) ordenado = false;
+  ok(ordenado, 'rodadas datadas começam e terminam em ordem (a 36ª e a 37ª podem se sobrepor por um dia)');
   ok(cal.rodadas.filter((r) => r.status !== 'concluida').every((r) => r.inicio && r.fim), 'rodadas futuras sempre têm datas');
   const ultimaC = Math.max(...cal.rodadas.filter((r) => r.status === 'concluida').map((r) => r.n));
   ok(cal.rodadas.filter((r) => r.n <= ultimaC).every((r) => r.status === 'concluida'), `concluídas formam um bloco contínuo desde a 1ª (até a ${ultimaC}ª)`);
@@ -131,9 +136,8 @@ section('Integridade do calendário 2026');
     ok([...times].every((t) => norm.has(t)), `rodada ${r}: todos os nomes batem com o dataset`);
     ok(j.every((x) => { const rd = cal.rodadas[r - 1]; return !x.data || (x.data >= rd.inicio && x.data <= rd.fim); }), `rodada ${r}: datas dos jogos dentro da janela da rodada`);
   }
-  const pend = cal.pendentes[0];
-  ok(pend && !jogados.has(M.normalizeTeam(pend.mandante) + '|' + M.normalizeTeam(pend.visitante)),
-    'jogo pendente (Chapecoense × Vasco) ainda não está no dataset — remova de "pendentes" quando for disputado');
+  ok(cal.pendentes.every((pend) => !jogados.has(M.normalizeTeam(pend.mandante) + '|' + M.normalizeTeam(pend.visitante))),
+    'nenhum jogo pendente já está no dataset — remova de "pendentes" quando for disputado');
 }
 
 // ── dataset da Série B ──────────────────────────────────────────────────────
