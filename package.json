@@ -11,7 +11,8 @@
     "test:copa": "node tests/copa2026-bracket.test.js",
     "test:i18n": "node tests/i18n.test.js",
     "test:competicoes": "node tests/competicoes.test.js && node tests/simulacao.test.js",
-    "test:backtest:b": "COMP=serie-b node tests/backtest.test.js"
+    "test:backtest:b": "COMP=serie-b node tests/backtest.test.js",
+    "audit:a11y": "node tests/a11y.audit.js"
   },
   "dependencies": {
     "papaparse": "^5.5.4"

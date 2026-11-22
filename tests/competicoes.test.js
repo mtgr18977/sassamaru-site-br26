@@ -91,6 +91,79 @@ section('Calendário da Série B 2026 — temporada encerrada');
   }
 }
 
+// ── playoff de acesso da Série B ────────────────────────────────────────────
+section('Playoff de acesso da Série B 2026');
+{
+  const cal = CALS['serie-b-2026'], po = cal.playoff;
+  ok(po && po.confrontos.length === 2, 'dois confrontos');
+  ok(po.confrontos.every((c) => c.jogos.length === 2 && c.jogos[0].fase === 'ida' && c.jogos[1].fase === 'volta'), 'cada confronto: ida e volta');
+  // o melhor colocado joga a volta em casa
+  ok(po.confrontos.every((c) => c.jogos[1].mandante === c.melhor && c.jogos[0].mandante === c.pior && c.jogos[0].visitante === c.melhor && c.jogos[1].visitante === c.pior), 'o melhor colocado manda a volta; a ida é na casa do pior');
+  ok(po.confrontos.every((c) => c.jogos[0].data < c.jogos[1].data), 'a ida vem antes da volta');
+  ok(po.confrontos.every((c) => c.jogos.every((j) => /^\d{4}-\d\d-\d\d$/.test(j.data) && /^\d\d:\d\d$/.test(j.hora) && (j.placar === null || (Array.isArray(j.placar) && j.placar.length === 2 && j.placar.every(Number.isInteger))))), 'datas, horas e placares bem formados');
+  ok(po.confrontos[0].pos.join() === '3,6' && po.confrontos[1].pos.join() === '4,5', 'chaves 3º × 6º e 4º × 5º');
+  // os 4 clubes são mesmo o 3º–6º da classificação da fase regular do dataset
+  const csvB = path.join(ROOT, C.obter('serie-b').csv);
+  if (fs.existsSync(csvB)) {
+    const ls = fs.readFileSync(csvB, 'utf8').trim().split('\n').slice(1), n26 = ls.length - 19 * 380;
+    const pts = {};
+    for (const l of ls.slice(-n26)) {
+      const c = l.split(','), h = M.normalizeTeam(c[2]), a = M.normalizeTeam(c[3]), gh = +c[5], ga = +c[6];
+      pts[h] = (pts[h] || 0) + (gh > ga ? 3 : gh === ga ? 1 : 0);
+      pts[a] = (pts[a] || 0) + (ga > gh ? 3 : gh === ga ? 1 : 0);
+    }
+    const ord = Object.entries(pts).sort((x, y) => y[1] - x[1]).map((e) => e[0]);
+    const nome = (c) => [M.normalizeTeam(c.melhor), M.normalizeTeam(c.pior)];
+    ok(nome(po.confrontos[0]).join() === [ord[2], ord[5]].join() && nome(po.confrontos[1]).join() === [ord[3], ord[4]].join(),
+      'confrontos = 3º×6º e 4º×5º da classificação final (pelo dataset)');
+    ok(pts[ord[5]] > pts[ord[6]], 'a fase regular separa o 6º do 7º colocado (ninguém depende de desempate para entrar)');
+  }
+  // resumoPlayoff
+  const mk = (p1, p2) => ({ melhor: 'M', pior: 'P', jogos: [{ fase: 'ida', mandante: 'P', visitante: 'M', placar: p1 }, { fase: 'volta', mandante: 'M', visitante: 'P', placar: p2 }] });
+  let r = C.resumoPlayoff(mk(null, null));
+  ok(r.estado === 'a-jogar' && r.classificado === null && r.agregado.M === 0, 'sem placares: a jogar');
+  r = C.resumoPlayoff(mk([2, 0], null));
+  ok(r.estado === 'em-andamento' && r.agregado.P === 2 && r.agregado.M === 0 && r.classificado === null, 'só a ida: agregado parcial, sem classificado');
+  r = C.resumoPlayoff(mk([2, 0], [1, 0]));
+  ok(r.estado === 'decidido' && r.classificado === 'P' && !r.porCriterio, 'pior colocado vira e sobe (agregado 2×1)');
+  r = C.resumoPlayoff(mk([0, 1], [0, 0]));
+  ok(r.classificado === 'M' && !r.porCriterio, 'melhor colocado vence no agregado');
+  r = C.resumoPlayoff(mk([1, 1], [2, 2]));
+  ok(r.agregado.M === 3 && r.agregado.P === 3 && r.classificado === 'M' && r.porCriterio, 'empate no agregado: sobe o melhor colocado (gols fora não contam)');
+  r = C.resumoPlayoff(mk([0, 3], [0, 0]));
+  ok(r.classificado === 'M', 'gol conta pelo clube, não pelo mando');
+  // próximos jogos
+  let pj = C.proximosJogosPlayoff(po);
+  const pend = po.confrontos.flatMap((c) => c.jogos).filter((j) => !j.placar);
+  ok(pj === null ? pend.length === 0 : pj.jogos.length >= 1 && pj.jogos.every((j) => j.fase === pj.fase && !j.placar), 'próximos jogos: só da fase mais próxima e sem placar');
+  const fake = { confrontos: [mk([1, 0], null), mk(null, null)].map((c, i) => ({ id: 'XY'[i], melhor: 'M', pior: 'P', jogos: c.jogos.map((j) => Object.assign({ data: j.fase === 'ida' ? '2026-11-22' : '2026-11-27', hora: '20:00' }, j)) })) };
+  pj = C.proximosJogosPlayoff(fake);
+  ok(pj.fase === 'ida' && pj.jogos.length === 1 && pj.data === '2026-11-22', 'ida de uma chave ainda por jogar vem antes das voltas');
+  fake.confrontos[1].jogos[0].placar = [0, 0];
+  pj = C.proximosJogosPlayoff(fake);
+  ok(pj.fase === 'volta' && pj.jogos.length === 2, 'idas jogadas: carrega as 2 voltas');
+  fake.confrontos.forEach((c) => c.jogos.forEach((j) => { j.placar = [0, 0]; }));
+  ok(C.proximosJogosPlayoff(fake) === null && C.proximosJogosPlayoff(undefined) === null, 'tudo jogado (ou sem playoff): nada a carregar');
+}
+
+// ── título garantido ────────────────────────────────────────────────────────
+section('campeaoAntecipado — título garantido');
+{
+  const L = (t, pts, w, played) => ({ t, pts, w, played });
+  // o caso real de 22/11/2026: Flamengo 80 pts/24 V, Palmeiras 74/21 V, ambos com 36 jogos → empata em 80, mas tem mais vitórias
+  let r = C.campeaoAntecipado([L('fla', 80, 24, 36), L('pal', 74, 21, 36), L('cru', 66, 20, 36), L('flu', 60, 17, 35)], 38);
+  ok(r && r.clube === 'fla' && !r.encerrada && r.faltam === 2 && r.vice === 'pal' && r.vantagem === 6, 'Flamengo: 80 pts/24 V × teto do Palmeiras (80 pts/23 V) → campeão com 2 rodadas por jogar');
+  ok(C.campeaoAntecipado([L('a', 80, 22, 36), L('b', 74, 21, 36)], 38) === null, 'empate possível em pontos com vitórias iguais ou menos (22 × 23): ainda não é garantido');
+  ok(C.campeaoAntecipado([L('a', 80, 23, 36), L('b', 74, 21, 36)], 38) === null, 'mesmas vitórias possíveis (23 × 23): saldo de gols decidiria → não é garantido');
+  ok(C.campeaoAntecipado([L('a', 81, 22, 36), L('b', 74, 21, 36)], 38).clube === 'a', 'pontos à frente do teto do rival: campeão mesmo com menos vitórias');
+  ok(C.campeaoAntecipado([L('a', 70, 20, 30), L('b', 69, 20, 30)], 38) === null, 'corrida aberta: null');
+  // jogos a menos do rival contam: b tem um jogo atrasado
+  ok(C.campeaoAntecipado([L('a', 80, 24, 36), L('b', 74, 21, 35)], 38) === null, 'rival com jogo a mais por disputar pode chegar a 83: não garantido');
+  r = C.campeaoAntecipado([L('nov', 73, 21, 38), L('juv', 71, 20, 38), L('vil', 66, 18, 38)], 38);
+  ok(r && r.clube === 'nov' && r.encerrada && r.faltam === 0 && r.vantagem === 2, 'temporada completa: o líder da tabela é o campeão');
+  ok(C.campeaoAntecipado([], 38) === null && C.campeaoAntecipado(undefined, 38) === null, 'sem tabela: null');
+}
+
 // ── rodadas sobrepostas ─────────────────────────────────────────────────────
 section('statusCalendario — rodadas que se sobrepõem');
 {

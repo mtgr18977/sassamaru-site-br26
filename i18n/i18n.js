@@ -234,7 +234,7 @@
     css.textContent =
       '.lang-switch{display:inline-flex;border:1px solid rgba(128,128,128,.35);border-radius:99px;overflow:hidden;' +
       'font:500 11px/1 "IBM Plex Mono",ui-monospace,monospace;flex-shrink:0;background:rgba(255,255,255,.04)}' +
-      '.lang-switch button{all:unset;cursor:pointer;padding:6px 10px;color:inherit;opacity:.65;box-sizing:border-box}' +
+      '.lang-switch button{all:unset;cursor:pointer;padding:6px 10px;color:inherit;opacity:.65;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;min-height:32px;min-width:36px}' +
       '.lang-switch button:hover{opacity:1}' +
       '.lang-switch button.on{opacity:1;background:rgba(128,128,128,.22);font-weight:700}' +
       '.lang-switch button:focus-visible{outline:2px solid currentColor;outline-offset:-2px}' +

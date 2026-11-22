@@ -21,7 +21,7 @@
     'serie-a-2026': {
       competicao: 'serie-a',
       temporada: 2026,
-      atualizadoEm: '2026-11-20',
+      atualizadoEm: '2026-11-22',
       fonte: 'CBF (tabela detalhada), conferida em valorfinal.com.br e Wikipedia',
       rodadas: [
         { n: 1,  inicio: '2026-01-28', fim: '2026-01-29', status: C },
@@ -69,9 +69,6 @@
       // jogos das próximas rodadas (horário de Brasília) — só as rodadas já detalhadas pela CBF
       // (36ª: tabela das rodadas 35 e 36, de 30/10; 37ª e 38ª: tabela de 06/11)
       jogos: [
-        { rodada: 36, data: '2026-11-21', hora: '16:30', mandante: 'Palmeiras', visitante: 'Flamengo' },
-        { rodada: 36, data: '2026-11-21', hora: '17:30', mandante: 'Bahia', visitante: 'Coritiba' },
-        { rodada: 36, data: '2026-11-21', hora: '21:00', mandante: 'Chapecoense', visitante: 'Cruzeiro' },
         { rodada: 36, data: '2026-11-22', hora: '16:00', mandante: 'Athletico Paranaense', visitante: 'Remo' },
         { rodada: 36, data: '2026-11-22', hora: '18:30', mandante: 'Fluminense', visitante: 'Mirassol' },
         { rodada: 36, data: '2026-11-22', hora: '19:30', mandante: 'Bragantino', visitante: 'Vasco' },
@@ -104,7 +101,7 @@
     'serie-b-2026': {
       competicao: 'serie-b',
       temporada: 2026,
-      atualizadoEm: '2026-11-20',
+      atualizadoEm: '2026-11-22',
       fonte: 'CBF (tabela básica); resultados conferidos na Wikipedia (pt e en)',
       rodadas: [
         { n: 1, inicio: null, fim: null, status: C },
@@ -148,9 +145,28 @@
       ],
       pendentes: [
       ],
-      // temporada regular encerrada em 14/11 (38 rodadas); resta o playoff de acesso (3º–6º), fora do modelo de pontos corridos
+      // temporada regular encerrada em 14/11 (38 rodadas); o playoff de acesso (3º–6º) fica fora do CSV e do modelo de pontos corridos
       jogos: [
       ],
+      // Playoff de acesso: 3º × 6º e 4º × 5º, ida e volta; o melhor colocado joga a volta em casa e, se empatar no
+      // agregado, é ele quem sobe. Os dois vencedores completam os 4 promovidos.
+      // COMO ATUALIZAR: depois de cada jogo, troque `placar: null` por `[gols do mandante, gols do visitante]`
+      // (mandante = o clube da chave `mandante` daquele jogo). Rode `npm run test:competicoes` e bump o CACHE_VERSION.
+      // `melhor`/`pior` = quem ficou à frente / atrás na classificação da fase regular (campo `pos` = colocações).
+      playoff: {
+        nome: 'Playoff de acesso',
+        fonte: 'CBF (tabela dos playoffs, de 16/11); jogos conferidos na Wikipedia (en)',
+        confrontos: [
+          { id: 'A', pos: [3, 6], melhor: 'Vila Nova', pior: 'Atlético-GO', jogos: [
+            { fase: 'ida',   data: '2026-11-22', hora: '18:30', mandante: 'Atlético-GO', visitante: 'Vila Nova', estadio: 'Antônio Accioly, Goiânia', placar: null },
+            { fase: 'volta', data: '2026-11-27', hora: '20:00', mandante: 'Vila Nova', visitante: 'Atlético-GO', estadio: 'Onésio Brasileiro Alvarenga, Goiânia', placar: null },
+          ] },
+          { id: 'B', pos: [4, 5], melhor: 'Fortaleza', pior: 'Criciúma', jogos: [
+            { fase: 'ida',   data: '2026-11-22', hora: '16:00', mandante: 'Criciúma', visitante: 'Fortaleza', estadio: 'Heriberto Hülse, Criciúma', placar: null },
+            { fase: 'volta', data: '2026-11-28', hora: '20:00', mandante: 'Fortaleza', visitante: 'Criciúma', estadio: 'Castelão, Fortaleza', placar: null },
+          ] },
+        ],
+      },
     },
   };
 });

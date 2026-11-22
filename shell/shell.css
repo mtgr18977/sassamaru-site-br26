@@ -11,12 +11,12 @@
   --app-green:#1A4731;
 }
 /* tokens comuns a todas as abas (html:root vence o :root de cada página) */
-html:root { --radius: 8px; --muted: #6B695F; }
+html:root { --radius: 8px; --muted: #6B695F; --gold-text: #7A5A06; }
 
 html[data-theme="dark"] {
   color-scheme: dark;
   --bg:#0E1210; --surface:#161C18; --border:#2A332D; --text:#E8EBE6; --muted:#9AA39B;
-  --accent:#35906A; --accent-lt:#17281F; --accent-2:#2F7D57; --gold-lt:#2A2410;
+  --gold-text:#E0B94A; --accent:#43A57A; --accent-lt:#17281F; --accent-2:#2F7D57; --accent-fill:#2F8059; --gold-lt:#2A2410;
   --lib:#3DA678; --lib-lt:#17281F; --sul:#8FA9F0; --sul-lt:#172036; --rel:#F08A8A; --rel-lt:#301A1A;
   --warn:#E8A33D; --warn-lt:#2E2511; --bad:#F08A8A; --bad-lt:#301A1A; --err:#F08A8A; --err-lt:#301A1A;
   --blue:#8FA9F0; --blue-lt:#172036; --orange:#E08A3C; --orange-lt:#2E2511;
@@ -85,6 +85,27 @@ body { overscroll-behavior-y: none; }
 }
 .app-tab:hover { color: #fff; background: rgba(255,255,255,.07); }
 .app-tab[aria-current="page"] { color: #fff; border-bottom-color: #D4AF37; font-weight: 600; }
+/* No escuro o --accent é um verde claro (serve de TEXTO sobre fundo escuro, ≥ 4,8:1). Botões sólidos com texto branco usam
+   var(--accent-fill, var(--accent)): no escuro um verde mais fundo (branco ≥ 4,8:1), no claro o próprio --accent. */
+[role="main"]:focus { outline: none; }
+/* rede de segurança de teclado: várias páginas tiram o outline dos campos; o foco visível volta (WCAG 2.4.7) */
+html body :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+html body .app-bar :focus-visible, html body .skip-link:focus-visible { outline-color: #fff; }
+/* quem pede menos movimento não leva animação nem rolagem suave */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}
+/* toque: botões e campos do conteúdo com pelo menos 40px de altura (WCAG 2.5.8 pede 24; 44 é o recomendado) */
+@media (pointer: coarse) {
+  [role="main"] button:not(.tab):not(.chip), [role="main"] select, [role="main"] input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), [role="main"] summary { min-height: 40px; }
+}
+/* telas com entalhe (viewport-fit=cover): o conteúdo respeita as áreas seguras; a barra do app as compensa e já se preenche sozinha */
+body { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); padding-bottom: env(safe-area-inset-bottom); }
+.app-bar { margin-left: calc(-1 * env(safe-area-inset-left)); margin-right: calc(-1 * env(safe-area-inset-right)); }
+[data-rolavel]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* link "Pular para o conteúdo": invisível até receber o foco do teclado */
+.skip-link { position: absolute; left: 8px; top: -64px; z-index: 100; background: #fff; color: #141412; padding: 10px 14px; border-radius: 6px; font: 500 14px/1 var(--sans, system-ui, sans-serif); text-decoration: none; box-shadow: 0 2px 8px rgba(0,0,0,.35); }
+.skip-link:focus { top: calc(8px + env(safe-area-inset-top)); outline: 2px solid #1A4731; outline-offset: 2px; }
 .app-tab:focus-visible { outline: 2px solid #fff; outline-offset: -3px; }
 .app-tab .ico { font-size: 14px; line-height: 1; }
 

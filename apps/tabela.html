@@ -2,7 +2,8 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="Classificação atualizada do Brasileirão Série A e B, com zonas, escudos, campeão e playoff de acesso." />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>Classificação — Sassamaru 2026</title>
 
   <!-- PWA -->
@@ -22,6 +23,7 @@
   <script src="../shell/shell.js"></script>
   <script src="../modelos/model.js"></script>
   <script src="../modelos/competicoes.js"></script>
+  <script src="../modelos/clubes.js"></script>
   <script src="../datasets/calendario.js"></script>
 
   <style>
@@ -34,63 +36,131 @@
       --shadow:0 1px 3px rgba(0,0,0,.08); --radius:6px;
       --mono:'IBM Plex Mono', ui-monospace, monospace; --sans:'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
     }
-    html { font-size: 15px; }
+    html { font-size: 15px; -webkit-text-size-adjust: 100%; }
     body { font-family: var(--sans); background: var(--bg); color: var(--text); line-height: 1.5; }
     .wrap { max-width: 1100px; margin: 0 auto; padding: 0 20px 64px; }
+    main:focus { outline: none; }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+    .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
     header { padding: 26px 0 20px; margin-bottom: 20px; border-bottom: 1px solid var(--border); }
     header h1 { font-size: 22px; font-weight: 600; letter-spacing: -.5px; }
-    header p { font: 400 12px/1.4 var(--mono); color: var(--muted); margin-top: 3px; }
-    .legend { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-bottom: 14px; font: 400 12px var(--mono); color: var(--muted); }
-    .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+    header p { font: 400 13px/1.4 var(--mono); color: var(--muted); margin-top: 3px; }
+
+    /* selo e faixa de campeão */
+    .campeao { display: flex; gap: 14px; align-items: center; background: var(--warn-lt); border: 1px solid var(--warn); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 16px; }
+    .campeao[hidden] { display: none; }
+    .campeao svg { flex: none; width: 40px; height: 40px; color:var(--s-warn-fg); }
+    .campeao h2 { font-size: 17px; font-weight: 600; letter-spacing: -.3px; line-height: 1.25; }
+    .campeao p { font: 400 13px/1.45 var(--mono); color: var(--text); margin-top: 3px; }
+    .selo { display: inline-flex; align-items: center; gap: 4px; margin-left: 8px; padding: 1px 8px 1px 6px; border: 1px solid var(--warn); border-radius: 999px; background: var(--warn-lt);
+      font: 600 11px/1.5 var(--mono); letter-spacing: .03em; text-transform: uppercase; color: var(--text); white-space: nowrap; }
+    .selo svg { width: 12px; height: 12px; color:var(--s-warn-fg); }
+
+    .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-bottom: 14px; font: 400 13px var(--mono); color: var(--muted); list-style: none; }
+    .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+    .tools { display: none; margin-bottom: 10px; }
+    .btn { font: 500 13px var(--sans); color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 0 14px; min-height: 44px; cursor: pointer; }
+    .btn:hover { border-color: var(--accent); }
+    .btn[aria-pressed="true"] { background: var(--accent-lt); border-color: var(--accent); }
     .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; font-size: 14px; }
     th, td { padding: 9px 10px; text-align: right; white-space: nowrap; }
-    th { font: 500 11px var(--mono); color: var(--muted); border-bottom: 1px solid var(--border); text-transform: uppercase; letter-spacing: .04em; }
-    td { border-bottom: 1px solid var(--border); font-variant-numeric: tabular-nums; }
-    tr:last-child td { border-bottom: 0; }
+    th { font: 500 12px var(--mono); color: var(--muted); border-bottom: 1px solid var(--border); text-transform: uppercase; letter-spacing: .04em; background: var(--surface); }
+    td, th[scope="row"] { border-bottom: 1px solid var(--border); font-variant-numeric: tabular-nums; }
+    tbody tr { background: var(--row-bg, var(--surface)); }
+    tbody tr:last-child td, tbody tr:last-child th { border-bottom: 0; }
     th.l, td.l { text-align: left; }
-    td.pos { width: 44px; font: 500 13px var(--mono); border-left: 4px solid transparent; }
-    td.club { font-weight: 500; width: 100%; }
+    abbr[title] { text-decoration: none; cursor: help; }
+    td.pos, th.pos { width: 44px; min-width: 44px; font: 500 13px var(--mono); border-left: 4px solid transparent; }
+    th[scope="row"].club { font: 500 14px var(--sans); text-transform: none; letter-spacing: 0; color: var(--text); width: 100%; background: var(--row-bg, var(--surface)); }
+    .clube { display: inline-flex; align-items: center; gap: 9px; }
+    .ebox { display: inline-flex; flex: none; width: 20px; height: 24px; }
+    .ebox .escudo, .ebox .escudo-img { width: 20px; height: 24px; object-fit: contain; }
     td.pts { font-weight: 600; }
-    tr.z-lib td.pos { border-left-color: var(--lib); }
-    tr.z-lib td.pos, tr.z-lib td.pts { color: var(--lib); }
-    tr.z-sul td.pos { border-left-color: var(--sul); }
-    tr.z-sul td.pos { color: var(--sul); }
-    tr.z-rel td.pos { border-left-color: var(--rel); }
-    tr.z-rel td.pos { color: var(--rel); }
-    tr.z-rel { background: var(--rel-lt); }
+    tr.z-lib td.pos { border-left-color: var(--lib); color: var(--lib); }
+    tr.z-lib td.pts { color: var(--lib); }
+    tr.z-sul td.pos { border-left-color: var(--sul); color: var(--sul); }
+    tr.z-rel td.pos { border-left-color: var(--rel); color: var(--rel); }
+    tr.z-rel { --row-bg: var(--rel-lt); }
+    tr.camp { --row-bg: var(--warn-lt); }
     .pos-neg { color: var(--bad); }
     .bar { display: inline-block; width: 54px; height: 6px; background: var(--border); border-radius: 3px; margin-left: 8px; vertical-align: middle; overflow: hidden; }
     .bar b { display: block; height: 100%; background: var(--accent); }
-    .notes { margin-top: 16px; font: 400 12px/1.6 var(--mono); color: var(--muted); }
+    .notes { margin-top: 16px; font: 400 13px/1.6 var(--mono); color: var(--muted); }
     .notes p + p { margin-top: 4px; }
-    .err { background: var(--bad-lt); color: var(--bad); border-radius: var(--radius); padding: 12px 14px; font: 400 13px var(--mono); }
+    .estado { padding: 28px 16px; text-align: center; font: 400 13px var(--mono); color: var(--muted); }
+    .err { background: var(--bad-lt); color: var(--bad); border-radius: var(--radius); padding: 14px 16px; font: 400 13px var(--mono); display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; }
+    .err .btn { color: var(--text); }
+
+    /* playoff de acesso */
+    .po { margin-top: 28px; }
+    .po h2 { font-size: 17px; font-weight: 600; letter-spacing: -.3px; }
+    .po > p { font: 400 13px/1.5 var(--mono); color: var(--muted); margin: 4px 0 14px; max-width: 760px; }
+    .po-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 12px; }
+    .po-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px 16px; }
+    .po-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .po-head h3 { font: 500 12px var(--mono); text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+    .po-tag { border: 1px solid var(--accent); border-radius: 999px; padding: 2px 10px; background: var(--accent-lt); color: var(--text); white-space: nowrap; font: 500 12px var(--mono); text-transform: uppercase; letter-spacing: .04em; }
+    .po-card.ok .po-tag { font-weight: 600; }
+    .po-leg { padding: 8px 0; border-top: 1px solid var(--border); }
+    .po-leg .when { font: 400 12px var(--mono); color: var(--muted); }
+    .po-leg .when b { font-weight: 500; color: var(--text); margin-right: 6px; }
+    .po-leg .jogo { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: baseline; margin-top: 2px; font-size: 15px; }
+    .po-leg .jogo span:first-child { text-align: right; }
+    .po-leg .jogo .pl { font: 600 15px var(--mono); min-width: 44px; text-align: center; color: var(--muted); }
+    .po-leg .jogo .pl.on { color: var(--text); }
+    .po-leg .where { font: 400 12px var(--mono); color: var(--muted); margin-top: 1px; }
+    .po-leg.done .jogo .w { font-weight: 600; }
+    .po-agg { border-top: 1px solid var(--border); padding-top: 9px; font: 400 13px/1.5 var(--mono); color: var(--muted); }
+    .po-agg b { color: var(--text); font-weight: 500; }
+    .nw { white-space: nowrap; }
+
     @media (max-width: 640px) {
-      th, td { padding: 8px 6px; }
+      .wrap { padding-left: 14px; padding-right: 14px; }
+      header { padding: 20px 0 16px; }
+      th, td { padding: 9px 6px; }
+      th[scope="row"].club { white-space: normal; min-width: 120px; line-height: 1.25; }
       .opt { display: none; }
       .bar { display: none; }
+      .tools { display: block; }
+      #tabela.all .opt { display: table-cell; }
+      #tabela.all table { min-width: 620px; }
+      /* com todas as colunas a tabela rola na horizontal: posição e clube ficam fixos à esquerda */
+      #tabela.all td.pos, #tabela.all th.pos { position: sticky; left: 0; z-index: 1; background: var(--row-bg, var(--surface)); }
+      #tabela.all th[scope="row"].club { position: sticky; left: 44px; z-index: 1; box-shadow: 1px 0 0 var(--border); }
+      #tabela.all thead th.pos, #tabela.all thead th.club { background: var(--surface); }
+      /* celular: o selo vira só o troféu (o texto segue para leitor de tela; a faixa acima já diz "campeão") */
+      .selo { margin-left: 2px; padding: 3px; }
+      .selo svg { width: 14px; height: 14px; }
+      .selo-t { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+      .campeao { padding: 12px; gap: 10px; }
+      .campeao svg { width: 32px; height: 32px; }
     }
   </style>
 </head>
 <body>
-<div class="wrap">
+<main id="conteudo" class="wrap" tabindex="-1">
   <header>
     <h1 id="titulo">Classificação</h1>
     <p id="sub"></p>
   </header>
-  <div id="legenda" class="legend"></div>
-  <div class="card"><div id="tabela" style="min-height:120px"></div></div>
+  <section id="campeao" class="campeao" aria-labelledby="campeaoTitulo" hidden></section>
+  <ul id="legenda" class="legend" aria-label="Zonas da tabela"></ul>
+  <div class="tools"><button type="button" id="maisCols" class="btn" aria-pressed="false" aria-controls="tabela" hidden></button></div>
+  <div class="card"><div id="tabela" aria-live="polite"><p class="estado" role="status">Carregando classificação…</p></div></div>
   <div id="notas" class="notes"></div>
-</div>
+  <section id="playoff" class="po" aria-labelledby="poTitulo" hidden></section>
+</main>
 
 <script>
 (function () {
   'use strict';
-  var Model = window.BenchModel, Comp = window.Competicoes;
+  var Model = window.BenchModel, Comp = window.Competicoes, Clubes = window.Clubes;
   var q = new URLSearchParams(location.search);
   var COMP = Comp.obter(q.get('comp') === 'serie-b' ? 'serie-b' : 'serie-a');
   var $ = function (id) { return document.getElementById(id); };
   var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+  var TROFEU = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="currentColor"><path d="M6 3h12v2h3v3a4 4 0 0 1-4 4h-.4A5.5 5.5 0 0 1 13 14.9V17h3v2H8v-2h3v-2.1A5.5 5.5 0 0 1 7.4 12H7a4 4 0 0 1-4-4V5h3V3Zm-1 4v1a2 2 0 0 0 1.5 1.9A5.6 5.6 0 0 1 6 7H5Zm14 0h-1a5.6 5.6 0 0 1-.5 2.9A2 2 0 0 0 19 8V7Z"/></svg>';
 
   // faixas de posição a destacar, na ordem em que aparecem; `cls` casa com as cores do CSS
   var ZONAS = COMP.id === 'serie-b'
@@ -101,8 +171,8 @@
        { cls: 'z-sul', faixa: COMP.zonas.sulamericana, rot: _t('Sul-Americana@@zona'), cor: 'var(--sul)' },
        { cls: 'z-rel', faixa: COMP.zonas.rebaixamento, rot: _t('Rebaixamento@@zona'), cor: 'var(--rel)' }];
   function zonaDe(pos) {
-    for (var i = 0; i < ZONAS.length; i++) if (pos >= ZONAS[i].faixa[0] && pos <= ZONAS[i].faixa[1]) return ZONAS[i].cls;
-    return '';
+    for (var i = 0; i < ZONAS.length; i++) if (pos >= ZONAS[i].faixa[0] && pos <= ZONAS[i].faixa[1]) return ZONAS[i];
+    return null;
   }
 
   function parseCsv(texto) {
@@ -113,6 +183,56 @@
       return o;
     });
   }
+
+  // escudo do clube (PNG; se falhar, o brasão em SVG). A imagem é decorativa: o nome já está ao lado.
+  function escudo(chave, nome) { return Clubes ? '<span class="ebox">' + Clubes.escudoImg(chave, nome, '../') + '</span>' : ''; }
+  document.addEventListener('error', function (ev) {
+    var img = ev.target;
+    if (!Clubes || !img || img.tagName !== 'IMG' || img.className !== 'escudo-img') return;
+    img.parentNode.innerHTML = Clubes.escudoSvg(img.getAttribute('data-chave'), img.getAttribute('data-nome'));
+  }, true);
+
+  // Playoff de acesso (só Série B): chaveamento, jogos de ida e volta, placares e quem sobe
+  function renderPlayoff(cal) {
+    var box = $('playoff'), po = cal && cal.playoff;
+    if (!po || COMP.id !== 'serie-b') { box.hidden = true; return; }
+    var loc = (window.I18N && I18N.LANGS[I18N.lang].locale) || 'pt-BR';
+    var quando = function (j) {
+      return '<time datetime="' + esc(j.data + (j.hora ? 'T' + j.hora : '')) + '">' +
+        esc(Comp.dia(j.data).toLocaleDateString(loc, { weekday: 'short', day: 'numeric', month: 'short' }) + (j.hora ? ' · ' + j.hora : '')) + '</time>';
+    };
+    var html = '<h2 id="poTitulo">' + esc(_t('Playoff de acesso')) + '</h2>' +
+      '<p>' + esc(_t('Ida e volta: o melhor colocado na fase regular joga a volta em casa e, se empatar no agregado, é ele quem sobe. Os dois vencedores completam os quatro promovidos à Série A.')) + '</p><div class="po-grid">';
+    po.confrontos.forEach(function (c) {
+      var r = Comp.resumoPlayoff(c);
+      var tag = r.estado === 'decidido' ? _t('{clube} sobe', { clube: r.classificado })
+        : r.estado === 'em-andamento' ? _t('Em andamento@@playoff') : _t('A jogar@@playoff');
+      html += '<article class="po-card' + (r.estado === 'decidido' ? ' ok' : '') + '"><div class="po-head"><h3>' + esc(_t('Chave {a} × {b}', { a: _o(c.pos[0]), b: _o(c.pos[1]) })) +
+        '</h3><span class="po-tag">' + esc(tag) + '</span></div>';
+      c.jogos.forEach(function (j) {
+        var feito = !!j.placar, gm = feito ? j.placar[0] : null, gv = feito ? j.placar[1] : null;
+        var rotulo = feito ? _t('Placar: {mandante} {gm} a {gv} {visitante}', { mandante: j.mandante, gm: gm, gv: gv, visitante: j.visitante })
+          : _t('A disputar: {mandante} contra {visitante}', { mandante: j.mandante, visitante: j.visitante });
+        html += '<div class="po-leg' + (feito ? ' done' : '') + '"><div class="when"><b>' + esc(j.fase === 'ida' ? _t('Ida@@jogo') : _t('Volta@@jogo')) + '</b>' + quando(j) + '</div>' +
+          '<div class="jogo" role="group" aria-label="' + esc(rotulo) + '"><span aria-hidden="true"' + (feito && gm > gv ? ' class="w"' : '') + '>' + esc(j.mandante) + '</span><span class="pl' + (feito ? ' on' : '') + '" aria-hidden="true">' + (feito ? gm + ' × ' + gv : '×') +
+          '</span><span aria-hidden="true"' + (feito && gv > gm ? ' class="w"' : '') + '>' + esc(j.visitante) + '</span></div>' +
+          (j.estadio ? '<div class="where">' + esc(j.estadio) + '</div>' : '') + '</div>';
+      });
+      html += '<div class="po-agg">' + esc(_t('Agregado')) + ': <b><span class="nw">' + esc(c.melhor) + '</span> ' + r.agregado[c.melhor] + ' × ' + r.agregado[c.pior] + ' <span class="nw">' + esc(c.pior) + '</span></b>' +
+        (r.porCriterio ? '<br>' + esc(_t('Empate no agregado: sobe o melhor colocado na fase regular.')) : '') + '</div></article>';
+    });
+    box.innerHTML = html + '</div>';
+    box.hidden = false;
+  }
+
+  // o cartão da tabela rola na horizontal quando não cabe (celular com todas as colunas): nesse caso ele precisa
+  // ser alcançável pelo teclado, com nome e papel para o leitor de tela
+  function ajustaRolagem() {
+    var card = $('tabela').parentNode, rola = card.scrollWidth > card.clientWidth + 1;
+    if (rola) { card.setAttribute('tabindex', '0'); card.setAttribute('role', 'region'); card.setAttribute('aria-label', _t('Classificação — {nome}', { nome: COMP.nome })); }
+    else { card.removeAttribute('tabindex'); card.removeAttribute('role'); card.removeAttribute('aria-label'); }
+  }
+  window.addEventListener('resize', ajustaRolagem);
 
   function render(rows) {
     var st = Model.computeSeasonState(rows);
@@ -125,43 +245,81 @@
     });
     var cal = (window.CALENDARIOS || {})[COMP.calendario];
     var total = COMP.nTimes * (COMP.nTimes - 1), jogos = tabela.reduce(function (n, x) { return n + x.s.played; }, 0) / 2;
+    var nome = function (t) { return nomes[t] || t; };
 
     $('titulo').textContent = _t('Classificação — {nome}', { nome: COMP.nome });
     $('sub').textContent = _t('Temporada {ano} · {n} de {total} jogos disputados · dados até {data}', { ano: cal ? cal.temporada : '', n: _n(jogos), total: _n(total), data: cal ? cal.atualizadoEm.split('-').reverse().join('/') : '—' });
     document.title = _t('Classificação — {nome}', { nome: COMP.nome }) + ' · Sassamaru 2026';
 
+    // título garantido (ou temporada completa): faixa no topo e selo na linha do campeão
+    var camp = Comp.campeaoAntecipado(tabela.map(function (x) { return { t: x.t, pts: x.s.pts, w: x.s.w, played: x.s.played }; }), COMP.rodadas);
+    var cb = $('campeao');
+    if (camp) {
+      var l = tabela[0].s, vars = { pts: l.pts, dif: camp.vantagem, vice: nome(camp.vice), n: camp.faltam };
+      var det = camp.encerrada ? _t('Campeão com {pts} pts, {dif} à frente do vice-líder ({vice}).', vars)
+        : camp.faltam === 1 ? _t('Título garantido com {pts} pts, {dif} à frente do vice-líder ({vice}); falta 1 rodada.', vars)
+        : _t('Título garantido com {pts} pts, {dif} à frente do vice-líder ({vice}); faltam {n} rodadas.', vars);
+      cb.innerHTML = TROFEU + '<div><h2 id="campeaoTitulo">' + esc(_t('{clube} é campeão da {nome} {ano}', { clube: nome(camp.clube), nome: COMP.nome, ano: cal ? cal.temporada : '' })) + '</h2><p>' + esc(det) + '</p></div>';
+      cb.hidden = false;
+    } else { cb.hidden = true; cb.innerHTML = ''; }
+
     $('legenda').innerHTML = ZONAS.map(function (z) {
-      return '<span><i style="background:' + z.cor + '"></i>' + esc(z.rot) + ' (' + z.faixa[0] + 'º–' + z.faixa[1] + 'º)</span>';
+      return '<li><i style="background:' + z.cor + '" aria-hidden="true"></i>' + esc(z.rot) + ' (' + z.faixa[0] + 'º–' + z.faixa[1] + 'º)</li>';
     }).join('');
 
-    var th = function (txt, cls) { return '<th' + (cls ? ' class="' + cls + '"' : '') + '>' + esc(txt) + '</th>'; };
-    var html = '<table><thead><tr>' + th('#', 'l') + th(_t('Clube@@coluna'), 'l') + th(_t('Pts@@pontos')) + th(_t('J@@jogos')) +
-      th(_t('V@@vitórias'), 'opt') + th(_t('E@@empates'), 'opt') + th(_t('D@@derrotas'), 'opt') + th(_t('GP@@gols pró'), 'opt') + th(_t('GC@@gols contra'), 'opt') +
-      th(_t('SG@@saldo de gols')) + th(_t('Aprov.@@coluna')) + '</tr></thead><tbody>';
+    var ab = function (sigla, completo) { return '<abbr title="' + esc(completo) + '">' + esc(sigla) + '</abbr>'; };
+    var th = function (inner, cls) { return '<th scope="col"' + (cls ? ' class="' + cls + '"' : '') + '>' + inner + '</th>'; };
+    var html = '<table><caption class="sr-only">' + esc(_t('Classificação — {nome}', { nome: COMP.nome }) + ' · ' + _t('{n} de {total} jogos disputados', { n: _n(jogos), total: _n(total) })) + '</caption><thead><tr>' +
+      th('<span aria-hidden="true">#</span><span class="sr-only">' + esc(_t('Posição')) + '</span>', 'pos l') + th(esc(_t('Clube@@coluna')), 'l') +
+      th(ab(_t('Pts@@pontos'), _t('Pontos'))) + th(ab(_t('J@@jogos'), _t('Jogos'))) +
+      th(ab(_t('V@@vitórias'), _t('Vitórias')), 'opt') + th(ab(_t('E@@empates'), _t('Empates')), 'opt') + th(ab(_t('D@@derrotas'), _t('Derrotas')), 'opt') +
+      th(ab(_t('GP@@gols pró'), _t('Gols pró')), 'opt') + th(ab(_t('GC@@gols contra'), _t('Gols contra')), 'opt') +
+      th(ab(_t('SG@@saldo de gols'), _t('Saldo de gols'))) + th(ab(_t('Aprov.@@coluna'), _t('Aproveitamento')), 'opt') + '</tr></thead><tbody>';
     tabela.forEach(function (x, i) {
-      var s = x.s, ap = s.played ? s.pts / (3 * s.played) : 0;
-      html += '<tr class="' + zonaDe(i + 1) + '"><td class="pos l">' + (i + 1) + '</td><td class="club l">' + esc(nomes[x.t] || x.t) + '</td>' +
+      var s = x.s, ap = s.played ? s.pts / (3 * s.played) : 0, z = zonaDe(i + 1), ehCamp = camp && camp.clube === x.t;
+      var cls = [z ? z.cls : '', ehCamp ? 'camp' : ''].filter(Boolean).join(' ');
+      html += '<tr' + (cls ? ' class="' + cls + '"' : '') + '><td class="pos l">' + (i + 1) + (z ? '<span class="sr-only"> (' + esc(z.rot) + ')</span>' : '') + '</td>' +
+        '<th scope="row" class="club l"><span class="clube">' + escudo(x.t, nome(x.t)) + '<span>' + esc(nome(x.t)) + '</span>' +
+        (ehCamp ? '<span class="selo">' + TROFEU + '<span class="selo-t">' + esc(_t('Campeão')) + '</span></span>' : '') + '</span></th>' +
         '<td class="pts">' + s.pts + '</td><td>' + s.played + '</td>' +
         '<td class="opt">' + s.w + '</td><td class="opt">' + s.d + '</td><td class="opt">' + s.l + '</td><td class="opt">' + s.gf + '</td><td class="opt">' + s.ga + '</td>' +
         '<td' + (s.gd < 0 ? ' class="pos-neg"' : '') + '>' + (s.gd > 0 ? '+' : '') + s.gd + '</td>' +
-        '<td>' + (ap * 100).toFixed(0) + '%<span class="bar"><b style="width:' + (ap * 100).toFixed(0) + '%"></b></span></td></tr>';
+        '<td class="opt">' + (ap * 100).toFixed(0) + '%<span class="bar" aria-hidden="true"><b style="width:' + (ap * 100).toFixed(0) + '%"></b></span></td></tr>';
     });
     $('tabela').innerHTML = html + '</tbody></table>';
 
-    var notas = [_t('Critérios de desempate: pontos, vitórias, saldo de gols e gols pró.')];
+    // celular: só #, clube, pontos, jogos e saldo; um botão mostra as demais colunas (a tabela passa a rolar na horizontal)
+    var btn = $('maisCols');
+    var rotuloBtn = function () { btn.textContent = $('tabela').classList.contains('all') ? _t('Mostrar menos colunas') : _t('Mostrar todas as colunas'); btn.setAttribute('aria-pressed', $('tabela').classList.contains('all') ? 'true' : 'false'); };
+    btn.hidden = false; rotuloBtn();
+    btn.onclick = function () { $('tabela').classList.toggle('all'); rotuloBtn(); ajustaRolagem(); };
+
+    var notas = [_t('Critérios de desempate: pontos, vitórias, saldo de gols e gols pró.'),
+      _t('Colunas') + ': ' + [['V', 'Vitórias'], ['E', 'Empates'], ['D', 'Derrotas'], ['GP', 'Gols pró'], ['GC', 'Gols contra'], ['SG', 'Saldo de gols']].map(function (c) { return c[0] + ' ' + _t(c[1]).toLowerCase(); }).join(' · ') + '.'];
     var min = Math.min.apply(null, tabela.map(function (x) { return x.s.played; })), max = Math.max.apply(null, tabela.map(function (x) { return x.s.played; }));
     if (min !== max) notas.push(_t('Clubes com número de jogos diferente têm partidas adiadas já disputadas (ou ainda por jogar).'));
     if (COMP.rodadasSinteticas) notas.push(_t('Série B: a ordem das rodadas é sintética (a fonte não traz datas); a tabela usa só os resultados reais.'));
+    if (navigator.onLine === false) notas.push(_t('Você está offline: mostrando os dados salvos neste aparelho.'));
     $('notas').innerHTML = notas.map(function (n) { return '<p>' + esc(n) + '</p>'; }).join('');
+    renderPlayoff(cal);
+    ajustaRolagem();
   }
 
-  fetch('../' + COMP.csv, { cache: 'no-store' }).then(function (r) {
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    return r.text();
-  }).then(function (t) { render(parseCsv(t)); }).catch(function (e) {
-    $('titulo').textContent = _t('Classificação — {nome}', { nome: COMP.nome });
-    $('tabela').innerHTML = '<div class="err">' + esc(_t('Não foi possível carregar os dados.')) + ' (' + esc(e.message) + ')</div>';
-  });
+  function carregar() {
+    $('tabela').innerHTML = '<p class="estado" role="status">' + esc(_t('Carregando classificação…')) + '</p>';
+    fetch('../' + COMP.csv, { cache: 'no-store' }).then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.text();
+    }).then(function (t) { render(parseCsv(t)); }).catch(function (e) {
+      $('titulo').textContent = _t('Classificação — {nome}', { nome: COMP.nome });
+      var off = navigator.onLine === false;
+      $('tabela').innerHTML = '<div class="err" role="alert"><span>' + esc(off ? _t('Sem conexão e sem dados salvos neste aparelho.') : _t('Não foi possível carregar os dados.')) + ' (' + esc(e.message) + ')</span>' +
+        '<button type="button" class="btn" id="tentar">' + esc(_t('Tentar de novo')) + '</button></div>';
+      $('tentar').onclick = carregar;
+    });
+  }
+  carregar();
+  window.addEventListener('online', carregar);
 
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('../service-worker.js').catch(function () {});
 })();

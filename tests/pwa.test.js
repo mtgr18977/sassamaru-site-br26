@@ -62,6 +62,12 @@ if (manifest) {
   assert(has192, 'has 192x192 icon');
   assert(has512, 'has 512x512 icon');
 
+  // maskable em PNG (Android recorta o ícone: SVG maskable costuma ser ignorado) e sem trava de orientação (WCAG 1.3.4)
+  assert(manifest.icons.some(i => i.purpose === 'maskable' && i.type === 'image/png' && i.sizes.includes('512')), 'has a 512px PNG maskable icon');
+  assert(!manifest.orientation || manifest.orientation === 'any', 'does not lock orientation');
+  assert(Array.isArray(manifest.screenshots) && manifest.screenshots.some(s => s.form_factor === 'narrow') && manifest.screenshots.some(s => s.form_factor === 'wide'), 'has narrow and wide screenshots');
+  for (const s of manifest.screenshots || []) assert(fs.existsSync(path.join(ROOT, s.src.replace(/^\.\//, ''))), `screenshot file exists: ${s.src}`);
+
   // Verify icon files referenced in manifest exist
   for (const icon of manifest.icons) {
     const iconPath = path.join(ROOT, icon.src.replace(/^\.\//, ''));

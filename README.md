@@ -18,7 +18,7 @@ A barra de abas no topo (`shell/shell.js` + `shell/shell.css`, injetada em todas
 
 ## Calendário e rodada atual
 
-As abas **Série A** e **Série B** comparam o dia do dispositivo com `datasets/calendario.js`, mostram a rodada em andamento (ou a próxima), as datas, quantos dias faltam e a faixa das 38 rodadas, e **já deixam o campo de jogos preenchido com a rodada em foco**; um botão simula a rodada. O navegador não consegue ler ge.globo.com nem a Wikipedia (CORS/bloqueio) e o app precisa funcionar offline, então o calendário é um arquivo editado a cada atualização, a partir da tabela detalhada da CBF. Série A: rodadas 1–35 concluídas; 36–38 confirmadas pela CBF (21 nov – 2 dez), com os 30 jogos detalhados (dia e hora). Série B: as 38 rodadas concluídas (a temporada regular terminou em 14 nov) — a aba mostra "Temporada encerrada". Sem os jogos da rodada no calendário, o campo fica vazio com um aviso para colar.
+As abas **Série A** e **Série B** comparam o dia do dispositivo com `datasets/calendario.js`, mostram a rodada em andamento (ou a próxima), as datas, quantos dias faltam e a faixa das 38 rodadas, e **já deixam o campo de jogos preenchido com a rodada em foco**; um botão simula a rodada. O navegador não consegue ler ge.globo.com nem a Wikipedia (CORS/bloqueio) e o app precisa funcionar offline, então o calendário é um arquivo editado a cada atualização, a partir da tabela detalhada da CBF. Série A: rodadas 1–35 concluídas; 36–38 confirmadas pela CBF (21 nov – 2 dez), com os 27 jogos que faltam detalhados (dia e hora). Série B: as 38 rodadas concluídas (a temporada regular terminou em 14 nov); enquanto o playoff de acesso não acaba, a aba carrega os jogos dele no campo de previsão, e depois mostra "Temporada encerrada". Sem os jogos da rodada no calendário, o campo fica vazio com um aviso para colar.
 
 ## Série B
 
@@ -31,24 +31,30 @@ Limitações, de propósito explícitas:
 - **Ganho pequeno.** `npm run test:backtest:b` (n = 1 140: 2024, 2025 e 2026): log-loss 1,045 × 1,054 da taxa-base 49/27/24 (RPS 0,215 × 0,218). A Série B é mais parelha e troca de elenco todo ano; clubes sem histórico entram como média da liga.
 - O treino usa todo o histórico (a janela muda pouco o resultado).
 
+**Playoff de acesso (3º × 6º e 4º × 5º, ida e volta).** Fica **fora** do CSV e do modelo de pontos corridos: é um mata-mata, então vive em `datasets/calendario.js`, no campo `playoff` de `serie-b-2026` (confrontos, datas, estádios e placares). A aba **Série B → Classificação** mostra o chaveamento com o agregado e quem sobe; a **Previsão da rodada** carrega os jogos da fase seguinte (ida ou volta) no campo de jogos. Para atualizar depois de cada jogo, troque `placar: null` por `[gols do mandante, gols do visitante]` (mandante = o clube que manda aquele jogo), rode `npm run test:competicoes` e suba o `CACHE_VERSION`. A regra (`resumoPlayoff` em `modelos/competicoes.js`): o melhor colocado da fase regular joga a volta em casa e, se empatar no agregado, é ele quem sobe — não há gols fora, prorrogação nem pênaltis.
+
 Para regerar: `python scripts/importar_wikipedia_serie_b.py` (precisa de internet; aceita `--cache DIR`; `--fonte pt|en` força uma das páginas em 2026, o padrão é a interseção das duas). Para atualizar as rodadas reais de 2026, baixe a tabela básica em PDF no site da CBF e rode `python scripts/importar_tabela_cbf.py tabela.pdf datasets/serie-b-2026-tabela-cbf.csv` (precisa do `pdftotext`). `python scripts/dados_serie.py validar <csv>` confere qualquer CSV no formato do modelo.
 
-## Estado dos dados (20 nov 2026)
+## Classificação, selo de campeão e acessibilidade
+
+A página **Classificação** (Série A e B) mostra escudo, zonas (com texto, não só cor) e, quando o título já está garantido, a faixa dourada e o selo **Campeão** — calculado pela tabela (`Competicoes.campeaoAntecipado`: ninguém mais alcança o líder, usando a vitória como 1º desempate), sem edição manual. No celular a tabela mostra #, clube, pontos, jogos e saldo, com um botão para as demais colunas. Foi auditada com o axe (claro/escuro, desktop/celular): sem violações. O app ganhou o atalho "Classificação" no manifest e o link "Pular para o conteúdo".
+
+## Estado dos dados (22 nov 2026)
 
 | Base | Cobertura | Jogos |
 |------|-----------|-------|
-| Brasileirão (clubes) | 2003 – rodada 35 de 2026 (+ adiados da 21ª) | 9 515 |
+| Brasileirão (clubes) | 2003 – rodada 35 de 2026 + 3 jogos da 36ª (+ adiados da 21ª) | 9 518 |
 | Seleções | 1872 – 2026 | 49 000+ |
 | Série B | 2007 – 2026 completa, 38 rodadas (2026 com rodadas reais da CBF) | 7 600 |
 
-Faltam no Brasileirão 2026: 30 jogos (350 de 380 disputados), as rodadas 36 a 38 (21 nov – 2 dez). O adiado da 21ª, Chapecoense 0×2 Vasco, já foi jogado.
+Faltam no Brasileirão 2026: 27 jogos (353 de 380 disputados), o resto da rodada 36 e as rodadas 37 e 38 (até 2 dez). O adiado da 21ª, Chapecoense 0×2 Vasco, já foi jogado.
 
-Precisão do modelo de clubes (backtest walk-forward; Série A n = 1 110, Série B n = 1 140):
+Precisão do modelo de clubes (backtest walk-forward; Série A n = 1 113, Série B n = 1 140):
 
 | | log-loss | RPS | acurácia |
 |---|---|---|---|
-| Série A — modelo | 1,025 | 0,211 | 48,7% |
-| Série A — taxa-base fixa 47/27/26 | 1,055 | 0,221 | 47,7% |
+| Série A — modelo | 1,026 | 0,211 | 48,7% |
+| Série A — taxa-base fixa 47/27/26 | 1,056 | 0,221 | 47,5% |
 | Série B — modelo | 1,045 | 0,215 | 47,0% |
 | Série B — taxa-base 49/27/24 | 1,054 | 0,218 | 47,8% |
 
