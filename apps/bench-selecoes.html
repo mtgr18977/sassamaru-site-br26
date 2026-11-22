@@ -2,7 +2,8 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="Previsão de jogos entre seleções nacionais com modelo Poisson/Dixon-Coles e Elo." />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>Bench Seleções</title>
 
   <!-- PWA -->
@@ -78,7 +79,7 @@
   .brand-mark {
     width: 36px;
     height: 36px;
-    background: var(--accent);
+    background: var(--accent-fill, var(--accent));
     border-radius: var(--radius);
     display: grid;
     place-items: center;
@@ -114,7 +115,7 @@
 
   .pill {
     font-family: var(--mono);
-    font-size: 10.5px;
+    font-size:11px;
     font-weight: 400;
     padding: 3px 8px;
     border-radius: 99px;
@@ -181,7 +182,7 @@
 
   .upload-btn {
     display: inline-block;
-    background: var(--accent);
+    background: var(--accent-fill, var(--accent));
     color: #fff;
     font-size: 12.5px;
     font-weight: 500;
@@ -287,7 +288,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 10px;
+    font-size:11px;
   }
 
   /* ── Options panel ── */
@@ -305,7 +306,7 @@
   .option-group:last-child { margin-bottom: 0; }
 
   .option-title {
-    font-size: 10.5px;
+    font-size:11px;
     font-weight: 500;
     letter-spacing: .06em;
     text-transform: uppercase;
@@ -344,7 +345,7 @@
   }
 
   .btn-primary {
-    background: var(--accent);
+    background: var(--accent-fill, var(--accent));
     color: #fff;
     font-family: var(--sans);
     font-size: 13px;
@@ -377,7 +378,7 @@
 
   #status.info   { background: var(--accent-lt); color: var(--accent); display: block; }
   #status.error  { background: var(--err-lt);    color: var(--err);    display: block; }
-  #status.warn   { background: var(--warn-lt);   color: var(--warn);   display: block; }
+  #status.warn   { background: var(--warn-lt);   color:var(--s-warn-fg);   display: block; }
 
   /* ── Results ── */
   #results { display: none; }
@@ -419,7 +420,7 @@
   }
 
   thead th {
-    font-size: 10px;
+    font-size:11px;
     font-weight: 500;
     letter-spacing: .07em;
     text-transform: uppercase;
@@ -467,7 +468,7 @@
   /* neutral badge */
   .neutral-badge {
     display: inline-block;
-    font-size: 9.5px;
+    font-size:11px;
     font-family: var(--mono);
     color: var(--muted);
     background: var(--s-chip);
@@ -499,7 +500,7 @@
 
   .prob-nums {
     font-family: var(--mono);
-    font-size: 10.5px;
+    font-size:11px;
     color: var(--muted);
     white-space: nowrap;
   }
@@ -543,7 +544,7 @@
   }
 
   .score-grid-title {
-    font-size: 10px;
+    font-size:11px;
     letter-spacing: .08em;
     text-transform: uppercase;
     color: var(--muted);
@@ -554,7 +555,7 @@
   .score-grid {
     border-collapse: collapse;
     font-family: var(--mono);
-    font-size: 10.5px;
+    font-size:11px;
   }
 
   .score-grid td, .score-grid th {
@@ -568,13 +569,13 @@
     background: var(--s-chip);
     color: var(--muted);
     font-weight: 500;
-    font-size: 9.5px;
+    font-size:11px;
   }
 
   .score-grid td { cursor: default; }
 
   .score-grid td.best {
-    background: var(--accent);
+    background: var(--accent-fill, var(--accent));
     color: #fff;
     font-weight: 500;
   }
@@ -595,7 +596,7 @@
   }
 
   .summary-card .sc-label {
-    font-size: 10px;
+    font-size:11px;
     letter-spacing: .08em;
     text-transform: uppercase;
     color: var(--muted);
@@ -612,7 +613,7 @@
   }
 
   .summary-card .sc-sub {
-    font-size: 10.5px;
+    font-size:11px;
     color: var(--muted);
     font-family: var(--mono);
     margin-top: 2px;
@@ -693,10 +694,10 @@
 
 </head>
 <body>
-<div class="page">
+<div class="page" role="main" id="conteudo" tabindex="-1">
 
   <!-- ── Header ── -->
-  <header>
+  <header role="none">
     <div class="brand">
       <div class="brand-mark">B∑</div>
       <div class="brand-text">
@@ -811,7 +812,7 @@ Espanha vs Portugal"></textarea>
     </div>
   </div>
 
-  <footer>
+  <footer role="none">
     <span>Bench Seleções v1.0</span>
     <span>Poisson + Elo + Dixon-Coles (MLE ρ)</span>
     <span>Dataset: Mart Jürisoo / international_results</span>
@@ -50325,13 +50326,13 @@ Espanha vs Portugal"></textarea>
     overlay.innerHTML = dots.map(d => {
       if (d.t==='empty') return `<div class="val-dot"></div>`;
       if (d.t==='err')   return `<div class="val-dot" style="color:#991B1B">✕</div>`;
-      if (d.t==='warn')  return `<div class="val-dot" style="color:#D97706">⚠</div>`;
+      if (d.t==='warn')  return `<div class="val-dot" style="color:var(--s-warn-fg)">⚠</div>`;
       return `<div class="val-dot" style="color:var(--accent)">✓</div>`;
     }).join('');
 
     const parts = [];
     if (ok)   parts.push(`<span style="color:var(--accent)">${_t('{n} ok', { n: ok })}</span>`);
-    if (warn) parts.push(`<span style="color:#D97706">${warn} ⚠</span>`);
+    if (warn) parts.push(`<span style="color:var(--s-warn-fg)">${warn} ⚠</span>`);
     if (err)  parts.push(`<span style="color:#991B1B">${_t('{n} erro', { n: err })}</span>`);
     document.getElementById('val-summary').innerHTML = parts.join(' · ');
   }
@@ -50430,14 +50431,14 @@ Espanha vs Portugal"></textarea>
             <div style="font-size:11px;color:var(--muted);font-family:var(--mono)">
               ${_t('{p}% de probabilidade', { p: (p.bestP*100).toFixed(1) })}
             </div>
-            ${p.warnings.length ? `<div style="margin-top:12px;font-size:11px;color:#D97706">⚠ ${p.warnings.map(trWarn).join(', ')}</div>` : ''}
+            ${p.warnings.length ? `<div style="margin-top:12px;font-size:11px;color:var(--s-warn-fg)">⚠ ${p.warnings.map(trWarn).join(', ')}</div>` : ''}
           </div>
           <div>
             <div class="score-grid-title">${_t('Odds (overround {n}%)', { n: (CFG.OVERROUND*100).toFixed(0) })}</div>
             <div style="display:flex;gap:20px;margin-top:8px;font-family:var(--mono);font-size:13px">
-              <div><div style="font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">${p.neutral?_t('Time 1'):_t('Casa')}</div>${fmt2(p.oh)}</div>
-              <div><div style="font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Empate</div>${fmt2(p.od)}</div>
-              <div><div style="font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">${p.neutral?_t('Time 2'):_t('Fora')}</div>${fmt2(p.oa)}</div>
+              <div><div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">${p.neutral?_t('Time 1'):_t('Casa')}</div>${fmt2(p.oh)}</div>
+              <div><div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Empate</div>${fmt2(p.od)}</div>
+              <div><div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">${p.neutral?_t('Time 2'):_t('Fora')}</div>${fmt2(p.oa)}</div>
             </div>
             <div style="margin-top:12px;font-size:11px;color:var(--muted);font-family:var(--mono)">
               ${_t('Elo casa: {v}', { v: Math.round(_model.elo.get(p.home)||CFG.ELO_INITIAL) })}<br>
@@ -50472,7 +50473,7 @@ Espanha vs Portugal"></textarea>
         <div class="sc-sub">
           <span style="color:var(--accent)">${_t('{n}C@@casa', { n: homes })}</span> ·
           <span style="color:var(--muted)">${_t('{n}E@@empate', { n: draws })}</span> ·
-          <span style="color:#D97706">${_t('{n}F@@fora', { n: aways })}</span>
+          <span style="color:var(--s-warn-fg)">${_t('{n}F@@fora', { n: aways })}</span>
         </div>
       </div>
       <div class="summary-card">

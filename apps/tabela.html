@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
+  <meta name="description" content="Classificação atualizada do Brasileirão Série A e B, com zonas, escudos, campeão e playoff de acesso." />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>Classificação — Sassamaru 2026</title>
 
@@ -37,7 +38,7 @@
     }
     html { font-size: 15px; -webkit-text-size-adjust: 100%; }
     body { font-family: var(--sans); background: var(--bg); color: var(--text); line-height: 1.5; }
-    .wrap { max-width: 1100px; margin: 0 auto; padding: 0 max(20px, env(safe-area-inset-right)) calc(64px + env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left)); }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 0 20px 64px; }
     main:focus { outline: none; }
     :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
     .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
@@ -48,12 +49,12 @@
     /* selo e faixa de campeão */
     .campeao { display: flex; gap: 14px; align-items: center; background: var(--warn-lt); border: 1px solid var(--warn); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 16px; }
     .campeao[hidden] { display: none; }
-    .campeao svg { flex: none; width: 40px; height: 40px; color: var(--warn); }
+    .campeao svg { flex: none; width: 40px; height: 40px; color:var(--s-warn-fg); }
     .campeao h2 { font-size: 17px; font-weight: 600; letter-spacing: -.3px; line-height: 1.25; }
     .campeao p { font: 400 13px/1.45 var(--mono); color: var(--text); margin-top: 3px; }
     .selo { display: inline-flex; align-items: center; gap: 4px; margin-left: 8px; padding: 1px 8px 1px 6px; border: 1px solid var(--warn); border-radius: 999px; background: var(--warn-lt);
       font: 600 11px/1.5 var(--mono); letter-spacing: .03em; text-transform: uppercase; color: var(--text); white-space: nowrap; }
-    .selo svg { width: 12px; height: 12px; color: var(--warn); }
+    .selo svg { width: 12px; height: 12px; color:var(--s-warn-fg); }
 
     .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-bottom: 14px; font: 400 13px var(--mono); color: var(--muted); list-style: none; }
     .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
@@ -115,7 +116,7 @@
     .nw { white-space: nowrap; }
 
     @media (max-width: 640px) {
-      .wrap { padding-left: max(14px, env(safe-area-inset-left)); padding-right: max(14px, env(safe-area-inset-right)); }
+      .wrap { padding-left: 14px; padding-right: 14px; }
       header { padding: 20px 0 16px; }
       th, td { padding: 9px 6px; }
       th[scope="row"].club { white-space: normal; min-width: 120px; line-height: 1.25; }

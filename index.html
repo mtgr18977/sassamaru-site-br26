@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8"/>
+  <meta name="description" content="Sassamaru 2026: previsão de partidas e simulação da temporada do Brasileirão (Séries A e B) e da Copa 2026, com modelo Poisson/Dixon-Coles e backtest público." />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
   <title>Sassamaru 2026 — Início</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -39,7 +40,7 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text); line
 .hero p.lead { margin-top: 14px; font-size: 16px; color: var(--muted); max-width: 40em; }
 .hero-cta { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 22px; }
 .btn { display: inline-block; text-decoration: none; padding: 10px 18px; border-radius: 99px; font-weight: 600; font-size: 13.5px; border: 1px solid var(--accent); }
-.btn.primary { background: var(--accent); color: #fff; }
+.btn.primary { background: var(--accent-fill, var(--accent)); color: #fff; }
 .btn.ghost { color: var(--accent); background: transparent; }
 .btn:hover { filter: brightness(1.12); }
 
@@ -66,14 +67,14 @@ h2.sec::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 .card .s { font: 400 11px var(--mono); color: var(--muted); }
 .card p { font-size: 13px; color: var(--muted); flex: 1; }
 .tags { display: flex; gap: 5px; flex-wrap: wrap; }
-.tag { font: 400 10px var(--mono); padding: 2px 7px; border-radius: 3px; background: var(--s-chip); color: var(--muted); }
+.tag { font: 400 11px var(--mono); padding: 2px 7px; border-radius: 3px; background: var(--s-chip); color: var(--muted); }
 .go { font: 500 12px var(--mono); color: var(--accent); }
 
 /* tables */
 .tbl-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
 table { width: 100%; border-collapse: collapse; font-size: 13px; }
 th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
-th { font: 500 10.5px var(--mono); text-transform: uppercase; letter-spacing: .05em; color: var(--muted); background: var(--s-sunk); white-space: nowrap; }
+th { font: 500 11px var(--mono); text-transform: uppercase; letter-spacing: .05em; color: var(--muted); background: var(--s-sunk); white-space: nowrap; }
 tr:last-child td { border-bottom: 0; }
 td.num, th.num { text-align: right; font-family: var(--mono); white-space: nowrap; }
 td.good { color: var(--accent); font-weight: 600; }
@@ -98,7 +99,7 @@ footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--border
 </style>
 </head>
 <body>
-<div class="page">
+<div class="page" role="main" id="conteudo" tabindex="-1">
 
   <section class="hero">
     <div class="eyebrow">Brasileirão · Copa do Mundo</div>
@@ -216,7 +217,7 @@ footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--border
     </tbody>
   </table></div>
 
-  <footer>
+  <footer role="none">
     <span>Sassamaru 2026 · Anthropic Claude</span>
     <span>Datasets: campeonatobrasileirolimpo.csv · Mart Jürisoo (1872–2026)</span>
   </footer>

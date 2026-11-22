@@ -115,7 +115,45 @@
     btn.addEventListener('click', function () { if (ev) { ev.prompt(); ev = null; btn.hidden = true; } });
   }
 
+  // Regiões que rolam na horizontal (tabelas largas no celular) precisam ser alcançáveis pelo teclado e ter nome e papel
+  // para o leitor de tela (WCAG 2.1.1). Vale para todas as páginas, inclusive para o que o JS da página insere depois:
+  // marca só o que de fato transborda e não tem nada focável dentro; desmarca quando deixa de transbordar.
+  function regioesRolaveis() {
+    var els = document.querySelectorAll('div, section, pre, table, ul');
+    var usados = {};
+    document.querySelectorAll('[data-rolavel][aria-label]').forEach(function (e) { var k = e.getAttribute('aria-label').replace(/ \(\d+\)$/, ''); usados[k] = (usados[k] || 0) + 1; });
+    for (var i = 0; i < els.length; i++) {
+      var el = els[i], rola = el.scrollWidth > el.clientWidth + 1;
+      if (el.getAttribute('data-rolavel') === '1') {
+        if (!rola) { el.removeAttribute('tabindex'); el.removeAttribute('role'); el.removeAttribute('aria-label'); el.removeAttribute('data-rolavel'); }
+        continue;
+      }
+      if (!rola || el.hasAttribute('tabindex') || el.hasAttribute('role')) continue;
+      var ov = getComputedStyle(el).overflowX;
+      if (ov !== 'auto' && ov !== 'scroll') continue;
+      if (el.querySelector('a[href], button, input, select, textarea, [tabindex]')) continue;
+      var rot = '';
+      for (var p = el, n = 0; p && n < 5 && !rot; p = p.parentElement, n++) {
+        var h = p.querySelector('h2, h3, h4'); if (h && h.textContent.trim()) rot = h.textContent.trim().slice(0, 80);
+      }
+      el.setAttribute('tabindex', '0'); el.setAttribute('role', 'region'); el.setAttribute('data-rolavel', '1');
+      rot = rot || T('Conteúdo rolável'); usados[rot] = (usados[rot] || 0) + 1;
+      el.setAttribute('aria-label', usados[rot] > 1 ? rot + ' (' + usados[rot] + ')' : rot);
+    }
+  }
+  var rolagemTimer = null;
+  function agendaRolagem() {
+    clearTimeout(rolagemTimer);
+    rolagemTimer = setTimeout(function () { (window.requestIdleCallback || function (f) { f(); })(regioesRolaveis); }, 400);
+  }
+  function observaRolagem() {
+    agendaRolagem();
+    window.addEventListener('resize', agendaRolagem);
+    window.addEventListener('load', agendaRolagem);
+    if (window.MutationObserver) new MutationObserver(agendaRolagem).observe(document.body, { childList: true, subtree: true });
+  }
+
   // registrado depois do listener do i18n.js, então o seletor de idioma já existe quando isto roda
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', build);
-  else build();
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { build(); observaRolagem(); });
+  else { build(); observaRolagem(); }
 })();

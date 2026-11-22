@@ -2,7 +2,8 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="description" content="Simulação Monte Carlo da Copa do Mundo 2026: chances de cada seleção em cada fase." />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
   <title>Bench Copa 2026 — Simulador</title>
 
   <!-- PWA -->
@@ -38,7 +39,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
 header{display:flex;align-items:center;justify-content:space-between;
   padding:26px 0 22px;border-bottom:1px solid var(--border);margin-bottom:28px;gap:14px;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:12px}
-.brand-mark{width:36px;height:36px;background:var(--accent);border-radius:var(--radius);
+.brand-mark{width:36px;height:36px;background:var(--accent-fill, var(--accent));border-radius:var(--radius);
   display:grid;place-items:center;color:#fff;font-family:var(--mono);font-size:12px;font-weight:500;flex-shrink:0}
 .brand-text h1{font-size:15px;font-weight:600;letter-spacing:-.3px;line-height:1.2}
 .brand-text p{font-size:11px;color:var(--muted);font-family:var(--mono)}
@@ -60,9 +61,9 @@ header{display:flex;align-items:center;justify-content:space-between;
 
 /* Controls */
 .controls{display:flex;align-items:center;gap:10px;margin-bottom:24px;flex-wrap:wrap}
-.btn{background:var(--accent);color:#fff;border:none;padding:9px 20px;border-radius:var(--radius);
+.btn{background:var(--accent-fill, var(--accent));color:#fff;border:none;padding:9px 20px;border-radius:var(--radius);
   cursor:pointer;font-family:var(--sans);font-size:13px;font-weight:500;transition:opacity .15s}
-.btn:hover{opacity:.85}
+.btn:hover{filter:brightness(.9)}
 .btn:disabled{opacity:.4;cursor:not-allowed}
 .btn-ghost{background:none;border:1px solid var(--border);color:var(--muted);
   font-size:12px;font-family:var(--sans);padding:7px 14px;border-radius:var(--radius);
@@ -85,11 +86,11 @@ header{display:flex;align-items:center;justify-content:space-between;
 .podium-card.p1::before{background:#D4AF37}
 .podium-card.p2::before{background:#A8A9AD}
 .podium-card.p3::before{background:#CD7F32}
-.podium-rank{font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
+.podium-rank{font-size:11px;letter-spacing:.08em;text-transform:uppercase;
   font-weight:500;color:var(--muted);margin-bottom:4px}
 .podium-team{font-size:14px;font-weight:600;margin-bottom:2px;line-height:1.2}
 .podium-pct{font-family:var(--mono);font-size:22px;font-weight:300;color:var(--text);line-height:1}
-.podium-sub{font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:3px}
+.podium-sub{font-size:11px;color:var(--muted);font-family:var(--mono);margin-top:3px}
 
 /* Win prob bar chart */
 .win-chart{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
@@ -108,7 +109,7 @@ header{display:flex;align-items:center;justify-content:space-between;
 .group-header{background:var(--s-sunk);padding:8px 12px;border-bottom:1px solid var(--border);
   display:flex;align-items:center;justify-content:space-between}
 .group-letter{font-size:12px;font-weight:600;color:var(--accent)}
-.group-label{font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.group-label{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:500}
 .group-team-row{display:flex;align-items:center;justify-content:space-between;
   padding:7px 12px;border-bottom:1px solid var(--border)}
 .group-team-row:last-child{border-bottom:none}
@@ -120,13 +121,13 @@ header{display:flex;align-items:center;justify-content:space-between;
 .team-nm.elim{color:var(--muted);font-weight:400}
 .qualify-bar-wrap{width:52px;background:var(--border);border-radius:2px;height:4px;overflow:hidden}
 .qualify-bar{height:100%;border-radius:2px}
-.qualify-pct{font-family:var(--mono);font-size:10px;color:var(--muted);min-width:30px;text-align:right}
+.qualify-pct{font-family:var(--mono);font-size:11px;color:var(--muted);min-width:30px;text-align:right}
 
 
 /* Finalist cards */
 .finalists{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:32px}
 .finalist-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px}
-.finalist-label{font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500;margin-bottom:4px}
+.finalist-label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500;margin-bottom:4px}
 .finalist-team{font-size:15px;font-weight:600;margin-bottom:3px}
 .finalist-pct{font-family:var(--mono);font-size:13px;color:var(--muted)}
 
@@ -149,8 +150,8 @@ header{display:flex;align-items:center;justify-content:space-between;
   padding:10px 12px}
 .ko-team{font-size:13px;font-weight:500;margin-bottom:2px;white-space:nowrap;
   overflow:hidden;text-overflow:ellipsis}
-.ko-pct{font-family:var(--mono);font-size:10.5px;color:var(--accent)}
-.ko-alt{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:3px}
+.ko-pct{font-family:var(--mono);font-size:11px;color:var(--accent)}
+.ko-alt{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:3px}
 .ko-empty{color:var(--muted);font-weight:400}
 
 footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
@@ -158,9 +159,9 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
 </style>
 </head>
 <body>
-<div class="page">
+<div class="page" role="main" id="conteudo" tabindex="-1">
 
-<header>
+<header role="none">
   <div class="brand">
     <div class="brand-mark">B∑</div>
     <div class="brand-text">
@@ -188,7 +189,7 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
 
   <div class="controls">
     <button class="btn" id="btn-run">▶ Simular Copa</button>
-    <select class="n-select" id="n-sims">
+    <select class="n-select" id="n-sims" aria-label="Número de simulações">
       <option value="1000">1 000 simulações</option>
       <option value="5000" selected>5 000 simulações</option>
       <option value="10000">10 000 simulações</option>
@@ -225,7 +226,7 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
   </div><!-- #results -->
 </div><!-- #main -->
 
-<footer>
+<footer role="none">
   <span>Bench Copa 2026 v1.0</span>
   <span>Dataset: Mart Jürisoo (1872–2026)</span>
   <span>Grupos: draw de 05/12/2025 · playoffs: favoritos</span>
@@ -50122,7 +50123,7 @@ function renderPodium(stats){
     <div class="podium-card p${i+1}">
       <div class="podium-rank">${i===0?_t('Favorito'):_o(i+1)}</div>
       <div class="podium-team">${flag(x.t)} ${dn(x.t)}</div>
-      <div class="podium-pct">${(x.p*100).toFixed(1)}%</div>
+      <div class="podium-pct">${_n(x.p*100,{minimumFractionDigits:1,maximumFractionDigits:1})}%</div>
       <div class="podium-sub">chance de título</div>
     </div>`).join('');
 }
@@ -50142,7 +50143,7 @@ function renderWinChart(stats){
         <div class="wc-bar-wrap">
           <div class="wc-bar" style="width:${(x.p/maxP*100).toFixed(1)}%;background:${color3(x.p)}"></div>
         </div>
-        <div class="wc-pct">${(x.p*100).toFixed(1)}%</div>
+        <div class="wc-pct">${_n(x.p*100,{minimumFractionDigits:1,maximumFractionDigits:1})}%</div>
       </div>`).join('');
 }
 
@@ -50224,7 +50225,7 @@ function renderKnockout(stats){
   for(const x of top3){
     html+=`<div class="ko-slot">
       <div class="ko-team">${flag(x.t)} ${dn(x.t)}</div>
-      <div class="ko-pct">${_t('{p}% de chance', { p: (x.p*100).toFixed(1) })}</div>
+      <div class="ko-pct">${_t('{p}% de chance', { p: _n(x.p*100,{minimumFractionDigits:1,maximumFractionDigits:1}) })}</div>
     </div>`;
   }
   html+='</div>';

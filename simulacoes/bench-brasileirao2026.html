@@ -2,7 +2,8 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="description" content="Simulação Monte Carlo do resto do Brasileirão 2026: chances de título, Libertadores, Sul-Americana e rebaixamento." />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
   <title>Bench Brasileirão 2026 — Simulador</title>
 
   <!-- PWA -->
@@ -41,7 +42,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
 header{display:flex;align-items:center;justify-content:space-between;
   padding:26px 0 22px;border-bottom:1px solid var(--border);margin-bottom:28px;gap:14px;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:12px}
-.brand-mark{width:36px;height:36px;background:var(--accent);border-radius:var(--radius);
+.brand-mark{width:36px;height:36px;background:var(--accent-fill, var(--accent));border-radius:var(--radius);
   display:grid;place-items:center;color:#fff;font-family:var(--mono);font-size:12px;font-weight:500;flex-shrink:0}
 .brand-text h1{font-size:15px;font-weight:600;letter-spacing:-.3px;line-height:1.2}
 .brand-text p{font-size:11px;color:var(--muted);font-family:var(--mono)}
@@ -61,9 +62,9 @@ header{display:flex;align-items:center;justify-content:space-between;
 
 /* Controls */
 .controls{display:flex;align-items:center;gap:10px;margin-bottom:24px;flex-wrap:wrap}
-.btn{background:var(--accent);color:#fff;border:none;padding:9px 20px;border-radius:var(--radius);
+.btn{background:var(--accent-fill, var(--accent));color:#fff;border:none;padding:9px 20px;border-radius:var(--radius);
   cursor:pointer;font-family:var(--sans);font-size:13px;font-weight:500;transition:opacity .15s}
-.btn:hover{opacity:.85}
+.btn:hover{filter:brightness(.9)}
 .btn:disabled{opacity:.4;cursor:not-allowed}
 .n-select{font-family:var(--mono);font-size:12px;padding:6px 10px;
   border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text);cursor:pointer;outline:none}
@@ -81,16 +82,16 @@ header{display:flex;align-items:center;justify-content:space-between;
 .podium-card.p3::before{background:#CD7F32}
 .podium-card.relz::before{background:var(--rel)}
 .podium-card.relz .podium-pct{color:var(--rel)}
-.podium-rank{font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:500;color:var(--muted);margin-bottom:3px}
+.podium-rank{font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:500;color:var(--muted);margin-bottom:3px}
 .podium-team{font-size:13.5px;font-weight:600;margin-bottom:2px;line-height:1.2;display:flex;align-items:center;gap:6px}
 .podium-pct{font-family:var(--mono);font-size:22px;font-weight:300;color:var(--text);line-height:1}
-.podium-sub{font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:3px}
+.podium-sub{font-size:11px;color:var(--muted);font-family:var(--mono);margin-top:3px}
 
 /* Main table */
 .table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
   overflow:hidden;margin-bottom:32px}
 table{width:100%;border-collapse:collapse;font-size:12.5px}
-thead th{font-size:9.5px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;
+thead th{font-size:11px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;
   color:var(--muted);background:var(--s-sunk);padding:9px 10px;border-bottom:1px solid var(--border);
   white-space:nowrap;text-align:left}
 thead th.r{text-align:right}
@@ -115,13 +116,13 @@ td.c{text-align:center}
 /* Team name cell */
 .team-cell{display:flex;align-items:center;gap:8px}
 .avatar{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-  font-size:9px;font-weight:700;flex-shrink:0;letter-spacing:-.3px}
+  font-size:11px;font-weight:700;flex-shrink:0;letter-spacing:-.3px}
 
 /* Probability bar (inline) */
 .prob-mini{display:flex;align-items:center;gap:6px}
 .pb-wrap{width:72px;background:var(--border);border-radius:2px;height:5px;overflow:hidden;flex-shrink:0}
 .pb-fill{height:100%;border-radius:2px}
-.pb-pct{font-family:var(--mono);font-size:10.5px;color:var(--muted);min-width:32px;text-align:right}
+.pb-pct{font-family:var(--mono);font-size:11px;color:var(--muted);min-width:32px;text-align:right}
 
 /* Detalhe por time (clique na linha) */
 tbody tr.team-row{cursor:pointer}
@@ -131,11 +132,11 @@ tr.detail-row>td,tr.detail-row:hover>td{background:var(--s-sunk)}
 .detail-head{font-size:11px;font-family:var(--mono);color:var(--muted);margin-bottom:10px}
 .dstat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:8px;margin-bottom:10px}
 .dstat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:8px 10px}
-.dstat-lbl{font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:2px;white-space:nowrap}
+.dstat-lbl{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:2px;white-space:nowrap}
 .dstat-val{font-family:var(--mono);font-size:16px;font-weight:500;line-height:1.2}
-.dstat-x{font-size:10px;color:var(--muted);margin-left:1px}
-.dstat-pct{font-family:var(--mono);font-size:10.5px;color:var(--muted)}
-.dstat.gold .dstat-val{color:var(--gold)}
+.dstat-x{font-size:11px;color:var(--muted);margin-left:1px}
+.dstat-pct{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.dstat.gold .dstat-val{color:var(--gold-text, var(--gold))}
 .dstat.lib .dstat-val{color:var(--lib)}
 .dstat.sul .dstat-val{color:var(--sul)}
 .dstat.rel .dstat-val{color:var(--rel)}
@@ -161,8 +162,8 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
 </style>
 </head>
 <body>
-<div class="page">
-<header>
+<div class="page" role="main" id="conteudo" tabindex="-1">
+<header role="none">
   <div class="brand">
     <div class="brand-mark">B∑</div>
     <div class="brand-text">
@@ -191,12 +192,12 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
   <div class="controls">
     <div id="data-warning" style="display:none;width:100%;margin-bottom:10px;padding:8px 12px;border-radius:6px;background:rgba(220,160,0,.12);border:1px solid rgba(220,160,0,.35);font-size:12px;line-height:1.5;"></div>
     <button class="btn" id="btn-run">▶ Simular resto da temporada</button>
-    <select class="n-select" id="n-seasons" title="Janela de temporadas usada para treinar o modelo">
+    <select class="n-select" id="n-seasons" title="Janela de temporadas usada para treinar o modelo" aria-label="Janela de temporadas usada para treinar o modelo">
       <option value="1">Últimas 1 temporada</option>
       <option value="5" selected>Últimas 5 temporadas (padrão)</option>
       <option value="10">Últimas 10 temporadas (histórico)</option>
     </select>
-    <select class="n-select" id="n-sims">
+    <select class="n-select" id="n-sims" aria-label="Número de simulações">
       <option value="1000">1 000 simulações</option>
       <option value="5000" selected>5 000 simulações</option>
       <option value="10000">10 000 simulações</option>
@@ -241,7 +242,7 @@ footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--border);
   </div>
 </div>
 
-<footer>
+<footer role="none">
   <span>Bench Brasileirão 2026 v1.0</span>
   <span>Dataset: campeonatobrasileirolimpo.csv (2003–2026)</span>
   <span id="footer-fixtures">simula os jogos restantes a partir da classificação real</span>
@@ -9888,7 +9889,7 @@ function avatar(t){
   const nm = dn(t);
   const init = nm.replace(/[^a-zA-ZÀ-ÿ\s]/g,'').split(/\s+/).filter(Boolean)
     .slice(0,2).map(w=>w[0].toUpperCase()).join('');
-  const [bg,fg] = TEAM_COLORS[t] || ['var(--s-text2)','#fff'];
+  const [bg,fg] = TEAM_COLORS[t] || ['var(--s-text2)','var(--surface)'];
   return `<div class="avatar" style="background:${bg};color:${fg}">${init}</div>`;
 }
 
@@ -9996,7 +9997,7 @@ async function runMC(model, N, onProgress){
 //  Rendering
 // ════════════════════════════════════════════════
 function p(count, N){ return count/N; }
-function fmtPct(v){ return (v*100).toFixed(1)+'%'; }
+function fmtPct(v){ return _n(v*100,{minimumFractionDigits:1,maximumFractionDigits:1})+'%'; }   // vírgula decimal em português, ponto em inglês
 function fmtPctInt(v){ return Math.round(v*100)+'%'; }
 
 function miniBar(prob, color){
@@ -10105,8 +10106,8 @@ function detailHTML(row, N){
       ${cell('Z4 — rebaixado', z4, 'rel')}
     </div>
     <div class="dstat-grid">
-      ${info('Pontos médios', row.avgPts.toFixed(1))}
-      ${info('Posição média', _t('{pos}º',{pos:(row.avgPos+1).toFixed(1)}))}
+      ${info('Pontos médios', _n(row.avgPts,{minimumFractionDigits:1,maximumFractionDigits:1}))}
+      ${info('Posição média', _t('{pos}º',{pos:_n(row.avgPos+1,{minimumFractionDigits:1,maximumFractionDigits:1})}))}
       ${info('Posição mais provável', _o(mode+1), _t('{p} das simulações',{p:fmtPct(h[mode]/N)}))}
       ${info('Melhor posição', best>=0 ? _o(best+1) : '—', best>=0 ? fmtN(h[best])+'×' : '')}
       ${info('Pior posição', worst>=0 ? _o(worst+1) : '—', worst>=0 ? fmtN(h[worst])+'×' : '')}
@@ -10165,7 +10166,7 @@ function renderTable(stats){
     return `<tr class="team-row" data-team="${row.t}" title="Clique para ver os detalhes">
       <td><span class="pos-badge ${posClass}">${pos}</span></td>
       <td><div class="team-cell">${avatar(row.t)}<span style="font-weight:500;font-size:13px">${dn(row.t)}</span></div></td>
-      <td class="r">${row.avgPts.toFixed(1)}</td>
+      <td class="r">${_n(row.avgPts,{minimumFractionDigits:1,maximumFractionDigits:1})}</td>
       <td class="c">${miniBar(row.cp,'#D4AF37')}</td>
       <td class="c">${miniBar(row.lib,'var(--lib)')}</td>
       <td class="c">${miniBar(row.sul,'var(--sul)')}</td>

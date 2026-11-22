@@ -18,6 +18,8 @@ npm run test:pwa           # PWA compliance tests (manifest, service worker, ico
 npm run test:copa          # Copa 2026 bracket tests
 npm run test:i18n          # Translations: en/zh coverage, placeholders, _t() keys, docs blocks
 
+npm run audit:a11y         # axe-core on every page, light/dark × desktop/phone (needs: npm i --no-save axe-core playwright + a static server); not part of npm test
+
 # Local development (no build step needed)
 python -m http.server 8000
 ```
@@ -84,6 +86,15 @@ CBF's first tiebreak). When true, `apps/tabela.html` shows the gold banner and t
 the leader is champion. Nothing to edit after a round. **Classificação page a11y** (checked with axe, light/dark, desktop/mobile, 0 violations):
 `<main id="conteudo">` + skip link from the shell, real table semantics (`caption`, `scope`, row-header club cell, `abbr` titles), zone
 names as screen-reader text (colour is never the only cue), phone layout with a "show all columns" toggle, loading/error/offline states.
+
+**Accessibility rules for every page** (all pages pass `npm run audit:a11y` with 0 violations — keep it that way): content wrapper has
+`role="main" id="conteudo" tabindex="-1"` (the shell then adds a skip link) and the page `<header>`/`<footer>` inside it carry `role="none"`
+(the shell bar is the only banner); every `<select>`/`<input>` has a label or `aria-label`; text colours come from tokens, never `#fff`/`rgba(255,255,255,…)`
+(invisible in light) nor `#D97706`/`#7A786F`/pastels (fail contrast) — warning text is `var(--s-warn-fg)`; **never lower contrast with `opacity`**
+(hover = `filter: brightness(.9)`); solid buttons with white text use `background: var(--accent-fill, var(--accent))` because in dark mode `--accent` is a
+light green made for text; horizontally scrolling boxes get keyboard focus/role/name automatically from the shell; text ≥ 11px; targets ≥ 24px
+(coarse pointers get ≥ 40px inside the main region); numbers shown to users go through `_n()` (pt uses a decimal comma). Pages need
+`viewport-fit=cover` (the shell applies the safe-area insets) and a `<meta name="description">`.
 
 ### Directory layout
 
