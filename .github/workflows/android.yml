@@ -1,0 +1,146 @@
+name: Android APK
+
+# Empacota o site estático num APK (Capacitor + Gradle).
+#  - tag v*  (ex.: v1.0.0): gera o APK ASSINADO e o anexa a um GitHub Release
+#  - pull request que mexe em app-android/ ou neste workflow: só confere que o build fecha (APK de debug)
+#  - "Run workflow" (manual): APK assinado se houver Secrets, senão debug; fica como artefato da execução
+# Segredos (Settings → Secrets and variables → Actions): ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD,
+# ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD. Como gerar a chave: ver "Android" no README.
+
+on:
+  push:
+    tags: ['v*']
+  pull_request:
+    paths: ['app-android/**', '.github/workflows/android.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+    outputs:
+      arquivo: ${{ steps.nome.outputs.arquivo }}
+      assinado: ${{ steps.nome.outputs.assinado }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app-android/package-lock.json
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Testes do site e do pacote do app
+        run: npm ci && npm test
+
+      - name: Dependências do Capacitor
+        working-directory: app-android
+        run: npm ci
+
+      - name: Monta o site dentro do app (www → assets)
+        working-directory: app-android
+        run: npm run sync
+
+      - name: Android SDK (plataforma e build-tools)
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.0.0" > /dev/null
+
+      - name: Cache do Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('app-android/android/**/*.gradle', 'app-android/android/gradle/wrapper/gradle-wrapper.properties', 'app-android/package-lock.json') }}
+          restore-keys: gradle-${{ runner.os }}-
+
+      - name: Versão
+        id: ver
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            V="${GITHUB_REF_NAME#v}"
+            [[ "$V" =~ ^[0-9]+(\.[0-9]+)*([.-][0-9A-Za-z.]+)?$ ]] || { echo "::error::Tag inválida para versão: $GITHUB_REF_NAME (use v1.2.3)"; exit 1; }
+          else V="0.0.${GITHUB_RUN_NUMBER}-dev"; fi
+          echo "nome=$V" >> "$GITHUB_OUTPUT"
+
+      - name: Release exige a chave de assinatura
+        if: startsWith(github.ref, 'refs/tags/v') && env.KEYSTORE_B64 == ''
+        run: |
+          echo "::error::Faltam os Secrets de assinatura (ANDROID_KEYSTORE_BASE64 etc.). Um release sem assinatura não atualiza o app já instalado."
+          exit 1
+
+      - name: Chave de assinatura
+        if: env.KEYSTORE_B64 != ''
+        run: |
+          echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/release.keystore"
+          echo "KEYSTORE_PATH=$RUNNER_TEMP/release.keystore" >> "$GITHUB_ENV"
+
+      - name: Gradle
+        id: gradle
+        working-directory: app-android/android
+        env:
+          VERSAO: ${{ steps.ver.outputs.nome }}
+        run: |
+          TAREFA=assembleDebug; if [ -n "$KEYSTORE_B64" ]; then TAREFA=assembleRelease; fi
+          ./gradlew "$TAREFA" --no-daemon -PappVersionName="$VERSAO" -PappVersionCode="$GITHUB_RUN_NUMBER"
+
+      - name: Nome do arquivo e verificação da assinatura
+        id: nome
+        env:
+          VERSAO: ${{ steps.ver.outputs.nome }}
+        run: |
+          mkdir -p dist
+          if [ -n "$KEYSTORE_B64" ]; then
+            ORIG=app-android/android/app/build/outputs/apk/release/app-release.apk; SUF=""; ASS=sim
+            "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --print-certs "$ORIG"
+          else
+            ORIG=app-android/android/app/build/outputs/apk/debug/app-debug.apk; SUF="-debug"; ASS=nao
+          fi
+          DEST="dist/Sassamaru-2026-${VERSAO}${SUF}.apk"
+          cp "$ORIG" "$DEST"
+          (cd dist && sha256sum "$(basename "$DEST")" | tee "$(basename "$DEST").sha256")
+          echo "arquivo=$(basename "$DEST")" >> "$GITHUB_OUTPUT"
+          echo "assinado=$ASS" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: apk
+          path: dist/*
+          if-no-files-found: error
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: apk
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: apk
+          path: dist
+      - name: Publica no GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/* --repo "$GITHUB_REPOSITORY" --title "Sassamaru 2026 $GITHUB_REF_NAME" \
+            --notes "APK com o site embutido (funciona offline). Instale direto no celular: o Android pede para permitir a instalação de fontes externas. Os dados são os do momento do build; para atualizar, instale o APK mais novo por cima. O hash SHA-256 está no arquivo .sha256 anexo." \
+            || gh release upload "$GITHUB_REF_NAME" dist/* --clobber --repo "$GITHUB_REPOSITORY"

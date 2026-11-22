@@ -1,0 +1,15 @@
+{
+  "name": "sassamaru-android",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Casca Android (Capacitor) do Sassamaru 2026: empacota o site estático dentro de um APK.",
+  "scripts": {
+    "www": "node scripts/montar-www.mjs",
+    "sync": "node scripts/montar-www.mjs && cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.6.2",
+    "@capacitor/cli": "^8.6.2",
+    "@capacitor/core": "^8.6.2"
+  }
+}

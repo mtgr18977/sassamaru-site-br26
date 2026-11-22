@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "test": "node tests/model.test.js && node tests/selecoes-model.test.js && node tests/pwa.test.js && node tests/copa2026-bracket.test.js && node tests/i18n.test.js && node tests/competicoes.test.js && node tests/simulacao.test.js",
+    "test": "node tests/model.test.js && node tests/selecoes-model.test.js && node tests/pwa.test.js && node tests/copa2026-bracket.test.js && node tests/i18n.test.js && node tests/competicoes.test.js && node tests/simulacao.test.js && node tests/android.test.js",
     "test:model": "node tests/model.test.js",
     "test:backtest": "node tests/backtest.test.js",
     "test:selecoes": "node tests/selecoes-model.test.js",
@@ -11,6 +11,8 @@
     "test:copa": "node tests/copa2026-bracket.test.js",
     "test:i18n": "node tests/i18n.test.js",
     "test:competicoes": "node tests/competicoes.test.js && node tests/simulacao.test.js",
+    "test:android": "node tests/android.test.js",
+    "android:sync": "npm --prefix app-android run sync",
     "test:backtest:b": "COMP=serie-b node tests/backtest.test.js",
     "audit:a11y": "node tests/a11y.audit.js"
   },

@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 # Run tests
-npm test                   # Seven suites (model, selecoes, pwa, copa, i18n, competicoes, simulacao)
+npm test                   # Eight suites (model, selecoes, pwa, copa, i18n, competicoes, simulacao, android)
 npm run test:model         # Club model unit tests
 npm run test:backtest      # Walk-forward accuracy regression gate — run this
                            # after ANY change to the Brasileirão model math
@@ -17,6 +17,7 @@ npm run test:selecoes      # Selection model tests (111 assertions)
 npm run test:pwa           # PWA compliance tests (manifest, service worker, icons)
 npm run test:copa          # Copa 2026 bracket tests
 npm run test:i18n          # Translations: en/zh coverage, placeholders, _t() keys, docs blocks
+npm run test:android       # APK bundle: every relative reference of every page is inside app-android/www; Capacitor/Gradle config; no keystore tracked
 
 npm run audit:a11y         # axe-core on every page, light/dark × desktop/phone (needs: npm i --no-save axe-core playwright + a static server); not part of npm test
 
@@ -96,6 +97,17 @@ light green made for text; horizontally scrolling boxes get keyboard focus/role/
 (coarse pointers get ≥ 40px inside the main region); numbers shown to users go through `_n()` (pt uses a decimal comma). Pages need
 `viewport-fit=cover` (the shell applies the safe-area insets) and a `<meta name="description">`.
 
+### Android APK (`app-android/`)
+
+Capacitor shell that embeds the static site in an APK (offline from first launch, independent of Netlify). `scripts/montar-www.mjs` copies an
+explicit allow-list (`INCLUIR`) of the repo into `www/` — **when a page starts loading a new file/folder, add it to `INCLUIR`**
+(`npm run test:android` fails on any dangling relative reference). `.github/workflows/android.yml` runs the tests, `cap sync`, `./gradlew
+assembleRelease`, verifies the signature and, on a `v*` tag, attaches the signed APK + sha256 to a GitHub Release (a tag without the
+signing Secrets fails on purpose). The keystore lives only in GitHub Secrets (`ANDROID_KEYSTORE_BASE64`, `…_PASSWORD`, `ANDROID_KEY_ALIAS`,
+`ANDROID_KEY_PASSWORD`); `build.gradle` reads it from env vars; never commit `*.keystore`/`*.jks`. Data inside an APK is frozen at build time, so
+after each data update push a new tag. `appId` is permanent once released. `www/`, `node_modules/` and Gradle outputs are git-ignored.
+See README → Android.
+
 ### Directory layout
 
 - `shell/` — app shell shared by all pages (tab bar, theme toggle, install button)
@@ -113,7 +125,8 @@ light green made for text; horizontally scrolling boxes get keyboard focus/role/
   also loads `../modelos/model.js`; `bench-copa2026.html` (and `apps/bench-selecoes.html`) still carry
   their own inline copy of the selections model — change `selecoes-model.js` and they do not follow
 - `datasets/` — CSV data files
-- `tests/` — Node tests: model math, walk-forward backtest, PWA compliance, Copa bracket
+- `app-android/` — Capacitor/Gradle project that packages the site as an APK (see *Android APK*)
+- `tests/` — Node tests: model math, walk-forward backtest, PWA compliance, Copa bracket, APK bundle
 
 Do NOT paste the model back inline into a page. The Brasileirão model used to exist as three
 diverging hand-copied versions with different constants and no test covering any of them.

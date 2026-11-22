@@ -35,6 +35,24 @@ Limitações, de propósito explícitas:
 
 Para regerar: `python scripts/importar_wikipedia_serie_b.py` (precisa de internet; aceita `--cache DIR`; `--fonte pt|en` força uma das páginas em 2026, o padrão é a interseção das duas). Para atualizar as rodadas reais de 2026, baixe a tabela básica em PDF no site da CBF e rode `python scripts/importar_tabela_cbf.py tabela.pdf datasets/serie-b-2026-tabela-cbf.csv` (precisa do `pdftotext`). `python scripts/dados_serie.py validar <csv>` confere qualquer CSV no formato do modelo.
 
+## Android (APK pelo GitHub Actions)
+
+`app-android/` empacota o site **dentro** de um APK com [Capacitor](https://capacitorjs.com) + Gradle: o app abre `index.html` de dentro do pacote, então funciona offline desde a primeira abertura e não depende do Netlify. O conteúdo é montado por `app-android/scripts/montar-www.mjs` (copia só o que as páginas usam; `npm run test:android` confere que não falta nada) e os dados são **os do momento do build**: a cada rodada atualizada, publique uma tag nova e instale o APK mais novo por cima.
+
+**Gerar o APK pelo GitHub** (workflow `.github/workflows/android.yml`):
+
+1. Uma vez, crie a chave de assinatura (guarde o `.keystore` e as senhas num cofre; **sem ela não dá para atualizar o app já instalado** e ela nunca vai para o repositório):
+   `keytool -genkeypair -v -keystore sassamaru.keystore -alias sassamaru -keyalg RSA -keysize 2048 -validity 10000`
+2. Em *Settings → Secrets and variables → Actions* crie: `ANDROID_KEYSTORE_BASE64` (saída de `base64 -w0 sassamaru.keystore`), `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS` (`sassamaru`) e `ANDROID_KEY_PASSWORD`.
+3. Publique uma tag: `git tag v1.0.0 && git push origin v1.0.0`. O workflow roda os testes, compila, confere a assinatura (`apksigner verify`) e anexa `Sassamaru-2026-1.0.0.apk` (+ `.sha256`) a um GitHub Release. Sem os Secrets, a tag falha de propósito (um release sem assinatura não atualiza o app).
+4. No celular: baixe o APK do Release e permita a instalação de fontes externas; o Play Protect pode avisar, porque o app não vem da loja.
+
+Pull requests que mexem em `app-android/` só conferem que o build fecha (APK de debug). "Run workflow" manual gera o APK como artefato da execução. O `versionCode` é o número da execução; a versão vem da tag.
+
+**Localmente** (precisa de Node 22, Java 21 e Android SDK com `platforms;android-36`): `npm --prefix app-android ci && npm run android:sync && cd app-android/android && ./gradlew assembleDebug` → `app/build/outputs/apk/debug/app-debug.apk`. O `appId` (`br.app.sassamaru`) é a identidade do app no Android: mude-o em `app-android/capacitor.config.json` e em `android/app/build.gradle` **antes** do primeiro release, nunca depois.
+
+Limites: só Android (iOS exigiria Mac, conta Apple paga e outro fluxo); fontes e bibliotecas de CDN (Google Fonts) continuam vindo da rede, o app cai nas fontes do sistema quando está offline na primeira vez.
+
 ## Classificação, selo de campeão e acessibilidade
 
 A página **Classificação** (Série A e B) mostra escudo, zonas (com texto, não só cor) e, quando o título já está garantido, a faixa dourada e o selo **Campeão** — calculado pela tabela (`Competicoes.campeaoAntecipado`: ninguém mais alcança o líder, usando a vitória como 1º desempate), sem edição manual. No celular a tabela mostra #, clube, pontos, jogos e saldo, com um botão para as demais colunas. Foi auditada com o axe (claro/escuro, desktop/celular): sem violações. O app ganhou o atalho "Classificação" no manifest e o link "Pular para o conteúdo".

@@ -3,3 +3,10 @@ __pycache__/
 *.pyo
 /tmp/
 node_modules/
+
+# Casca Android (Capacitor): o conteúdo do app é montado a cada build e as chaves de assinatura nunca entram
+app-android/node_modules/
+app-android/www/
+app-android/android/local.properties
+*.keystore
+*.jks
