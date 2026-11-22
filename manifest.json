@@ -69,6 +69,18 @@
           "sizes": "192x192"
         }
       ]
+    },
+    {
+      "name": "Classificação",
+      "short_name": "Tabela",
+      "description": "Classificação do Brasileirão e título",
+      "url": "./apps/tabela.html",
+      "icons": [
+        {
+          "src": "./icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ],
   "id": "./index.html"

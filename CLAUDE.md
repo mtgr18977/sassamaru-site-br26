@@ -78,6 +78,13 @@ gives aggregate and who goes up (higher-seeded team hosts the 2nd leg and wins a
 next phase's pending legs, which the Série B prediction page loads into the fixtures box once the 38 rounds are done. The Classificação page
 renders the bracket. The test pins that the four clubs are the 3rd–6th of the dataset's final table.
 
+**Champion badge** (Classificação page, both divisions): not hand-coded — `Competicoes.campeaoAntecipado(tabela, rodadas)` decides from the
+table whether the leader can no longer be caught (rival max points; on equal points the leader needs more wins than the rival can reach,
+CBF's first tiebreak). When true, `apps/tabela.html` shows the gold banner and the "Campeão" chip on that row; when the season is complete
+the leader is champion. Nothing to edit after a round. **Classificação page a11y** (checked with axe, light/dark, desktop/mobile, 0 violations):
+`<main id="conteudo">` + skip link from the shell, real table semantics (`caption`, `scope`, row-header club cell, `abbr` titles), zone
+names as screen-reader text (colour is never the only cue), phone layout with a "show all columns" toggle, loading/error/offline states.
+
 ### Directory layout
 
 - `shell/` — app shell shared by all pages (tab bar, theme toggle, install button)

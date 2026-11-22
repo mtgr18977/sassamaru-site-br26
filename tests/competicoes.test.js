@@ -146,6 +146,24 @@ section('Playoff de acesso da Série B 2026');
   ok(C.proximosJogosPlayoff(fake) === null && C.proximosJogosPlayoff(undefined) === null, 'tudo jogado (ou sem playoff): nada a carregar');
 }
 
+// ── título garantido ────────────────────────────────────────────────────────
+section('campeaoAntecipado — título garantido');
+{
+  const L = (t, pts, w, played) => ({ t, pts, w, played });
+  // o caso real de 22/11/2026: Flamengo 80 pts/24 V, Palmeiras 74/21 V, ambos com 36 jogos → empata em 80, mas tem mais vitórias
+  let r = C.campeaoAntecipado([L('fla', 80, 24, 36), L('pal', 74, 21, 36), L('cru', 66, 20, 36), L('flu', 60, 17, 35)], 38);
+  ok(r && r.clube === 'fla' && !r.encerrada && r.faltam === 2 && r.vice === 'pal' && r.vantagem === 6, 'Flamengo: 80 pts/24 V × teto do Palmeiras (80 pts/23 V) → campeão com 2 rodadas por jogar');
+  ok(C.campeaoAntecipado([L('a', 80, 22, 36), L('b', 74, 21, 36)], 38) === null, 'empate possível em pontos com vitórias iguais ou menos (22 × 23): ainda não é garantido');
+  ok(C.campeaoAntecipado([L('a', 80, 23, 36), L('b', 74, 21, 36)], 38) === null, 'mesmas vitórias possíveis (23 × 23): saldo de gols decidiria → não é garantido');
+  ok(C.campeaoAntecipado([L('a', 81, 22, 36), L('b', 74, 21, 36)], 38).clube === 'a', 'pontos à frente do teto do rival: campeão mesmo com menos vitórias');
+  ok(C.campeaoAntecipado([L('a', 70, 20, 30), L('b', 69, 20, 30)], 38) === null, 'corrida aberta: null');
+  // jogos a menos do rival contam: b tem um jogo atrasado
+  ok(C.campeaoAntecipado([L('a', 80, 24, 36), L('b', 74, 21, 35)], 38) === null, 'rival com jogo a mais por disputar pode chegar a 83: não garantido');
+  r = C.campeaoAntecipado([L('nov', 73, 21, 38), L('juv', 71, 20, 38), L('vil', 66, 18, 38)], 38);
+  ok(r && r.clube === 'nov' && r.encerrada && r.faltam === 0 && r.vantagem === 2, 'temporada completa: o líder da tabela é o campeão');
+  ok(C.campeaoAntecipado([], 38) === null && C.campeaoAntecipado(undefined, 38) === null, 'sem tabela: null');
+}
+
 // ── rodadas sobrepostas ─────────────────────────────────────────────────────
 section('statusCalendario — rodadas que se sobrepõem');
 {

@@ -85,6 +85,9 @@ body { overscroll-behavior-y: none; }
 }
 .app-tab:hover { color: #fff; background: rgba(255,255,255,.07); }
 .app-tab[aria-current="page"] { color: #fff; border-bottom-color: #D4AF37; font-weight: 600; }
+/* link "Pular para o conteúdo": invisível até receber o foco do teclado */
+.skip-link { position: absolute; left: 8px; top: -64px; z-index: 100; background: #fff; color: #141412; padding: 10px 14px; border-radius: 6px; font: 500 14px/1 var(--sans, system-ui, sans-serif); text-decoration: none; box-shadow: 0 2px 8px rgba(0,0,0,.35); }
+.skip-link:focus { top: calc(8px + env(safe-area-inset-top)); outline: 2px solid #1A4731; outline-offset: 2px; }
 .app-tab:focus-visible { outline: 2px solid #fff; outline-offset: -3px; }
 .app-tab .ico { font-size: 14px; line-height: 1; }
 

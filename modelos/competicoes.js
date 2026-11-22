@@ -128,6 +128,22 @@
 
   function jogosDaRodada(cal, n) { return cal.jogos.filter(function (j) { return j.rodada === n; }); }
 
+  // ── Título garantido ───────────────────────────────────────────────────────
+  // `tabela`: classificação JÁ ordenada pelos critérios da CBF (pontos, vitórias, saldo, gols pró), cada linha { t, pts, w, played }.
+  // O líder é campeão se nenhum rival consegue alcançá-lo nem empatar com vantagem: o rival termina, no máximo, com
+  // pts + 3×jogos que faltam; empatando em pontos, o líder só está a salvo se já tem MAIS vitórias do que o rival pode somar
+  // (vitórias é o 1º desempate; saldo de gols nunca é garantido). Conservador: ignora que o próprio líder ainda vai pontuar.
+  function campeaoAntecipado(tabela, rodadas) {
+    if (!tabela || !tabela.length) return null;
+    var l = tabela[0], faltam = function (r) { return Math.max(0, rodadas - r.played); };
+    if (tabela.every(function (r) { return faltam(r) === 0; })) return { clube: l.t, encerrada: true, faltam: 0, vice: tabela[1] ? tabela[1].t : null, vantagem: tabela[1] ? l.pts - tabela[1].pts : null };
+    for (var i = 1; i < tabela.length; i++) {
+      var r = tabela[i], maxPts = r.pts + 3 * faltam(r), maxV = r.w + faltam(r);
+      if (!(l.pts > maxPts || (l.pts === maxPts && l.w > maxV))) return null;
+    }
+    return { clube: l.t, encerrada: false, faltam: faltam(l), vice: tabela[1] ? tabela[1].t : null, vantagem: tabela[1] ? l.pts - tabela[1].pts : null };
+  }
+
   // ── Playoff de acesso (mata-mata de ida e volta) ───────────────────────────
   // confronto = { melhor, pior, jogos: [{ fase, mandante, visitante, placar: null | [golsMandante, golsVisitante] }] }
   // O melhor colocado joga a volta em casa; empate no agregado → sobe o melhor colocado (não há prorrogação nem pênaltis).
@@ -172,6 +188,6 @@
   return {
     COMPETICOES: COMPETICOES, PADRAO: PADRAO, obter: obter, lista: lista, indiceTreino: indiceTreino,
     dia: dia, diasEntre: diasEntre, statusCalendario: statusCalendario, jogosDaRodada: jogosDaRodada,
-    resumoPlayoff: resumoPlayoff, proximosJogosPlayoff: proximosJogosPlayoff,
+    resumoPlayoff: resumoPlayoff, proximosJogosPlayoff: proximosJogosPlayoff, campeaoAntecipado: campeaoAntecipado,
   };
 });
