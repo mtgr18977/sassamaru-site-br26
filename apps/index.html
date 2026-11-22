@@ -10224,7 +10224,10 @@
 9512,35.0,Grêmio,Bahia,-,0,0
 9513,35.0,Vasco,Internacional,Vasco,2,1
 9514,35.0,Vitória,Bragantino,Vitória,2,1
-9515,35.0,São Paulo,Fluminense,Fluminense,0,1`;</script>
+9515,35.0,São Paulo,Fluminense,Fluminense,0,1
+9516,36.0,Palmeiras,Flamengo,-,1,1
+9517,36.0,Bahia,Coritiba,Coritiba,0,1
+9518,36.0,Chapecoense,Cruzeiro,Cruzeiro,1,2`;</script>
 </head>
 
 <body>
@@ -11323,6 +11326,8 @@ function renderCalendario() {
   if (!CAL) { card.hidden = true; return; }
   const st = Comp.statusCalendario(CAL, new Date());
   const foco = st.foco;
+  // sem rodada em foco (temporada regular encerrada): se há playoff com jogos sem placar, ele é a pauta
+  const po = !foco && CAL.playoff ? Comp.proximosJogosPlayoff(CAL.playoff) : null;
   let titulo, sub, count, agora = false;
   if (st.estado === 'em-andamento') {
     titulo = _t('Rodada {n}', { n: foco.n }); agora = true;
@@ -11332,6 +11337,11 @@ function renderCalendario() {
     titulo = _t('Rodada {n}', { n: foco.n });
     count = fmtDias(st.diasAteFoco);
     sub = _t('começa {dia}', { dia: fmtLongo(foco.inicioStr) }) + (foco.fimStr !== foco.inicioStr ? ' · ' + _t('termina {dia}', { dia: fmtLongo(foco.fimStr) }) : '');
+  } else if (po) {
+    const dd = Comp.diasEntre(st.hoje, Comp.dia(po.data));
+    titulo = _t('Playoff de acesso');
+    count = dd >= 0 ? fmtDias(dd) : '';
+    sub = _t('Temporada regular encerrada · {fase}: {dia}.', { fase: po.fase === 'ida' ? _t('jogos de ida') : _t('jogos de volta'), dia: fmtLongo(po.data) });
   } else if (st.estado === 'sem-calendario') {
     titulo = _t('Sem datas para as próximas rodadas'); count = '';
     sub = _t('O calendário do app vai até a rodada {n}; as datas seguintes ainda não foram divulgadas.', { n: st.ultima ? st.ultima.n : '—' });
@@ -11356,7 +11366,7 @@ function renderCalendario() {
     return `<i class="${cls}" title="${_t('Rodada {n}', { n: r.n })}${datas ? ' · ' + datas : ''}"></i>`;
   }).join('');
 
-  const jogos = foco ? Comp.jogosDaRodada(CAL, foco.n) : [];
+  const jogos = foco ? Comp.jogosDaRodada(CAL, foco.n) : po ? po.jogos : [];
   const pend = CAL.pendentes || [];
   const provisorio = foco && foco.status === 'provisoria';
   const atualizado = Comp.dia(CAL.atualizadoEm);
@@ -11364,11 +11374,11 @@ function renderCalendario() {
 
   card.innerHTML =
     `<div class="cal-grid"><div class="cal-main">`
-    + `<div class="eyebrow">${st.estado === 'em-andamento' ? _t('Rodada atual') : _t('Próxima rodada')} · ${COMP.nome} ${CAL.temporada}</div>`
+    + `<div class="eyebrow">${po ? _t('Próximos jogos') : st.estado === 'em-andamento' ? _t('Rodada atual') : _t('Próxima rodada')} · ${COMP.nome} ${CAL.temporada}</div>`
     + `<div class="big"><b>${titulo}</b>${count ? `<span class="count${agora ? ' now' : ''}">${count}</span>` : ''}</div>`
     + `<div class="sub">${sub}</div>`
     + `<div class="cal-actions">`
-    + (jogos.length ? `<button type="button" id="calLoad">${_t('Simular os {n} jogos da rodada {r}', { n: jogos.length, r: foco.n })}</button>` : '')
+    + (jogos.length ? `<button type="button" id="calLoad">${foco ? _t('Simular os {n} jogos da rodada {r}', { n: jogos.length, r: foco.n }) : _t('Simular os {n} jogos do playoff', { n: jogos.length })}</button>` : '')
     + `</div></div>`
     + `<div class="cal-side">${lado.map(([k, v]) => `<div><div class="k">${k}</div><div class="v">${v}</div></div>`).join('')}</div></div>`
     + `<div class="cal-strip" aria-label="${_t('Rodadas da temporada')}">${strip}</div>`
@@ -11387,6 +11397,7 @@ function renderCalendario() {
   const campo = $("fixtures");
   campo.value = jogos.map(j => `${j.mandante} x ${j.visitante}`).join("\n");
   if (foco) $("upcomingRound").value = foco.n;
+  else if (po) $("upcomingRound").value = CAL.rodadas.length;   // o modelo só usa o número como rótulo; o playoff vem depois da última rodada
   campo.dispatchEvent(new Event('input', { bubbles: true }));
 
   const btn = $("calLoad");

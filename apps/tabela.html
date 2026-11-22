@@ -64,6 +64,25 @@
     .bar b { display: block; height: 100%; background: var(--accent); }
     .notes { margin-top: 16px; font: 400 12px/1.6 var(--mono); color: var(--muted); }
     .notes p + p { margin-top: 4px; }
+    .po { margin-top: 28px; }
+    .po h2 { font-size: 17px; font-weight: 600; letter-spacing: -.3px; }
+    .po > p { font: 400 12px/1.5 var(--mono); color: var(--muted); margin: 4px 0 14px; max-width: 760px; }
+    .po-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+    .po-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px 16px; }
+    .po-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 10px; font: 500 11px var(--mono); text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+    .po-tag { border: 1px solid var(--border); border-radius: 999px; padding: 2px 9px; background: var(--accent-lt); color: var(--accent); white-space: nowrap; }
+    .po-card.ok .po-tag { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .po-leg { padding: 8px 0; border-top: 1px solid var(--border); }
+    .po-leg .when { font: 400 11px var(--mono); color: var(--muted); }
+    .po-leg .when b { font-weight: 500; color: var(--text); margin-right: 6px; }
+    .po-leg .jogo { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: baseline; margin-top: 2px; font-size: 15px; }
+    .po-leg .jogo span:first-child { text-align: right; }
+    .po-leg .jogo .pl { font: 600 15px var(--mono); min-width: 44px; text-align: center; color: var(--muted); }
+    .po-leg .jogo .pl.on { color: var(--text); }
+    .po-leg .where { font: 400 11px var(--mono); color: var(--muted); margin-top: 1px; }
+    .po-leg.done .jogo .w { font-weight: 600; }
+    .po-agg { border-top: 1px solid var(--border); padding-top: 9px; font: 400 12px/1.5 var(--mono); color: var(--muted); }
+    .po-agg b { color: var(--text); font-weight: 500; }
     .err { background: var(--bad-lt); color: var(--bad); border-radius: var(--radius); padding: 12px 14px; font: 400 13px var(--mono); }
     @media (max-width: 640px) {
       th, td { padding: 8px 6px; }
@@ -81,6 +100,7 @@
   <div id="legenda" class="legend"></div>
   <div class="card"><div id="tabela" style="min-height:120px"></div></div>
   <div id="notas" class="notes"></div>
+  <section id="playoff" class="po" hidden></section>
 </div>
 
 <script>
@@ -112,6 +132,36 @@
       cab.forEach(function (c, i) { o[c] = v[i]; });
       return o;
     });
+  }
+
+  // Playoff de acesso (só Série B): chaveamento, jogos de ida e volta, placares e quem sobe
+  function renderPlayoff(cal) {
+    var box = $('playoff'), po = cal && cal.playoff;
+    if (!po || COMP.id !== 'serie-b') { box.hidden = true; return; }
+    var loc = (window.I18N && I18N.LANGS[I18N.lang].locale) || 'pt-BR';
+    var quando = function (j) {
+      return Comp.dia(j.data).toLocaleDateString(loc, { weekday: 'short', day: 'numeric', month: 'short' }) + (j.hora ? ' · ' + j.hora : '');
+    };
+    var html = '<h2>' + esc(_t('Playoff de acesso')) + '</h2>' +
+      '<p>' + esc(_t('Ida e volta: o melhor colocado na fase regular joga a volta em casa e, se empatar no agregado, é ele quem sobe. Os dois vencedores completam os quatro promovidos à Série A.')) + '</p><div class="po-grid">';
+    po.confrontos.forEach(function (c) {
+      var r = Comp.resumoPlayoff(c);
+      var tag = r.estado === 'decidido' ? _t('{clube} sobe', { clube: r.classificado })
+        : r.estado === 'em-andamento' ? _t('Em andamento@@playoff') : _t('A jogar@@playoff');
+      html += '<div class="po-card' + (r.estado === 'decidido' ? ' ok' : '') + '"><div class="po-head"><span>' + esc(_o(c.pos[0]) + ' × ' + _o(c.pos[1])) +
+        '</span><span class="po-tag">' + esc(tag) + '</span></div>';
+      c.jogos.forEach(function (j) {
+        var feito = !!j.placar, gm = feito ? j.placar[0] : null, gv = feito ? j.placar[1] : null;
+        html += '<div class="po-leg' + (feito ? ' done' : '') + '"><div class="when"><b>' + esc(j.fase === 'ida' ? _t('Ida@@jogo') : _t('Volta@@jogo')) + '</b>' + esc(quando(j)) + '</div>' +
+          '<div class="jogo"><span' + (feito && gm > gv ? ' class="w"' : '') + '>' + esc(j.mandante) + '</span><span class="pl' + (feito ? ' on' : '') + '">' + (feito ? gm + ' × ' + gv : '×') +
+          '</span><span' + (feito && gv > gm ? ' class="w"' : '') + '>' + esc(j.visitante) + '</span></div>' +
+          (j.estadio ? '<div class="where">' + esc(j.estadio) + '</div>' : '') + '</div>';
+      });
+      html += '<div class="po-agg">' + esc(_t('Agregado')) + ': <b>' + esc(c.melhor) + ' ' + r.agregado[c.melhor] + ' × ' + r.agregado[c.pior] + ' ' + esc(c.pior) + '</b>' +
+        (r.porCriterio ? '<br>' + esc(_t('Empate no agregado: sobe o melhor colocado na fase regular.')) : '') + '</div></div>';
+    });
+    box.innerHTML = html + '</div>';
+    box.hidden = false;
   }
 
   function render(rows) {
@@ -153,6 +203,7 @@
     if (min !== max) notas.push(_t('Clubes com número de jogos diferente têm partidas adiadas já disputadas (ou ainda por jogar).'));
     if (COMP.rodadasSinteticas) notas.push(_t('Série B: a ordem das rodadas é sintética (a fonte não traz datas); a tabela usa só os resultados reais.'));
     $('notas').innerHTML = notas.map(function (n) { return '<p>' + esc(n) + '</p>'; }).join('');
+    renderPlayoff(cal);
   }
 
   fetch('../' + COMP.csv, { cache: 'no-store' }).then(function (r) {

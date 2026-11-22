@@ -71,6 +71,13 @@ doubtful scores in a third source, `python scripts/dados_serie.py validar`, then
 division-agnostic (`buildModel(rows, {trainFromSeason})`); unseen clubs fall back to α=β=1, Elo 1500 with a warning.
 Keep a club's name identical across divisions (the importer's `CANONICO` map) or the model will not recognise a promoted club.
 
+**Série B promotion playoff** (3rd×6th, 4th×5th, two legs) is *not* in the CSV or the model: it lives in `datasets/calendario.js`
+(`serie-b-2026.playoff.confrontos[].jogos[]`, each leg with date/time/venue and `placar: null | [homeGoals, awayGoals]`). After every
+leg, fill in the `placar` of that leg (home team first), run `npm run test:competicoes`, bump `CACHE_VERSION`. `Competicoes.resumoPlayoff(conf)`
+gives aggregate and who goes up (higher-seeded team hosts the 2nd leg and wins a level aggregate); `proximosJogosPlayoff(playoff)` gives the
+next phase's pending legs, which the Série B prediction page loads into the fixtures box once the 38 rounds are done. The Classificação page
+renders the bracket. The test pins that the four clubs are the 3rd–6th of the dataset's final table.
+
 ### Directory layout
 
 - `shell/` — app shell shared by all pages (tab bar, theme toggle, install button)
@@ -164,12 +171,12 @@ became a 21st club in the table.
 ## Model accuracy
 
 `npm run test:backtest` is the regression gate. Current numbers (walk-forward, refit every 4
-rounds, last 3 seasons, n=1110 for Série A, data through round 35 of 2026):
+rounds, last 3 seasons, n=1113 for Série A, data through round 36 (3 games) of 2026):
 
 | | log-loss | RPS | accuracy |
 |---|---|---|---|
-| Model | 1.025 | 0.211 | 48.7% |
-| Constant 47/27/26 baseline | 1.055 | 0.221 | 47.7% |
+| Model | 1.026 | 0.211 | 48.7% |
+| Constant 47/27/26 baseline | 1.056 | 0.221 | 47.5% |
 | Série B model (n=1,140) | 1.045 | 0.215 | 47.0% |
 | Série B constant 49/27/24 baseline | 1.054 | 0.218 | 47.8% |
 

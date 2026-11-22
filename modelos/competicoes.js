@@ -128,8 +128,50 @@
 
   function jogosDaRodada(cal, n) { return cal.jogos.filter(function (j) { return j.rodada === n; }); }
 
+  // ── Playoff de acesso (mata-mata de ida e volta) ───────────────────────────
+  // confronto = { melhor, pior, jogos: [{ fase, mandante, visitante, placar: null | [golsMandante, golsVisitante] }] }
+  // O melhor colocado joga a volta em casa; empate no agregado → sobe o melhor colocado (não há prorrogação nem pênaltis).
+  function resumoPlayoff(conf) {
+    var gols = {}; gols[conf.melhor] = 0; gols[conf.pior] = 0;
+    var jogados = 0;
+    conf.jogos.forEach(function (j) {
+      if (!j.placar) return;
+      jogados++;
+      gols[j.mandante] += j.placar[0];
+      gols[j.visitante] += j.placar[1];
+    });
+    var total = conf.jogos.length, decidido = jogados === total;
+    var classificado = null, porCriterio = false;
+    if (decidido) {
+      if (gols[conf.melhor] === gols[conf.pior]) { classificado = conf.melhor; porCriterio = true; }
+      else classificado = gols[conf.melhor] > gols[conf.pior] ? conf.melhor : conf.pior;
+    }
+    return {
+      estado: decidido ? 'decidido' : jogados === 0 ? 'a-jogar' : 'em-andamento',
+      jogados: jogados, total: total,
+      agregado: gols,                       // { [clube]: gols no agregado até agora }
+      classificado: classificado,           // quem sobe (null enquanto não decidido)
+      porCriterio: porCriterio,             // true se subiu só por ser o melhor colocado (empate no agregado)
+    };
+  }
+
+  // Jogos do playoff ainda sem placar, da fase (ida ou volta) mais próxima — é o que o campo de jogos da Série B carrega.
+  // Devolve null quando todos os jogos já têm placar.
+  function proximosJogosPlayoff(playoff) {
+    if (!playoff) return null;
+    var pend = [];
+    playoff.confrontos.forEach(function (c) { c.jogos.forEach(function (j) { if (!j.placar) pend.push(j); }); });
+    if (!pend.length) return null;
+    var primeira = pend.map(function (j) { return j.data; }).sort()[0];
+    var fase = pend.filter(function (j) { return j.data === primeira; })[0].fase;
+    var jogos = pend.filter(function (j) { return j.fase === fase; });
+    jogos.sort(function (a, b) { return (a.data + (a.hora || '')) < (b.data + (b.hora || '')) ? -1 : 1; });
+    return { fase: fase, data: jogos[0].data, jogos: jogos };
+  }
+
   return {
     COMPETICOES: COMPETICOES, PADRAO: PADRAO, obter: obter, lista: lista, indiceTreino: indiceTreino,
     dia: dia, diasEntre: diasEntre, statusCalendario: statusCalendario, jogosDaRodada: jogosDaRodada,
+    resumoPlayoff: resumoPlayoff, proximosJogosPlayoff: proximosJogosPlayoff,
   };
 });
