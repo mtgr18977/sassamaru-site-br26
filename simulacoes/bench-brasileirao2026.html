@@ -9929,10 +9929,10 @@ function buildFixtureCDF(model){
 
 // Simula APENAS os jogos que faltam, partindo da classificação real.
 function simulateSeason(){
-  const pts={}, gd={}, gf={};
+  const pts={}, gd={}, gf={}, vit={};
   for(const t of TEAMS){
-    const st = SEASON_STATE.standings.get(t) || {pts:0, gd:0, gf:0};
-    pts[t]=st.pts; gd[t]=st.gd; gf[t]=st.gf;
+    const st = SEASON_STATE.standings.get(t) || {pts:0, gd:0, gf:0, w:0};
+    pts[t]=st.pts; gd[t]=st.gd; gf[t]=st.gf; vit[t]=st.w || 0;
   }
 
   for(const f of FIXTURE_CDF){
@@ -9942,13 +9942,15 @@ function simulateSeason(){
     const hg = f.hgs[i], ag = f.ags[i];
     pts[f.home] += hg>ag?3:(hg===ag?1:0);
     pts[f.away] += ag>hg?3:(ag===hg?1:0);
+    if(hg>ag) vit[f.home]++; else if(ag>hg) vit[f.away]++;
     gd[f.home]  += hg-ag; gd[f.away] += ag-hg;
     gf[f.home]  += hg;    gf[f.away] += ag;
   }
 
   return TEAMS
-    .map(t=>({t, pts:pts[t], gd:gd[t], gf:gf[t]}))
-    .sort((a,b)=>b.pts-a.pts||b.gd-a.gd||b.gf-a.gf);
+    .map(t=>({t, pts:pts[t], w:vit[t], gd:gd[t], gf:gf[t]}))
+    // critérios da CBF: pontos, vitórias, saldo de gols, gols pró (como em modelos/simulacao.js)
+    .sort((a,b)=>b.pts-a.pts||b.w-a.w||b.gd-a.gd||b.gf-a.gf);
 }
 
 // ════════════════════════════════════════════════
