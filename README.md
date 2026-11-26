@@ -43,17 +43,17 @@ A página **Classificação** (Série A e B) mostra escudo, zonas (com texto, n�
 
 | Base | Cobertura | Jogos |
 |------|-----------|-------|
-| Brasileirão (clubes) | 2003 – rodada 35 de 2026 + 3 jogos da 36ª (+ adiados da 21ª) | 9 518 |
+| Brasileirão (clubes) | 2003 – rodada 36 de 2026 + 1 jogo da 37ª (+ adiados da 21ª) | 9 526 |
 | Seleções | 1872 – 2026 | 49 000+ |
 | Série B | 2007 – 2026 completa, 38 rodadas (2026 com rodadas reais da CBF) | 7 600 |
 
-Faltam no Brasileirão 2026: 27 jogos (353 de 380 disputados), o resto da rodada 36 e as rodadas 37 e 38 (até 2 dez). O adiado da 21ª, Chapecoense 0×2 Vasco, já foi jogado.
+Faltam no Brasileirão 2026: 19 jogos (361 de 380 disputados), 9 da rodada 37 e a rodada 38 (2 dez). O adiado da 21ª, Chapecoense 0×2 Vasco, já foi jogado.
 
-Precisão do modelo de clubes (backtest walk-forward; Série A n = 1 113, Série B n = 1 140):
+Precisão do modelo de clubes (backtest walk-forward; Série A n = 1 121, Série B n = 1 140):
 
 | | log-loss | RPS | acurácia |
 |---|---|---|---|
-| Série A — modelo | 1,026 | 0,211 | 48,7% |
+| Série A — modelo | 1,027 | 0,211 | 48,6% |
 | Série A — taxa-base fixa 47/27/26 | 1,056 | 0,221 | 47,5% |
 | Série B — modelo | 1,045 | 0,215 | 47,0% |
 | Série B — taxa-base 49/27/24 | 1,054 | 0,218 | 47,8% |
