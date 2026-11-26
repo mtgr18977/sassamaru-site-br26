@@ -21,7 +21,7 @@
     'serie-a-2026': {
       competicao: 'serie-a',
       temporada: 2026,
-      atualizadoEm: '2026-11-22',
+      atualizadoEm: '2026-11-26',
       fonte: 'CBF (tabela detalhada), conferida em valorfinal.com.br e Wikipedia',
       rodadas: [
         { n: 1,  inicio: '2026-01-28', fim: '2026-01-29', status: C },
@@ -59,7 +59,7 @@
         { n: 33, inicio: '2026-10-28', fim: '2026-10-31', status: C },
         { n: 34, inicio: '2026-11-02', fim: '2026-11-06', status: C },
         { n: 35, inicio: '2026-11-14', fim: '2026-11-19', status: C },
-        { n: 36, inicio: '2026-11-21', fim: '2026-11-25', status: K },
+        { n: 36, inicio: '2026-11-21', fim: '2026-11-25', status: C },
         { n: 37, inicio: '2026-11-24', fim: '2026-11-29', status: K },
         { n: 38, inicio: '2026-12-02', fim: '2026-12-02', status: K },
       ],
@@ -67,16 +67,8 @@
       pendentes: [
       ],
       // jogos das próximas rodadas (horário de Brasília) — só as rodadas já detalhadas pela CBF
-      // (36ª: tabela das rodadas 35 e 36, de 30/10; 37ª e 38ª: tabela de 06/11)
+      // (37ª e 38ª: tabela de 06/11; Chapecoense 3×0 Palmeiras, da 37ª, foi antecipado para 24/11 e já está no CSV)
       jogos: [
-        { rodada: 36, data: '2026-11-22', hora: '16:00', mandante: 'Athletico Paranaense', visitante: 'Remo' },
-        { rodada: 36, data: '2026-11-22', hora: '18:30', mandante: 'Fluminense', visitante: 'Mirassol' },
-        { rodada: 36, data: '2026-11-22', hora: '19:30', mandante: 'Bragantino', visitante: 'Vasco' },
-        { rodada: 36, data: '2026-11-23', hora: '19:30', mandante: 'Internacional', visitante: 'Vitória' },
-        { rodada: 36, data: '2026-11-23', hora: '20:00', mandante: 'Botafogo', visitante: 'São Paulo' },
-        { rodada: 36, data: '2026-11-23', hora: '21:00', mandante: 'Santos', visitante: 'Grêmio' },
-        { rodada: 36, data: '2026-11-25', hora: '20:00', mandante: 'Atlético Mineiro', visitante: 'Corinthians' },
-        { rodada: 37, data: '2026-11-24', hora: '18:00', mandante: 'Chapecoense', visitante: 'Palmeiras' },
         { rodada: 37, data: '2026-11-26', hora: '20:00', mandante: 'São Paulo', visitante: 'Remo' },
         { rodada: 37, data: '2026-11-27', hora: '20:00', mandante: 'Fluminense', visitante: 'Cruzeiro' },
         { rodada: 37, data: '2026-11-28', hora: '21:00', mandante: 'Botafogo', visitante: 'Bahia' },
@@ -101,7 +93,7 @@
     'serie-b-2026': {
       competicao: 'serie-b',
       temporada: 2026,
-      atualizadoEm: '2026-11-22',
+      atualizadoEm: '2026-11-26',
       fonte: 'CBF (tabela básica); resultados conferidos na Wikipedia (pt e en)',
       rodadas: [
         { n: 1, inicio: null, fim: null, status: C },
@@ -158,11 +150,11 @@
         fonte: 'CBF (tabela dos playoffs, de 16/11); jogos conferidos na Wikipedia (en)',
         confrontos: [
           { id: 'A', pos: [3, 6], melhor: 'Vila Nova', pior: 'Atlético-GO', jogos: [
-            { fase: 'ida',   data: '2026-11-22', hora: '18:30', mandante: 'Atlético-GO', visitante: 'Vila Nova', estadio: 'Antônio Accioly, Goiânia', placar: null },
+            { fase: 'ida',   data: '2026-11-22', hora: '18:30', mandante: 'Atlético-GO', visitante: 'Vila Nova', estadio: 'Antônio Accioly, Goiânia', placar: [1, 1] },
             { fase: 'volta', data: '2026-11-27', hora: '20:00', mandante: 'Vila Nova', visitante: 'Atlético-GO', estadio: 'Onésio Brasileiro Alvarenga, Goiânia', placar: null },
           ] },
           { id: 'B', pos: [4, 5], melhor: 'Fortaleza', pior: 'Criciúma', jogos: [
-            { fase: 'ida',   data: '2026-11-22', hora: '16:00', mandante: 'Criciúma', visitante: 'Fortaleza', estadio: 'Heriberto Hülse, Criciúma', placar: null },
+            { fase: 'ida',   data: '2026-11-22', hora: '16:00', mandante: 'Criciúma', visitante: 'Fortaleza', estadio: 'Heriberto Hülse, Criciúma', placar: [1, 0] },
             { fase: 'volta', data: '2026-11-28', hora: '20:00', mandante: 'Fortaleza', visitante: 'Criciúma', estadio: 'Castelão, Fortaleza', placar: null },
           ] },
         ],
